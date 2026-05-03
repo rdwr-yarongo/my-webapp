@@ -5,34 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alteon ADC Demo Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
     <div class="app-shell">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>Alteon ADC Demo</h2>
+                <h2><i class="bi bi-diagram-3"></i> Alteon ADC Demo</h2>
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="#" data-section="scenario-1" class="active">Scenario 1</a></li>
-                    <li><a href="#" data-section="scenario-2">Scenario 2</a></li>
+                    <li><a href="#" data-section="scenario-1" class="active">Scenario 1 - GSLB</a></li>
+                    <li><a href="#" data-section="scenario-2">Scenario 2 - HA Failover</a></li>
                     <li><a href="#" data-section="scenario-3">Scenario 3</a></li>
-                    <li><a href="#" data-section="settings">Settings</a></li>
+                    <li><a href="#" data-section="settings"><i class="bi bi-sliders nav-item-icon"></i>Settings</a></li>
                 </ul>
             </nav>
         </aside>
         <main class="main-content">
             <section id="scenario-1" class="content-section active">
-                <h1>Scenario 1</h1>
+                <h1><i class="bi bi-play-btn headline-icon"></i>Scenario 1</h1>
                 <div class="panel">
-                    <h3>Run Scenario 1</h3>
+                    <h3><i class="bi bi-caret-right-square headline-icon"></i>Run Scenario 1</h3>
                     <p>Start the GSLB live execution attempts for app1.radware.lab.</p>
                     <button class="btn btn-primary" onclick="executeScenario('gslb_rr')">Execute Scenario 1</button>
                 </div>
                 <div class="panel">
-                    <h3>Global Site Load Balancing Demonstration</h3>
+                    <h3><i class="bi bi-globe2 headline-icon"></i>Global Site Load Balancing Demonstration</h3>
                     <p>In this section we will demonstrate global site load balancing.</p>
-                    <p>Please note Main site has two links and DR site has one link:</p>
+                    <p>Please note: the Main site has two links, and the DR site has one link:</p>
                     <ul>
                         <li>Site A ISP link 1 is represented by VIP 10.100.4.54</li>
                         <li>Site A ISP link 2 is represented by VIP 10.100.5.54</li>
@@ -76,23 +77,23 @@
                 </div>
             </section>
             <section id="scenario-2" class="content-section">
-                <h1>Scenario 2</h1>
+                <h1><i class="bi bi-diagram-2 headline-icon"></i>Scenario 2</h1>
                 <div class="panel">
                     <h3>Coming Soon</h3>
                     <p>Use this section for your next GSLB/ADC flow.</p>
                 </div>
             </section>
             <section id="scenario-3" class="content-section">
-                <h1>Scenario 3</h1>
+                <h1><i class="bi bi-signpost-split headline-icon"></i>Scenario 3</h1>
                 <div class="panel">
                     <h3>Coming Soon</h3>
                     <p>Add additional scenarios here and link them from the left sidebar.</p>
                 </div>
             </section>
             <section id="settings" class="content-section">
-                <h1>Settings</h1>
+                <h1><i class="bi bi-gear headline-icon"></i>Settings</h1>
                 <div class="panel">
-                    <h3>DNS Configuration</h3>
+                    <h3><i class="bi bi-hdd-network headline-icon"></i>DNS Configuration</h3>
                     <div class="form-group">
                         <label for="dns-domain">Test Domain:</label>
                         <input type="text" id="dns-domain" value="example.com">
@@ -104,7 +105,7 @@
         </main>
         <aside id="results-sidebar" class="results-sidebar">
             <div class="results-sidebar-header">
-                <h2>Execution Results</h2>
+                <h2><i class="bi bi-bar-chart-line"></i> Execution Results</h2>
             </div>
             <div id="results-content" class="results-content">
                 <p>No results yet. Execute a scenario to see results here.</p>
