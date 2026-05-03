@@ -343,6 +343,11 @@ p {
     margin-bottom: var(--spacing-4);
 }
 
+.error {
+    color: #ff7b7b;
+    font-weight: 500;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .app-shell {
