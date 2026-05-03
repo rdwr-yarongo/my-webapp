@@ -14,86 +14,36 @@
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="#" data-section="scenarios" class="active">Scenarios</a></li>
+                    <li><a href="#" data-section="scenario-1" class="active">Scenario 1</a></li>
+                    <li><a href="#" data-section="scenario-2">Scenario 2</a></li>
+                    <li><a href="#" data-section="scenario-3">Scenario 3</a></li>
                     <li><a href="#" data-section="settings">Settings</a></li>
                 </ul>
             </nav>
         </aside>
         <main class="main-content">
-            <section id="scenarios" class="content-section active">
-                <h1>Scenarios</h1>
-                <div class="tabs">
-                    <button class="tab-btn active" data-tab="gslb">GSLB & HA</button>
-                    <button class="tab-btn" data-tab="ssl">SSL & L7</button>
-                    <button class="tab-btn" data-tab="content">Content Based</button>
-                    <button class="tab-btn" data-tab="other">Other</button>
-                </div>
-                <div id="gslb-tab" class="tab-content active">
-                    <div class="scenario-grid">
-                        <div class="scenario-card">
-                            <h3>Round Robin Global Load Balancing</h3>
-                            <p>Distribute traffic across global servers</p>
-                            <button class="btn btn-primary" onclick="executeScenario('gslb_rr')">Execute</button>
-                        </div>
-                        <div class="scenario-card">
-                            <h3>Local and Global High Availability</h3>
-                            <p>Ensure service continuity</p>
-                            <button class="btn btn-primary" onclick="executeScenario('ha')">Execute</button>
-                        </div>
+            <section id="scenario-1" class="content-section active">
+                <h1>Scenario 1</h1>
+                <div class="scenario-grid">
+                    <div class="scenario-card">
+                        <h3>Round Robin Global Load Balancing</h3>
+                        <p>Distribute traffic across global servers</p>
+                        <button class="btn btn-primary" onclick="executeScenario('gslb_rr')">Execute</button>
                     </div>
                 </div>
-                <div id="ssl-tab" class="tab-content">
-                    <div class="scenario-grid">
-                        <div class="scenario-card">
-                            <h3>Browse Directly to Web Server</h3>
-                            <p>Direct access without ADC</p>
-                            <button class="btn btn-primary" onclick="executeScenario('direct')">Execute</button>
-                        </div>
-                        <div class="scenario-card">
-                            <h3>HTTP Header Injection</h3>
-                            <p>Add custom headers via ADC</p>
-                            <button class="btn btn-primary" onclick="executeScenario('header_injection')">Execute</button>
-                            <a href="http://localhost:5001" target="_blank" class="btn btn-secondary">View Post-ADC</a>
-                        </div>
-                        <div class="scenario-card">
-                            <h3>HTTP Body Modification</h3>
-                            <p>Modify request/response bodies</p>
-                            <button class="btn btn-primary" onclick="executeScenario('body_mod')">Execute</button>
-                        </div>
-                        <div class="scenario-card">
-                            <h3>Compression Offloading</h3>
-                            <p>Enable gzip compression</p>
-                            <button class="btn btn-primary" onclick="executeScenario('compression')">Execute</button>
-                        </div>
-                    </div>
+            </section>
+            <section id="scenario-2" class="content-section">
+                <h1>Scenario 2</h1>
+                <div class="panel">
+                    <h3>Coming Soon</h3>
+                    <p>Use this section for your next GSLB/ADC flow.</p>
                 </div>
-                <div id="content-tab" class="tab-content">
-                    <div class="scenario-grid">
-                        <div class="scenario-card">
-                            <h3>HTTP Content Based Rules</h3>
-                            <p>Route based on HTTP content</p>
-                            <button class="btn btn-primary" onclick="executeScenario('http_content')">Execute</button>
-                        </div>
-                        <div class="scenario-card">
-                            <h3>HTTPS Content Based Rules</h3>
-                            <p>Route based on HTTPS content</p>
-                            <button class="btn btn-primary" onclick="executeScenario('https_content')">Execute</button>
-                        </div>
-                    </div>
-                </div>
-                <div id="other-tab" class="tab-content">
-                    <div class="scenario-grid">
-                        <div class="scenario-card">
-                            <h3>HTTP2 Gateway</h3>
-                            <p>HTTP2 protocol handling</p>
-                            <button class="btn btn-primary" onclick="executeScenario('http2')">Execute</button>
-                        </div>
-                        <div class="scenario-card">
-                            <h3>Advanced Analytics</h3>
-                            <p>Cyber controller analytics</p>
-                            <button class="btn btn-primary" onclick="executeScenario('analytics')">Execute</button>
-                        </div>
-                    </div>
+            </section>
+            <section id="scenario-3" class="content-section">
+                <h1>Scenario 3</h1>
+                <div class="panel">
+                    <h3>Coming Soon</h3>
+                    <p>Add additional scenarios here and link them from the left sidebar.</p>
                 </div>
             </section>
             <section id="settings" class="content-section">

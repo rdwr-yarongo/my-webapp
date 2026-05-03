@@ -57,6 +57,45 @@ function buildIframeDocument(html, baseHref) {
     return `<!doctype html><html><head><base href="${safeBase}"></head><body>${sourceHtml}</body></html>`;
 }
 
+function getGslbConceptDiagramHtml() {
+    return `
+        <div class="panel">
+            <h3>How GSLB Works (Behind The Scenes)</h3>
+            <svg viewBox="0 0 900 310" width="100%" height="260" role="img" aria-label="GSLB flow diagram">
+                <defs>
+                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#111"></path>
+                    </marker>
+                </defs>
+                <rect x="20" y="120" width="140" height="70" rx="6" fill="#f4f6f8" stroke="#607080"/>
+                <text x="90" y="160" text-anchor="middle" fill="#1f2d3d" font-size="16">Lab Controller</text>
+
+                <rect x="250" y="105" width="130" height="100" rx="6" fill="#f4f6f8" stroke="#607080"/>
+                <text x="315" y="160" text-anchor="middle" fill="#1f2d3d" font-size="16">DNS Server</text>
+
+                <rect x="560" y="35" width="140" height="55" rx="6" fill="#f4f6f8" stroke="#607080"/>
+                <text x="630" y="67" text-anchor="middle" fill="#1f2d3d" font-size="14">Site B / Alteon</text>
+
+                <rect x="560" y="128" width="140" height="55" rx="6" fill="#f4f6f8" stroke="#607080"/>
+                <text x="630" y="160" text-anchor="middle" fill="#1f2d3d" font-size="14">Site A / Alteon #1</text>
+
+                <rect x="560" y="220" width="140" height="55" rx="6" fill="#f4f6f8" stroke="#607080"/>
+                <text x="630" y="252" text-anchor="middle" fill="#1f2d3d" font-size="14">Site A / Alteon #2</text>
+
+                <line x1="160" y1="145" x2="248" y2="145" stroke="#111" stroke-width="3" marker-end="url(#arrow)"/>
+                <line x1="248" y1="172" x2="160" y2="172" stroke="#111" stroke-width="3" marker-end="url(#arrow)"/>
+
+                <line x1="380" y1="125" x2="558" y2="62" stroke="#111" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+                <line x1="380" y1="155" x2="558" y2="155" stroke="#111" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+                <line x1="380" y1="185" x2="558" y2="248" stroke="#111" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+
+                <text x="450" y="22" fill="#334" font-size="16">Repeated attempts = repeated DNS decisions</text>
+            </svg>
+            <p><small>Flow: Controller asks DNS for app1.radware.lab, DNS returns one destination per attempt based on GSLB policy, controller then sends HTTP to that selected target.</small></p>
+        </div>
+    `;
+}
+
 function renderGslbResults(data, scenarioId) {
     const resultsContent = document.getElementById('results-content');
     const dnsOptions = (data.dns_options || []).map(ip => `<li>${escapeHtml(ip)}</li>`).join('');
@@ -80,7 +119,7 @@ function renderGslbResults(data, scenarioId) {
 
         const iframe = document.createElement('iframe');
         iframe.sandbox = 'allow-same-origin';
-        iframe.style.cssText = 'width:100%;height:320px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
+        iframe.style.cssText = 'width:100%;height:520px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
         const baseHref = result.final_url || (result.target_ip ? `http://${result.target_ip}/` : '');
         iframe.srcdoc = buildIframeDocument(result.body_html || '', baseHref);
         const wrapper = document.createElement('div');
@@ -108,6 +147,7 @@ function renderGslbResults(data, scenarioId) {
             ${data.warning ? `<p class="error">${escapeHtml(data.warning)}</p>` : ''}
             <p><small>Executed at: ${new Date().toLocaleString()}</small></p>
         </div>
+        ${getGslbConceptDiagramHtml()}
         ${httpResults}
     `;
 }
@@ -168,6 +208,7 @@ function startGslbStream() {
             <p><strong>Target:</strong> app1.radware.lab &nbsp;|&nbsp; <strong>DNS:</strong> 10.100.1.30</p>
             <span id="gslb-live-indicator" style="display:inline-block;padding:2px 8px;background:#28a745;color:#fff;border-radius:4px;font-size:12px;font-weight:600;">&#9679; LIVE</span>
         </div>
+        ${getGslbConceptDiagramHtml()}
         <div id="gslb-attempts"></div>
     `;
     const sidebar = document.querySelector('.results-sidebar-header');
@@ -197,7 +238,7 @@ function startGslbStream() {
             panel.innerHTML = `<h4>Attempt ${escapeHtml(result.attempt)} — ${escapeHtml(result.target_ip)}</h4><p>Resolved: ${escapeHtml((result.resolved_records || []).join(', '))} &nbsp;|&nbsp; Status: ${escapeHtml(result.status_code)} &nbsp;|&nbsp; <small>${new Date().toLocaleTimeString()}</small></p>`;
             const iframe = document.createElement('iframe');
             iframe.sandbox = 'allow-same-origin';
-            iframe.style.cssText = 'width:100%;height:300px;border:1px solid #555;border-radius:4px;margin-top:6px;background:#fff;';
+            iframe.style.cssText = 'width:100%;height:520px;border:1px solid #555;border-radius:4px;margin-top:6px;background:#fff;';
             const baseHref = result.final_url || (result.target_ip ? `http://${result.target_ip}/` : '');
             iframe.srcdoc = buildIframeDocument(result.body_html || '', baseHref);
             panel.appendChild(iframe);
