@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alteon ADC Demo Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Alteon ADC Demo</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" data-section="scenarios" class="active">Scenarios</a></li>
+                    <li><a href="#" data-section="settings">Settings</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <section id="scenarios" class="content-section active">
+                <h1>Scenarios</h1>
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="gslb">GSLB & HA</button>
+                    <button class="tab-btn" data-tab="ssl">SSL & L7</button>
+                    <button class="tab-btn" data-tab="content">Content Based</button>
+                    <button class="tab-btn" data-tab="other">Other</button>
+                </div>
+                <div id="gslb-tab" class="tab-content active">
+                    <div class="scenario-grid">
+                        <div class="scenario-card">
+                            <h3>Round Robin Global Load Balancing</h3>
+                            <p>Distribute traffic across global servers</p>
+                            <button class="btn btn-primary" onclick="executeScenario('gslb_rr')">Execute</button>
+                        </div>
+                        <div class="scenario-card">
+                            <h3>Local and Global High Availability</h3>
+                            <p>Ensure service continuity</p>
+                            <button class="btn btn-primary" onclick="executeScenario('ha')">Execute</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="ssl-tab" class="tab-content">
+                    <div class="scenario-grid">
+                        <div class="scenario-card">
+                            <h3>Browse Directly to Web Server</h3>
+                            <p>Direct access without ADC</p>
+                            <button class="btn btn-primary" onclick="executeScenario('direct')">Execute</button>
+                        </div>
+                        <div class="scenario-card">
+                            <h3>HTTP Header Injection</h3>
+                            <p>Add custom headers via ADC</p>
+                            <button class="btn btn-primary" onclick="executeScenario('header_injection')">Execute</button>
+                            <a href="http://localhost:5001" target="_blank" class="btn btn-secondary">View Post-ADC</a>
+                        </div>
+                        <div class="scenario-card">
+                            <h3>HTTP Body Modification</h3>
+                            <p>Modify request/response bodies</p>
+                            <button class="btn btn-primary" onclick="executeScenario('body_mod')">Execute</button>
+                        </div>
+                        <div class="scenario-card">
+                            <h3>Compression Offloading</h3>
+                            <p>Enable gzip compression</p>
+                            <button class="btn btn-primary" onclick="executeScenario('compression')">Execute</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="content-tab" class="tab-content">
+                    <div class="scenario-grid">
+                        <div class="scenario-card">
+                            <h3>HTTP Content Based Rules</h3>
+                            <p>Route based on HTTP content</p>
+                            <button class="btn btn-primary" onclick="executeScenario('http_content')">Execute</button>
+                        </div>
+                        <div class="scenario-card">
+                            <h3>HTTPS Content Based Rules</h3>
+                            <p>Route based on HTTPS content</p>
+                            <button class="btn btn-primary" onclick="executeScenario('https_content')">Execute</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="other-tab" class="tab-content">
+                    <div class="scenario-grid">
+                        <div class="scenario-card">
+                            <h3>HTTP2 Gateway</h3>
+                            <p>HTTP2 protocol handling</p>
+                            <button class="btn btn-primary" onclick="executeScenario('http2')">Execute</button>
+                        </div>
+                        <div class="scenario-card">
+                            <h3>Advanced Analytics</h3>
+                            <p>Cyber controller analytics</p>
+                            <button class="btn btn-primary" onclick="executeScenario('analytics')">Execute</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="settings" class="content-section">
+                <h1>Settings</h1>
+                <div class="panel">
+                    <h3>DNS Configuration</h3>
+                    <div class="form-group">
+                        <label for="dns-domain">Test Domain:</label>
+                        <input type="text" id="dns-domain" value="example.com">
+                        <button class="btn btn-primary" onclick="performDnsLookup()">Lookup</button>
+                    </div>
+                    <div id="dns-result"></div>
+                </div>
+            </section>
+        </main>
+        <aside id="results-sidebar" class="results-sidebar">
+            <div class="results-sidebar-header">
+                <h2>Execution Results</h2>
+            </div>
+            <div id="results-content" class="results-content">
+                <p>No results yet. Execute a scenario to see results here.</p>
+            </div>
+        </aside>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
