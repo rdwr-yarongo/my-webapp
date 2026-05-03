@@ -137,7 +137,7 @@ p {
 }
 
 .results-sidebar {
-    width: 340px;
+    width: 760px;
     background-color: var(--sidebar-bg);
     border-left: 1px solid var(--border-color);
     padding: var(--spacing-16);
@@ -276,6 +276,15 @@ p {
 .btn-secondary {
     background-color: var(--secondary-color);
     color: white;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #a71d2a;
 }
 
 .badge {

@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response, stream_with_context
 import dns.resolver
 import requests
+import json
+import time
 
 app = Flask(__name__)
 
@@ -51,14 +53,13 @@ def run_gslb_rr_demo():
                     timeout=5,
                     allow_redirects=True
                 )
-                preview = ' '.join(response.text.split())[:200]
                 http_results.append({
                     'attempt': attempt,
                     'target_ip': chosen_ip,
                     'resolved_records': ips,
                     'status_code': response.status_code,
                     'final_url': response.url,
-                    'body_preview': preview
+                    'body_html': response.text
                 })
             except Exception as exc:
                 http_results.append({
@@ -92,6 +93,51 @@ def run_gslb_rr_demo():
         'http_results': http_results,
         'warning': warning
     }
+
+@app.route('/api/scenario/gslb_rr/stream')
+def gslb_rr_stream():
+    def generate():
+        target_host = 'app1.radware.lab'
+        dns_server = '10.100.1.30'
+        attempt = 0
+        while True:
+            attempt += 1
+            result = {'attempt': attempt}
+            try:
+                resolver = dns.resolver.Resolver(configure=False)
+                resolver.nameservers = [dns_server]
+                resolver.port = 53
+                resolver.cache = None
+                resolver.timeout = 3
+                resolver.lifetime = 3
+                answers = resolver.resolve(target_host, 'A')
+                ips = [rdata.address for rdata in answers]
+                result['resolved_records'] = ips
+                chosen_ip = ips[0]
+                result['target_ip'] = chosen_ip
+                try:
+                    response = requests.get(
+                        f'http://{chosen_ip}/',
+                        headers={'Host': target_host, 'Cache-Control': 'no-cache', 'Pragma': 'no-cache'},
+                        timeout=5,
+                        allow_redirects=True
+                    )
+                    result['status_code'] = response.status_code
+                    result['final_url'] = response.url
+                    result['body_html'] = response.text
+                except Exception as exc:
+                    result['http_error'] = str(exc)
+            except Exception as exc:
+                result['dns_error'] = str(exc)
+            yield f"data: {json.dumps(result)}\n\n"
+            time.sleep(3)
+
+    return Response(
+        stream_with_context(generate()),
+        content_type='text/event-stream',
+        headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'}
+    )
+
 
 @app.route('/')
 def index():

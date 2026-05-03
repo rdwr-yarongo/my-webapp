@@ -59,16 +59,19 @@ function renderGslbResults(data, scenarioId) {
             `;
         }
 
-        return `
-            <div class="panel">
-                <h4>HTTP Attempt ${escapeHtml(result.attempt)} (${escapeHtml(result.target_ip)})</h4>
-                <p>Resolved A Records: ${escapeHtml((result.resolved_records || []).join(', ') || 'n/a')}</p>
-                <p>Scheme: HTTP</p>
-                <p>Status: ${escapeHtml(result.status_code)}</p>
-                <p>Final URL: ${escapeHtml(result.final_url)}</p>
-                <p>Body Preview: ${escapeHtml(result.body_preview || '')}</p>
-            </div>
+        const iframe = document.createElement('iframe');
+        iframe.sandbox = 'allow-same-origin';
+        iframe.style.cssText = 'width:100%;height:320px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
+        iframe.srcdoc = result.body_html || '';
+        const wrapper = document.createElement('div');
+        wrapper.className = 'panel';
+        wrapper.innerHTML = `
+            <h4>HTTP Attempt ${escapeHtml(result.attempt)} &mdash; ${escapeHtml(result.target_ip)}</h4>
+            <p>Resolved A Records: ${escapeHtml((result.resolved_records || []).join(', ') || 'n/a')}</p>
+            <p>Scheme: HTTP &nbsp;|&nbsp; Status: ${escapeHtml(result.status_code)} &nbsp;|&nbsp; URL: ${escapeHtml(result.final_url)}</p>
         `;
+        wrapper.appendChild(iframe);
+        return wrapper.outerHTML;
     }).join('');
 
     resultsContent.innerHTML = `
@@ -118,8 +121,80 @@ function performDnsLookup() {
     });
 }
 
+// Active SSE source for GSLB streaming
+let gslbEventSource = null;
+
+function stopGslbStream() {
+    if (gslbEventSource) {
+        gslbEventSource.close();
+        gslbEventSource = null;
+    }
+    const btn = document.getElementById('gslb-stop-btn');
+    if (btn) btn.remove();
+    const indicator = document.getElementById('gslb-live-indicator');
+    if (indicator) {
+        indicator.style.background = '#dc3545';
+        indicator.textContent = '\u25CF STOPPED';
+        indicator.id = '';
+    }
+}
+
+function startGslbStream() {
+    stopGslbStream();
+    const resultsContent = document.getElementById('results-content');
+    resultsContent.innerHTML = `
+        <div class="panel">
+            <h3>Round Robin Global Load Balancing — Live</h3>
+            <p><strong>Target:</strong> app1.radware.lab &nbsp;|&nbsp; <strong>DNS:</strong> 10.100.1.30</p>
+            <span id="gslb-live-indicator" style="display:inline-block;padding:2px 8px;background:#28a745;color:#fff;border-radius:4px;font-size:12px;font-weight:600;">&#9679; LIVE</span>
+        </div>
+        <div id="gslb-attempts"></div>
+    `;
+    const sidebar = document.querySelector('.results-sidebar-header');
+    if (sidebar && !document.getElementById('gslb-stop-btn')) {
+        const btn = document.createElement('button');
+        btn.id = 'gslb-stop-btn';
+        btn.className = 'btn btn-danger';
+        btn.textContent = 'Stop';
+        btn.style.cssText = 'padding:4px 12px;font-size:12px;';
+        btn.onclick = stopGslbStream;
+        sidebar.appendChild(btn);
+    }
+
+    gslbEventSource = new EventSource('/api/scenario/gslb_rr/stream');
+
+    gslbEventSource.onmessage = function(event) {
+        const result = JSON.parse(event.data);
+        const attemptsDiv = document.getElementById('gslb-attempts');
+        if (!attemptsDiv) return;
+        const panel = document.createElement('div');
+        panel.className = 'panel';
+        if (result.dns_error) {
+            panel.innerHTML = `<h4>Attempt ${escapeHtml(result.attempt)}</h4><p class="error">DNS Error: ${escapeHtml(result.dns_error)}</p><p><small>${new Date().toLocaleTimeString()}</small></p>`;
+        } else if (result.http_error) {
+            panel.innerHTML = `<h4>Attempt ${escapeHtml(result.attempt)} — ${escapeHtml(result.target_ip)}</h4><p>Resolved: ${escapeHtml((result.resolved_records || []).join(', '))}</p><p class="error">HTTP Error: ${escapeHtml(result.http_error)}</p><p><small>${new Date().toLocaleTimeString()}</small></p>`;
+        } else {
+            panel.innerHTML = `<h4>Attempt ${escapeHtml(result.attempt)} — ${escapeHtml(result.target_ip)}</h4><p>Resolved: ${escapeHtml((result.resolved_records || []).join(', '))} &nbsp;|&nbsp; Status: ${escapeHtml(result.status_code)} &nbsp;|&nbsp; <small>${new Date().toLocaleTimeString()}</small></p>`;
+            const iframe = document.createElement('iframe');
+            iframe.sandbox = 'allow-same-origin';
+            iframe.style.cssText = 'width:100%;height:300px;border:1px solid #555;border-radius:4px;margin-top:6px;background:#fff;';
+            iframe.srcdoc = result.body_html || '';
+            panel.appendChild(iframe);
+        }
+        attemptsDiv.insertBefore(panel, attemptsDiv.firstChild);
+    };
+
+    gslbEventSource.onerror = function() {
+        stopGslbStream();
+    };
+}
+
 // Scenario execution
 function executeScenario(scenarioId) {
+    if (scenarioId === 'gslb_rr') {
+        startGslbStream();
+        return;
+    }
     fetch('/api/scenario/' + scenarioId, {
         method: 'POST'
     })
@@ -127,10 +202,6 @@ function executeScenario(scenarioId) {
     .then(data => {
         const resultsContent = document.getElementById('results-content');
         if (data.success) {
-            if (scenarioId === 'gslb_rr' && Array.isArray(data.http_results)) {
-                renderGslbResults(data, scenarioId);
-                return;
-            }
             resultsContent.innerHTML = `
                 <div class="panel">
                     <h3>Scenario Executed: ${scenarioId}</h3>
