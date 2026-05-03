@@ -38,6 +38,25 @@ function escapeHtml(value) {
         .replace(/'/g, '&#39;');
 }
 
+function buildIframeDocument(html, baseHref) {
+    const safeBase = String(baseHref || '').replace(/"/g, '&quot;');
+    const sourceHtml = html || '';
+
+    if (!sourceHtml) {
+        return `<!doctype html><html><head><base href="${safeBase}"></head><body></body></html>`;
+    }
+
+    if (/<head[^>]*>/i.test(sourceHtml)) {
+        return sourceHtml.replace(/<head([^>]*)>/i, `<head$1><base href="${safeBase}">`);
+    }
+
+    if (/<html[^>]*>/i.test(sourceHtml)) {
+        return sourceHtml.replace(/<html([^>]*)>/i, `<html$1><head><base href="${safeBase}"></head>`);
+    }
+
+    return `<!doctype html><html><head><base href="${safeBase}"></head><body>${sourceHtml}</body></html>`;
+}
+
 function renderGslbResults(data, scenarioId) {
     const resultsContent = document.getElementById('results-content');
     const dnsOptions = (data.dns_options || []).map(ip => `<li>${escapeHtml(ip)}</li>`).join('');
@@ -62,7 +81,8 @@ function renderGslbResults(data, scenarioId) {
         const iframe = document.createElement('iframe');
         iframe.sandbox = 'allow-same-origin';
         iframe.style.cssText = 'width:100%;height:320px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
-        iframe.srcdoc = result.body_html || '';
+        const baseHref = result.final_url || (result.target_ip ? `http://${result.target_ip}/` : '');
+        iframe.srcdoc = buildIframeDocument(result.body_html || '', baseHref);
         const wrapper = document.createElement('div');
         wrapper.className = 'panel';
         wrapper.innerHTML = `
@@ -178,7 +198,8 @@ function startGslbStream() {
             const iframe = document.createElement('iframe');
             iframe.sandbox = 'allow-same-origin';
             iframe.style.cssText = 'width:100%;height:300px;border:1px solid #555;border-radius:4px;margin-top:6px;background:#fff;';
-            iframe.srcdoc = result.body_html || '';
+            const baseHref = result.final_url || (result.target_ip ? `http://${result.target_ip}/` : '');
+            iframe.srcdoc = buildIframeDocument(result.body_html || '', baseHref);
             panel.appendChild(iframe);
         }
         attemptsDiv.insertBefore(panel, attemptsDiv.firstChild);
