@@ -1,17 +1,17 @@
 :root {
-    /* Design Tokens - Dark Mode Only */
-    --primary-color: #007bff;
+    /* Design Tokens - Inspired Dark Neon Theme */
+    --primary-color: #c7a66a;
     --secondary-color: #6c757d;
     --success-color: #28a745;
     --warning-color: #ffc107;
     --danger-color: #dc3545;
     --info-color: #17a2b8;
     
-    --bg-color: #1a1a1a;
+    --bg-color: #060c18;
     --text-color: #ffffff;
-    --sidebar-bg: #2d2d2d;
-    --card-bg: #333333;
-    --border-color: #555555;
+    --sidebar-bg: rgba(13, 23, 42, 0.72);
+    --card-bg: rgba(10, 20, 40, 0.62);
+    --border-color: rgba(162, 127, 81, 0.24);
     
     --border-radius: 6px;
     
@@ -23,8 +23,8 @@
     --spacing-24: 24px;
     --spacing-32: 32px;
     
-    --shadow: 0 2px 4px rgba(0,0,0,0.3);
-    --shadow-lg: 0 4px 8px rgba(0,0,0,0.4);
+    --shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 18px 36px rgba(0, 0, 0, 0.45);
     
     --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --font-size-base: 13px;
@@ -47,6 +47,10 @@ body {
     font-size: var(--font-size-base);
     line-height: var(--line-height-base);
     background-color: var(--bg-color);
+    background-image:
+        radial-gradient(circle at 4% 88%, rgba(190, 28, 42, 0.36), transparent 36%),
+        radial-gradient(circle at 74% 2%, rgba(255, 192, 94, 0.12), transparent 34%),
+        linear-gradient(120deg, #060b16 0%, #090f1e 42%, #08101d 100%);
     color: var(--text-color);
 }
 
@@ -86,11 +90,12 @@ p {
 }
 
 .sidebar {
-    width: 220px;
-    background-color: var(--sidebar-bg);
+    width: 260px;
+    background: linear-gradient(180deg, rgba(8, 16, 30, 0.88) 0%, rgba(20, 10, 16, 0.76) 100%);
     padding: var(--spacing-16);
     border-right: 1px solid var(--border-color);
     flex-shrink: 0;
+    backdrop-filter: blur(8px);
 }
 
 .sidebar-header {
@@ -103,11 +108,12 @@ p {
 .sidebar-header h2 {
     font-size: var(--font-size-lg);
     margin-bottom: 0;
+    letter-spacing: 0.2px;
 }
 
 .sidebar-header h2 i,
 .results-sidebar-header h2 i {
-    color: #63b3ff;
+    color: #d5b980;
     margin-right: var(--spacing-8);
 }
 
@@ -123,25 +129,30 @@ p {
     display: flex;
     align-items: center;
     gap: var(--spacing-4);
-    padding: var(--spacing-8) var(--spacing-12);
+    padding: 10px 12px;
     text-decoration: none;
     color: var(--text-color);
     border-radius: var(--border-radius);
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, box-shadow 0.2s, border-color 0.2s;
     font-size: var(--font-size-sm);
+    border: 1px solid transparent;
+    font-weight: 600;
 }
 
 .sidebar-nav a::before {
     content: '\25B8';
-    color: #8aa7c7;
+    color: #c8ab75;
     font-size: 11px;
     margin-right: 0;
+    opacity: 0.95;
 }
 
 .sidebar-nav a:hover,
 .sidebar-nav a.active {
-    background-color: var(--primary-color);
+    background: linear-gradient(90deg, rgba(132, 101, 48, 0.45) 0%, rgba(198, 40, 40, 0.68) 100%);
     color: white;
+    border-color: rgba(216, 170, 97, 0.35);
+    box-shadow: 0 10px 20px rgba(127, 21, 32, 0.28);
 }
 
 .sidebar-nav a:hover::before,
@@ -156,7 +167,7 @@ p {
 
 .headline-icon {
     margin-right: var(--spacing-8);
-    color: #63b3ff;
+    color: #d8bb82;
     font-size: 0.95em;
     vertical-align: -1px;
 }
@@ -169,13 +180,15 @@ p {
 }
 
 .results-sidebar {
-    width: 760px;
-    background-color: var(--sidebar-bg);
+    width: min(46vw, 760px);
+    min-width: 460px;
+    background: linear-gradient(180deg, rgba(8, 18, 35, 0.8) 0%, rgba(20, 13, 24, 0.72) 100%);
     border-left: 1px solid var(--border-color);
     padding: var(--spacing-16);
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
+    backdrop-filter: blur(8px);
 }
 
 .results-sidebar-header {
@@ -211,7 +224,7 @@ p {
 .card, .scenario-card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
+    border-radius: 12px;
     padding: var(--spacing-16);
     box-shadow: var(--shadow);
     transition: box-shadow 0.2s;
@@ -297,12 +310,13 @@ p {
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
+    background: linear-gradient(90deg, #7d5d2e 0%, #b33a38 100%);
     color: white;
+    box-shadow: 0 8px 20px rgba(125, 93, 46, 0.24);
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
+    background: linear-gradient(90deg, #94703a 0%, #cb4b48 100%);
 }
 
 .btn-secondary {
@@ -336,9 +350,31 @@ p {
 .panel {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
+    border-radius: 12px;
     padding: var(--spacing-16);
     margin-bottom: var(--spacing-16);
+    box-shadow: var(--shadow);
+}
+
+.panel h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-12);
+    margin-top: 0;
+}
+
+.panel h3 i {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: linear-gradient(145deg, rgba(137, 103, 53, 0.4) 0%, rgba(63, 34, 43, 0.54) 100%);
+    border: 1px solid rgba(214, 169, 95, 0.3);
+    color: #e7cf9e;
+    margin-right: 0;
+    font-size: 16px;
 }
 
 .panel ul {
@@ -349,10 +385,6 @@ p {
 
 .panel li {
     margin-bottom: var(--spacing-4);
-}
-
-.panel h3 {
-    margin-top: 0;
 }
 
 .form-group {
@@ -371,7 +403,7 @@ p {
     padding: var(--spacing-8);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    background-color: var(--bg-color);
+    background-color: rgba(7, 13, 24, 0.84);
     color: var(--text-color);
     font-size: var(--font-size-sm);
 }
@@ -379,10 +411,29 @@ p {
 #dns-result {
     margin-top: var(--spacing-8);
     padding: var(--spacing-12);
-    background-color: var(--card-bg);
+    background-color: rgba(8, 14, 27, 0.74);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     font-size: var(--font-size-sm);
+}
+
+h1 {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-8);
+}
+
+h1 .headline-icon {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid rgba(213, 165, 91, 0.35);
+    background: rgba(56, 35, 28, 0.5);
+    margin-right: 0;
+    font-size: 14px;
 }
 
 #dns-result ul {
