@@ -84,6 +84,12 @@ p {
     font-size: var(--font-size-sm);
 }
 
+svg + p,
+p + svg {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
 .app-shell {
     display: flex;
     min-height: 100vh;
@@ -271,6 +277,12 @@ p {
     margin-bottom: var(--spacing-12);
     flex-grow: 1;
     font-size: var(--font-size-sm);
+}
+
+svg {
+    display: block;
+    margin: 0;
+    padding: 0;
 }
 
 .tabs {
