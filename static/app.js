@@ -38,23 +38,36 @@ function escapeHtml(value) {
         .replace(/'/g, '&#39;');
 }
 
-function buildIframeDocument(html, baseHref) {
+function buildIframeDocument(html, baseHref, protocolFallback) {
     const safeBase = String(baseHref || '').replace(/"/g, '&quot;');
     const sourceHtml = html || '';
+    const safeProtocol = String(protocolFallback || '').replace(/"/g, '&quot;');
+
+    const protocolPatchScript = safeProtocol
+        ? `<script>(function(){function apply(){var el=document.getElementById('ProtocolVer');if(!el)return;var v=(el.textContent||'').trim();if(!v||/^Detecting\.\.\.$/i.test(v)||/^Unavailable$/i.test(v)){el.textContent='${safeProtocol}';}}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){setTimeout(apply,150);});}else{setTimeout(apply,150);}})();<\/script>`
+        : '';
+
+    function addProtocolPatch(doc) {
+        if (!protocolPatchScript) return doc;
+        if (/<\/body>/i.test(doc)) {
+            return doc.replace(/<\/body>/i, `${protocolPatchScript}</body>`);
+        }
+        return `${doc}${protocolPatchScript}`;
+    }
 
     if (!sourceHtml) {
-        return `<!doctype html><html><head><base href="${safeBase}"></head><body></body></html>`;
+        return addProtocolPatch(`<!doctype html><html><head><base href="${safeBase}"></head><body></body></html>`);
     }
 
     if (/<head[^>]*>/i.test(sourceHtml)) {
-        return sourceHtml.replace(/<head([^>]*)>/i, `<head$1><base href="${safeBase}">`);
+        return addProtocolPatch(sourceHtml.replace(/<head([^>]*)>/i, `<head$1><base href="${safeBase}">`));
     }
 
     if (/<html[^>]*>/i.test(sourceHtml)) {
-        return sourceHtml.replace(/<html([^>]*)>/i, `<html$1><head><base href="${safeBase}"></head>`);
+        return addProtocolPatch(sourceHtml.replace(/<html([^>]*)>/i, `<html$1><head><base href="${safeBase}"></head>`));
     }
 
-    return `<!doctype html><html><head><base href="${safeBase}"></head><body>${sourceHtml}</body></html>`;
+    return addProtocolPatch(`<!doctype html><html><head><base href="${safeBase}"></head><body>${sourceHtml}</body></html>`);
 }
 
 function renderGslbResults(data, scenarioId) {
@@ -79,10 +92,11 @@ function renderGslbResults(data, scenarioId) {
         }
 
         const iframe = document.createElement('iframe');
-        iframe.sandbox = 'allow-same-origin';
+        // Required so embedded response pages can execute their own JS and fully render dynamic fields.
+        iframe.sandbox = 'allow-same-origin allow-scripts';
         iframe.style.cssText = 'width:100%;height:520px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
         const baseHref = result.final_url || (result.target_ip ? `http://${result.target_ip}/` : '');
-        iframe.srcdoc = buildIframeDocument(result.body_html || '', baseHref);
+        iframe.srcdoc = buildIframeDocument(result.body_html || '', baseHref, result.protocol_version || 'HTTP/1.1');
         const wrapper = document.createElement('div');
         wrapper.className = 'panel';
         wrapper.innerHTML = `
@@ -196,10 +210,11 @@ function startGslbStream() {
         } else {
             panel.innerHTML = `<h4>Attempt ${escapeHtml(result.attempt)} — ${escapeHtml(result.target_ip)}</h4><p>Resolved: ${escapeHtml((result.resolved_records || []).join(', '))} &nbsp;|&nbsp; Status: ${escapeHtml(result.status_code)} &nbsp;|&nbsp; <small>${new Date().toLocaleTimeString()}</small></p>`;
             const iframe = document.createElement('iframe');
-            iframe.sandbox = 'allow-same-origin';
+            // Required so embedded response pages can execute their own JS and fully render dynamic fields.
+            iframe.sandbox = 'allow-same-origin allow-scripts';
             iframe.style.cssText = 'width:100%;height:520px;border:1px solid #555;border-radius:4px;margin-top:6px;background:#fff;';
             const baseHref = result.final_url || (result.target_ip ? `http://${result.target_ip}/` : '');
-            iframe.srcdoc = buildIframeDocument(result.body_html || '', baseHref);
+            iframe.srcdoc = buildIframeDocument(result.body_html || '', baseHref, result.protocol_version || 'HTTP/1.1');
             panel.appendChild(iframe);
         }
         attemptsDiv.insertBefore(panel, attemptsDiv.firstChild);

@@ -7,6 +7,17 @@ import time
 app = Flask(__name__)
 
 
+def format_http_version(response):
+    raw_version = getattr(getattr(response, 'raw', None), 'version', None)
+    version_map = {
+        9: 'HTTP/0.9',
+        10: 'HTTP/1.0',
+        11: 'HTTP/1.1',
+        20: 'HTTP/2'
+    }
+    return version_map.get(raw_version, 'HTTP/1.1')
+
+
 def run_gslb_rr_demo():
     target_host = 'app1.radware.lab'
     dns_server = '10.100.1.30'
@@ -58,6 +69,7 @@ def run_gslb_rr_demo():
                     'target_ip': chosen_ip,
                     'resolved_records': ips,
                     'status_code': response.status_code,
+                    'protocol_version': format_http_version(response),
                     'final_url': response.url,
                     'body_html': response.text
                 })
@@ -123,6 +135,7 @@ def gslb_rr_stream():
                         allow_redirects=True
                     )
                     result['status_code'] = response.status_code
+                    result['protocol_version'] = format_http_version(response)
                     result['final_url'] = response.url
                     result['body_html'] = response.text
                 except Exception as exc:
