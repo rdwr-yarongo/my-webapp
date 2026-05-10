@@ -39,7 +39,7 @@ function escapeHtml(value) {
 }
 
 function buildIframeDocument(html, baseHref, protocolFallback) {
-    const safeBase = String(baseHref || '').replace(/"/g, '&quot;');
+    const safeBase = String(baseHref || window.location.origin + '/').replace(/"/g, '&quot;');
     const sourceHtml = html || '';
     const safeProtocol = String(protocolFallback || '').replace(/"/g, '&quot;');
 
@@ -74,7 +74,7 @@ function createResponseIframe(result) {
     const iframe = document.createElement('iframe');
     iframe.sandbox = 'allow-same-origin allow-scripts';
     iframe.style.cssText = 'width:100%;height:520px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
-    const baseHref = result.final_url || (result.target_ip ? `http://${result.target_ip}/` : '');
+    const baseHref = window.location.origin + '/';
     iframe.srcdoc = buildIframeDocument(result.body_html || '', baseHref, result.protocol_version || 'HTTP/1.1');
     return iframe;
 }
@@ -248,12 +248,6 @@ function stopHaStream() {
         haEventSource = null;
     }
     removeResultsActionButton('ha-stop-btn');
-    const indicator = document.getElementById('ha-live-indicator');
-    if (indicator) {
-        indicator.style.background = '#dc3545';
-        indicator.textContent = '\u25CF STOPPED';
-        indicator.id = '';
-    }
 }
 
 function startGslbStream() {
@@ -285,45 +279,23 @@ function startGslbStream() {
     };
 }
 
-function renderHaShell(metadata) {
+function renderHaShell() {
     const resultsContent = document.getElementById('results-content');
-    resultsContent.innerHTML = `
-        <div class="panel">
-            <h3>High Availability Failover — Live</h3>
-            <p>${escapeHtml(metadata.message || '')}</p>
-            <p><strong>Target:</strong> ${escapeHtml(metadata.target_host || 'app1.radware.lab')} &nbsp;|&nbsp; <strong>DNS:</strong> ${escapeHtml(metadata.dns_server || '10.100.1.30')}</p>
-            <p><strong>Primary Alteon:</strong> ${escapeHtml(metadata.alteon_primary_ip || '10.100.0.51')} &nbsp;|&nbsp; <strong>Ports:</strong> ${escapeHtml((metadata.ports || []).join(', '))}</p>
-            <span id="ha-live-indicator" style="display:inline-block;padding:2px 8px;background:#28a745;color:#fff;border-radius:4px;font-size:12px;font-weight:600;">&#9679; LIVE</span>
-        </div>
-        <div id="ha-action-results"></div>
-        <div id="ha-attempts"></div>
-    `;
+    resultsContent.innerHTML = '<div id="ha-attempts"></div>';
 }
 
-function renderHaActionResult(data) {
-    const actionResults = document.getElementById('ha-action-results');
-    if (!actionResults) return;
+function renderHaActionError(actionName, errorText) {
+    const attemptsDiv = document.getElementById('ha-attempts');
+    if (!attemptsDiv) return;
 
     const panel = document.createElement('div');
     panel.className = 'panel';
-    const portsMarkup = (data.ports || []).map(portResult => {
-        const outcome = portResult.success ? 'OK' : 'FAILED';
-        const detail = portResult.error
-            ? escapeHtml(portResult.error)
-            : `HTTP ${escapeHtml(portResult.status_code || 'n/a')}`;
-        return `<li>Port ${escapeHtml(portResult.port)} -> state ${escapeHtml(portResult.requested_state)}: ${outcome} (${detail})</li>`;
-    }).join('');
-
     panel.innerHTML = `
-        <h4>${escapeHtml((data.action || 'action').toUpperCase())} command</h4>
-        <p>${escapeHtml(data.message || '')}</p>
-        <p><strong>Alteon:</strong> ${escapeHtml(data.alteon_ip || 'n/a')}</p>
-        <ul>${portsMarkup || '<li>No port results returned</li>'}</ul>
-        ${data.success ? '' : '<p class="error">One or more Alteon API calls failed.</p>'}
+        <h4>${escapeHtml(actionName.toUpperCase())} command</h4>
+        <p class="error">${escapeHtml(errorText)}</p>
         <p><small>${new Date().toLocaleString()}</small></p>
     `;
-
-    actionResults.insertBefore(panel, actionResults.firstChild);
+    attemptsDiv.insertBefore(panel, attemptsDiv.firstChild);
 }
 
 function callHaAction(actionName) {
@@ -332,18 +304,13 @@ function callHaAction(actionName) {
     })
     .then(response => response.json())
     .then(data => {
-        if (!document.getElementById('ha-action-results')) {
+        if (data.success) {
             return;
         }
-        renderHaActionResult(data);
+        renderHaActionError(actionName, data.message || 'One or more Alteon API calls failed.');
     })
     .catch(error => {
-        const actionResults = document.getElementById('ha-action-results');
-        if (!actionResults) return;
-        const panel = document.createElement('div');
-        panel.className = 'panel';
-        panel.innerHTML = `<h4>${escapeHtml(actionName.toUpperCase())} command</h4><p class="error">Error: ${escapeHtml(error)}</p>`;
-        actionResults.insertBefore(panel, actionResults.firstChild);
+        renderHaActionError(actionName, `Error: ${error}`);
     });
 }
 
@@ -360,7 +327,7 @@ function startHaScenario() {
             throw new Error(data.error || 'Unable to start HA monitoring');
         }
 
-        renderHaShell(data);
+        renderHaShell();
         ensureResultsActionButton('ha-stop-btn', 'Stop', stopHaStream);
         haEventSource = new EventSource('/api/scenario/ha_failover/stream');
 

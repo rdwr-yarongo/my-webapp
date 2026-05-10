@@ -165,7 +165,7 @@
                 <h1><i class="bi bi-diagram-2 headline-icon"></i>Scenario 2</h1>
                 <div class="panel">
                     <h3><i class="bi bi-caret-right-square headline-icon"></i>Run Scenario 2</h3>
-                    <p>Monitor live traffic for <strong>app1.radware.lab</strong>, trigger a failover from Alteon 1 to Alteon 2, and then restore the primary unit.</p>
+                    <p>Monitor live traffic for <strong>app2.radware.lab</strong>, trigger a failover from Alteon 1 to Alteon 2, and then restore the primary unit.</p>
                     <div class="btn-row">
                         <button class="btn btn-primary" onclick="executeScenario('ha_failover')">Start Monitoring</button>
                         <button class="btn btn-danger" onclick="callHaAction('failover')">Trigger Failover</button>
@@ -177,7 +177,52 @@
                     <p>Alteon 1 starts as the master ADC and Alteon 2 starts as the backup ADC in the HA pair.</p>
                     <p>The failover action forces Alteon 1 to relinquish traffic by shutting down ports 1, 2, and 3 over the Alteon API.</p>
                     <p>The restore action brings the same interfaces back up so the primary unit can return to service.</p>
-                    <p>In the live results pane, the customer can watch the backend response continue to succeed while the <strong>Served By</strong> marker changes to show which Alteon is handling traffic.</p>
+                    <p>In the live results pane, the customer can watch the embedded <strong>app2.radware.lab</strong> page continue to load while the proof fields show which system handled the request after failover.</p>
+                </div>
+                <div class="panel">
+                    <h3>HA Flow Diagram</h3>
+                    <svg viewBox="0 10 1000 360" width="100%" role="img" aria-label="High availability failover flow diagram">
+                        <defs>
+                            <marker id="ha-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#ffffff"/>
+                            </marker>
+                            <marker id="ha-arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#00ff88"/>
+                            </marker>
+                        </defs>
+
+                        <rect x="30" y="145" width="190" height="90" rx="6" fill="#a0a0a0" stroke="#607080" stroke-width="2"/>
+                        <text x="125" y="188" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="bold">Lab Controller</text>
+                        <text x="125" y="215" text-anchor="middle" fill="#ffffff" font-size="16">Scenario 2</text>
+
+                        <rect x="340" y="45" width="220" height="90" rx="6" fill="#808080" stroke="#607080" stroke-width="2"/>
+                        <text x="450" y="82" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="bold">Alteon 1</text>
+                        <text x="450" y="108" text-anchor="middle" fill="#ffffff" font-size="17">Master / Active</text>
+                        <text x="450" y="128" text-anchor="middle" fill="#ffb3b3" font-size="14">Ports 1, 2, 3 forced down</text>
+
+                        <rect x="340" y="235" width="220" height="90" rx="6" fill="#808080" stroke="#607080" stroke-width="2"/>
+                        <text x="450" y="272" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="bold">Alteon 2</text>
+                        <text x="450" y="298" text-anchor="middle" fill="#ffffff" font-size="17">Backup / Takes Over</text>
+                        <text x="450" y="318" text-anchor="middle" fill="#9cff9c" font-size="14">Traffic keeps flowing</text>
+
+                        <rect x="720" y="145" width="240" height="90" rx="6" fill="#2d5a5a" stroke="#00ff88" stroke-width="3"/>
+                        <text x="840" y="183" text-anchor="middle" fill="#00ff88" font-size="22" font-weight="bold">app2.radware.lab</text>
+                        <text x="840" y="210" text-anchor="middle" fill="#ffffff" font-size="16">Embedded website proof</text>
+
+                        <text x="235" y="138" fill="#ffffff" font-size="17" font-weight="bold">API failover command</text>
+                        <line x1="220" y1="160" x2="340" y2="98" stroke="#ffffff" stroke-width="3" marker-end="url(#ha-arrow)"/>
+
+                        <text x="238" y="257" fill="#00ff88" font-size="17" font-weight="bold">HTTP monitoring</text>
+                        <line x1="220" y1="205" x2="340" y2="280" stroke="#00ff88" stroke-width="3" marker-end="url(#ha-arrow-green)"/>
+
+                        <line x1="560" y1="98" x2="720" y2="165" stroke="#888888" stroke-width="2" stroke-dasharray="6,6" marker-end="url(#ha-arrow)"/>
+                        <text x="610" y="78" fill="#bbbbbb" font-size="15">Before failover</text>
+
+                        <line x1="560" y1="280" x2="720" y2="215" stroke="#00ff88" stroke-width="4" marker-end="url(#ha-arrow-green)"/>
+                        <text x="600" y="318" fill="#00ff88" font-size="15" font-weight="bold">After failover</text>
+
+                        <text x="70" y="355" fill="#ffffff" font-size="14">Gray dashed: original active path | Green: traffic observed after failover to backup Alteon</text>
+                    </svg>
                 </div>
             </section>
             <section id="scenario-3" class="content-section">

@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, Response, stream_wit
 import json
 import re
 import time
+from urllib.parse import quote, urljoin
 
 import dns.resolver
 import requests
@@ -12,17 +13,50 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 app = Flask(__name__)
 
-TARGET_HOST = 'app1.radware.lab'
+GSLB_TARGET_HOST = 'app1.radware.lab'
+HA_TARGET_HOST = 'app2.radware.lab'
 DNS_SERVER = '10.100.1.30'
-HTTP_HEADERS = {
-    'Host': TARGET_HOST,
-    'Cache-Control': 'no-cache',
-    'Pragma': 'no-cache'
-}
 ALTEON_1_MGMT_IP = '10.100.0.51'
 ALTEON_AUTH = HTTPBasicAuth('admin', 'admin')
 ALTEON_TIMEOUT = 2
 HA_PORTS = (1, 2, 3)
+
+
+def build_request_headers(target_host):
+    return {
+        'Host': target_host,
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+    }
+
+
+def rewrite_relative_resource_urls(body_html, target_ip, target_host):
+    if not body_html or not target_ip or not target_host:
+        return body_html
+
+    def replace_attr(match):
+        attr_name = match.group(1)
+        original_value = match.group(2)
+
+        if (
+            original_value.startswith('http://')
+            or original_value.startswith('https://')
+            or original_value.startswith('data:')
+            or original_value.startswith('mailto:')
+            or original_value.startswith('#')
+            or original_value.startswith('javascript:')
+        ):
+            return match.group(0)
+
+        normalized_path = urljoin('/', original_value)
+        proxy_url = (
+            f'/api/backend_resource?target_ip={quote(target_ip)}'
+            f'&target_host={quote(target_host)}'
+            f'&path={quote(normalized_path, safe="/")}'
+        )
+        return f'{attr_name}="{proxy_url}"'
+
+    return re.sub(r'(src|href|action)="([^"]+)"', replace_attr, body_html, flags=re.IGNORECASE)
 
 
 def format_http_version(response):
@@ -59,14 +93,14 @@ def build_resolver():
     return resolver
 
 
-def fetch_target_attempt(attempt):
+def fetch_target_attempt(attempt, target_host):
     result = {
         'attempt': attempt,
         'timestamp': int(time.time())
     }
 
     try:
-        answers = build_resolver().resolve(TARGET_HOST, 'A')
+        answers = build_resolver().resolve(target_host, 'A')
         ips = [rdata.address for rdata in answers]
         result['resolved_records'] = ips
         if not ips:
@@ -79,7 +113,7 @@ def fetch_target_attempt(attempt):
         try:
             response = requests.get(
                 f'http://{chosen_ip}/',
-                headers=HTTP_HEADERS,
+                headers=build_request_headers(target_host),
                 timeout=5,
                 allow_redirects=True
             )
@@ -88,7 +122,7 @@ def fetch_target_attempt(attempt):
                 'status_code': response.status_code,
                 'protocol_version': format_http_version(response),
                 'final_url': response.url,
-                'body_html': body_html,
+                'body_html': rewrite_relative_resource_urls(body_html, chosen_ip, target_host),
                 'served_by': extract_backend_marker(body_html, 'Served By'),
                 'server_name': extract_backend_marker(body_html, 'Server'),
                 'server_ip': extract_backend_marker(body_html, 'Server IP'),
@@ -109,7 +143,7 @@ def run_gslb_rr_demo():
     unique_ips = set()
 
     for attempt in range(1, attempt_count + 1):
-        result = fetch_target_attempt(attempt)
+        result = fetch_target_attempt(attempt, GSLB_TARGET_HOST)
         if result.get('dns_error'):
             dns_checks.append({'attempt': attempt, 'error': result['dns_error']})
             http_results.append({
@@ -156,7 +190,7 @@ def run_gslb_rr_demo():
     return {
         'success': True,
         'message': 'Round Robin Global Load Balancing executed from controller (HTTP only)',
-        'target_host': TARGET_HOST,
+        'target_host': GSLB_TARGET_HOST,
         'dns_server': DNS_SERVER,
         'attempt_count': attempt_count,
         'dns_checks': dns_checks,
@@ -216,7 +250,7 @@ def run_ha_action(action_name, target_state):
         'message': summary,
         'alteon_ip': ALTEON_1_MGMT_IP,
         'ports': port_results,
-        'target_host': TARGET_HOST
+        'target_host': HA_TARGET_HOST
     }
 
 
@@ -226,7 +260,7 @@ def gslb_rr_stream():
         attempt = 0
         while True:
             attempt += 1
-            yield f"data: {json.dumps(fetch_target_attempt(attempt))}\\n\\n"
+            yield f"data: {json.dumps(fetch_target_attempt(attempt, GSLB_TARGET_HOST))}\n\n"
             time.sleep(3)
 
     return Response(
@@ -241,7 +275,7 @@ def ha_failover_start():
     return jsonify({
         'success': True,
         'message': 'HA failover monitoring started. Alteon 1 is expected to begin as the active unit.',
-        'target_host': TARGET_HOST,
+        'target_host': HA_TARGET_HOST,
         'dns_server': DNS_SERVER,
         'alteon_primary_ip': ALTEON_1_MGMT_IP,
         'ports': list(HA_PORTS)
@@ -258,15 +292,55 @@ def ha_failover_restore():
     return jsonify(run_ha_action('restore', 1))
 
 
+@app.route('/api/backend_resource')
+def backend_resource():
+    target_ip = request.args.get('target_ip', '').strip()
+    target_host = request.args.get('target_host', '').strip()
+    path = request.args.get('path', '/').strip() or '/'
+
+    if not target_ip or not target_host:
+        return Response('Missing target parameters', status=400)
+
+    if not path.startswith('/'):
+        path = '/' + path
+
+    upstream_url = f'http://{target_ip}{path}'
+    upstream_headers = build_request_headers(target_host)
+
+    try:
+        upstream_response = requests.get(
+            upstream_url,
+            headers=upstream_headers,
+            timeout=5,
+            allow_redirects=True
+        )
+    except Exception as exc:
+        return Response(f'Upstream fetch failed: {exc}', status=502)
+
+    passthrough_headers = {}
+    content_type = upstream_response.headers.get('Content-Type')
+    cache_control = upstream_response.headers.get('Cache-Control')
+    if content_type:
+        passthrough_headers['Content-Type'] = content_type
+    if cache_control:
+        passthrough_headers['Cache-Control'] = cache_control
+
+    return Response(
+        upstream_response.content,
+        status=upstream_response.status_code,
+        headers=passthrough_headers
+    )
+
+
 @app.route('/api/scenario/ha_failover/stream')
 def ha_failover_stream():
     def generate():
         attempt = 0
         while True:
             attempt += 1
-            result = fetch_target_attempt(attempt)
+            result = fetch_target_attempt(attempt, HA_TARGET_HOST)
             result['scenario'] = 'ha_failover'
-            yield f"data: {json.dumps(result)}\\n\\n"
+            yield f"data: {json.dumps(result)}\n\n"
             time.sleep(3)
 
     return Response(
