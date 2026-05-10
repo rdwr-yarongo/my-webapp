@@ -15,9 +15,16 @@
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="#" data-section="scenario-1" class="active">Scenario 1 - GSLB</a></li>
-                    <li><a href="#" data-section="scenario-2">Scenario 2 - HA Failover</a></li>
-                    <li><a href="#" data-section="scenario-3">Scenario 3</a></li>
+                    <li class="nav-group open">
+                        <div class="nav-group-header" onclick="toggleNavGroup(this)">
+                            <span class="nav-group-arrow">&#x25B8;</span>Scenario 1
+                        </div>
+                        <ul class="nav-sub-list">
+                            <li><a href="#" data-section="scenario-1" class="nav-sub-link active">GSLB</a></li>
+                            <li><a href="#" data-section="scenario-2" class="nav-sub-link">HA Failover</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#" data-section="scenario-3">Scenario 2</a></li>
                     <li><a href="#" data-section="settings"><i class="bi bi-sliders nav-item-icon"></i>Settings</a></li>
                 </ul>
             </nav>

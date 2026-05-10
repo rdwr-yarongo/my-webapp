@@ -550,3 +550,51 @@ h1 .headline-icon {
     background: rgba(255, 193, 7, 0.16);
     border-color: rgba(255, 193, 7, 0.34);
 }
+
+/* Nav group (collapsible) */
+.nav-group > .nav-group-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    cursor: pointer;
+    color: var(--text-color);
+    border-radius: var(--border-radius);
+    border: 1px solid transparent;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    transition: background-color 0.2s, border-color 0.2s;
+    user-select: none;
+}
+
+.nav-group > .nav-group-header:hover {
+    background: linear-gradient(90deg, rgba(132, 101, 48, 0.45) 0%, rgba(198, 40, 40, 0.68) 100%);
+    border-color: rgba(216, 170, 97, 0.35);
+}
+
+.nav-group-arrow {
+    color: #c8ab75;
+    font-size: 11px;
+    display: inline-block;
+    transition: transform 0.2s;
+}
+
+.nav-group.open > .nav-group-header .nav-group-arrow {
+    transform: rotate(90deg);
+}
+
+.nav-sub-list {
+    display: none;
+    list-style: none;
+    margin: 4px 0 0 0;
+    padding: 0;
+}
+
+.nav-group.open > .nav-sub-list {
+    display: block;
+}
+
+.nav-sub-link {
+    padding-left: 28px !important;
+    font-weight: 400 !important;
+}

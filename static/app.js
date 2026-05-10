@@ -6,8 +6,15 @@ document.querySelectorAll('.sidebar-nav a').forEach(link => {
         switchSection(section);
         document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
         this.classList.add('active');
+        // Auto-expand parent group if sub-link
+        const group = this.closest('.nav-group');
+        if (group) group.classList.add('open');
     });
 });
+
+function toggleNavGroup(header) {
+    header.closest('.nav-group').classList.toggle('open');
+}
 
 // Tab switching
 document.querySelectorAll('.tab-btn').forEach(btn => {
