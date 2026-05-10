@@ -70,6 +70,54 @@ function buildIframeDocument(html, baseHref, protocolFallback) {
     return addProtocolPatch(`<!doctype html><html><head><base href="${safeBase}"></head><body>${sourceHtml}</body></html>`);
 }
 
+function createResponseIframe(result) {
+    const iframe = document.createElement('iframe');
+    iframe.sandbox = 'allow-same-origin allow-scripts';
+    iframe.style.cssText = 'width:100%;height:520px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
+    const baseHref = result.final_url || (result.target_ip ? `http://${result.target_ip}/` : '');
+    iframe.srcdoc = buildIframeDocument(result.body_html || '', baseHref, result.protocol_version || 'HTTP/1.1');
+    return iframe;
+}
+
+function formatTimestamp(epochSeconds) {
+    if (!epochSeconds) {
+        return new Date().toLocaleTimeString();
+    }
+    return new Date(epochSeconds * 1000).toLocaleTimeString();
+}
+
+function buildTrafficPanel(result, options = {}) {
+    const panel = document.createElement('div');
+    panel.className = 'panel';
+    const titlePrefix = options.titlePrefix || 'Attempt';
+
+    if (result.dns_error) {
+        panel.innerHTML = `<h4>${escapeHtml(titlePrefix)} ${escapeHtml(result.attempt)}</h4><p class="error">DNS Error: ${escapeHtml(result.dns_error)}</p><p><small>${formatTimestamp(result.timestamp)}</small></p>`;
+        return panel;
+    }
+
+    if (result.http_error) {
+        panel.innerHTML = `<h4>${escapeHtml(titlePrefix)} ${escapeHtml(result.attempt)} — ${escapeHtml(result.target_ip || 'n/a')}</h4><p>Resolved: ${escapeHtml((result.resolved_records || []).join(', ') || 'n/a')}</p><p class="error">HTTP Error: ${escapeHtml(result.http_error)}</p><p><small>${formatTimestamp(result.timestamp)}</small></p>`;
+        return panel;
+    }
+
+    const servedByBadge = result.served_by
+        ? `<span class="status-chip success">Served By: ${escapeHtml(result.served_by)}</span>`
+        : `<span class="status-chip warning">Served By: unavailable</span>`;
+    const wanlinkBadge = result.wanlink
+        ? `<span class="status-chip">Wanlink: ${escapeHtml(result.wanlink)}</span>`
+        : '';
+
+    panel.innerHTML = `
+        <h4>${escapeHtml(titlePrefix)} ${escapeHtml(result.attempt)} — ${escapeHtml(result.target_ip || 'n/a')}</h4>
+        <p>Resolved: ${escapeHtml((result.resolved_records || []).join(', ') || 'n/a')} &nbsp;|&nbsp; Status: ${escapeHtml(result.status_code)} &nbsp;|&nbsp; <small>${formatTimestamp(result.timestamp)}</small></p>
+        <div class="status-chip-row">${servedByBadge}${wanlinkBadge}</div>
+        <p>Server: ${escapeHtml(result.server_name || 'n/a')} &nbsp;|&nbsp; Server IP: ${escapeHtml(result.server_ip || 'n/a')} &nbsp;|&nbsp; URL: ${escapeHtml(result.final_url || 'n/a')}</p>
+    `;
+    panel.appendChild(createResponseIframe(result));
+    return panel;
+}
+
 function renderGslbResults(data, scenarioId) {
     const resultsContent = document.getElementById('results-content');
     const dnsOptions = (data.dns_options || []).map(ip => `<li>${escapeHtml(ip)}</li>`).join('');
@@ -91,20 +139,16 @@ function renderGslbResults(data, scenarioId) {
             `;
         }
 
-        const iframe = document.createElement('iframe');
-        // Required so embedded response pages can execute their own JS and fully render dynamic fields.
-        iframe.sandbox = 'allow-same-origin allow-scripts';
-        iframe.style.cssText = 'width:100%;height:520px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
-        const baseHref = result.final_url || (result.target_ip ? `http://${result.target_ip}/` : '');
-        iframe.srcdoc = buildIframeDocument(result.body_html || '', baseHref, result.protocol_version || 'HTTP/1.1');
         const wrapper = document.createElement('div');
         wrapper.className = 'panel';
+        const servedByLine = result.served_by ? `<p><strong>Served By:</strong> ${escapeHtml(result.served_by)}</p>` : '';
         wrapper.innerHTML = `
             <h4>HTTP Attempt ${escapeHtml(result.attempt)} &mdash; ${escapeHtml(result.target_ip)}</h4>
             <p>Resolved A Records: ${escapeHtml((result.resolved_records || []).join(', ') || 'n/a')}</p>
             <p>Scheme: HTTP &nbsp;|&nbsp; Status: ${escapeHtml(result.status_code)} &nbsp;|&nbsp; URL: ${escapeHtml(result.final_url)}</p>
+            ${servedByLine}
         `;
-        wrapper.appendChild(iframe);
+        wrapper.appendChild(createResponseIframe(result));
         return wrapper.outerHTML;
     }).join('');
 
@@ -124,6 +168,32 @@ function renderGslbResults(data, scenarioId) {
         </div>
         ${httpResults}
     `;
+}
+
+function ensureResultsActionButton(buttonId, label, onClick) {
+    const sidebar = document.querySelector('.results-sidebar-header');
+    if (!sidebar) return;
+
+    const existing = document.getElementById(buttonId);
+    if (existing) {
+        existing.onclick = onClick;
+        return;
+    }
+
+    const button = document.createElement('button');
+    button.id = buttonId;
+    button.className = 'btn btn-danger';
+    button.textContent = label;
+    button.style.cssText = 'padding:4px 12px;font-size:12px;';
+    button.onclick = onClick;
+    sidebar.appendChild(button);
+}
+
+function removeResultsActionButton(buttonId) {
+    const button = document.getElementById(buttonId);
+    if (button) {
+        button.remove();
+    }
 }
 
 // DNS Lookup
@@ -155,16 +225,15 @@ function performDnsLookup() {
     });
 }
 
-// Active SSE source for GSLB streaming
 let gslbEventSource = null;
+let haEventSource = null;
 
 function stopGslbStream() {
     if (gslbEventSource) {
         gslbEventSource.close();
         gslbEventSource = null;
     }
-    const btn = document.getElementById('gslb-stop-btn');
-    if (btn) btn.remove();
+    removeResultsActionButton('gslb-stop-btn');
     const indicator = document.getElementById('gslb-live-indicator');
     if (indicator) {
         indicator.style.background = '#dc3545';
@@ -173,7 +242,22 @@ function stopGslbStream() {
     }
 }
 
+function stopHaStream() {
+    if (haEventSource) {
+        haEventSource.close();
+        haEventSource = null;
+    }
+    removeResultsActionButton('ha-stop-btn');
+    const indicator = document.getElementById('ha-live-indicator');
+    if (indicator) {
+        indicator.style.background = '#dc3545';
+        indicator.textContent = '\u25CF STOPPED';
+        indicator.id = '';
+    }
+}
+
 function startGslbStream() {
+    stopHaStream();
     stopGslbStream();
     const resultsContent = document.getElementById('results-content');
     resultsContent.innerHTML = `
@@ -184,39 +268,15 @@ function startGslbStream() {
         </div>
         <div id="gslb-attempts"></div>
     `;
-    const sidebar = document.querySelector('.results-sidebar-header');
-    if (sidebar && !document.getElementById('gslb-stop-btn')) {
-        const btn = document.createElement('button');
-        btn.id = 'gslb-stop-btn';
-        btn.className = 'btn btn-danger';
-        btn.textContent = 'Stop';
-        btn.style.cssText = 'padding:4px 12px;font-size:12px;';
-        btn.onclick = stopGslbStream;
-        sidebar.appendChild(btn);
-    }
 
+    ensureResultsActionButton('gslb-stop-btn', 'Stop', stopGslbStream);
     gslbEventSource = new EventSource('/api/scenario/gslb_rr/stream');
 
     gslbEventSource.onmessage = function(event) {
         const result = JSON.parse(event.data);
         const attemptsDiv = document.getElementById('gslb-attempts');
         if (!attemptsDiv) return;
-        const panel = document.createElement('div');
-        panel.className = 'panel';
-        if (result.dns_error) {
-            panel.innerHTML = `<h4>Attempt ${escapeHtml(result.attempt)}</h4><p class="error">DNS Error: ${escapeHtml(result.dns_error)}</p><p><small>${new Date().toLocaleTimeString()}</small></p>`;
-        } else if (result.http_error) {
-            panel.innerHTML = `<h4>Attempt ${escapeHtml(result.attempt)} — ${escapeHtml(result.target_ip)}</h4><p>Resolved: ${escapeHtml((result.resolved_records || []).join(', '))}</p><p class="error">HTTP Error: ${escapeHtml(result.http_error)}</p><p><small>${new Date().toLocaleTimeString()}</small></p>`;
-        } else {
-            panel.innerHTML = `<h4>Attempt ${escapeHtml(result.attempt)} — ${escapeHtml(result.target_ip)}</h4><p>Resolved: ${escapeHtml((result.resolved_records || []).join(', '))} &nbsp;|&nbsp; Status: ${escapeHtml(result.status_code)} &nbsp;|&nbsp; <small>${new Date().toLocaleTimeString()}</small></p>`;
-            const iframe = document.createElement('iframe');
-            // Required so embedded response pages can execute their own JS and fully render dynamic fields.
-            iframe.sandbox = 'allow-same-origin allow-scripts';
-            iframe.style.cssText = 'width:100%;height:520px;border:1px solid #555;border-radius:4px;margin-top:6px;background:#fff;';
-            const baseHref = result.final_url || (result.target_ip ? `http://${result.target_ip}/` : '');
-            iframe.srcdoc = buildIframeDocument(result.body_html || '', baseHref, result.protocol_version || 'HTTP/1.1');
-            panel.appendChild(iframe);
-        }
+        const panel = buildTrafficPanel(result, { titlePrefix: 'Attempt' });
         attemptsDiv.insertBefore(panel, attemptsDiv.firstChild);
     };
 
@@ -225,10 +285,110 @@ function startGslbStream() {
     };
 }
 
+function renderHaShell(metadata) {
+    const resultsContent = document.getElementById('results-content');
+    resultsContent.innerHTML = `
+        <div class="panel">
+            <h3>High Availability Failover — Live</h3>
+            <p>${escapeHtml(metadata.message || '')}</p>
+            <p><strong>Target:</strong> ${escapeHtml(metadata.target_host || 'app1.radware.lab')} &nbsp;|&nbsp; <strong>DNS:</strong> ${escapeHtml(metadata.dns_server || '10.100.1.30')}</p>
+            <p><strong>Primary Alteon:</strong> ${escapeHtml(metadata.alteon_primary_ip || '10.100.0.51')} &nbsp;|&nbsp; <strong>Ports:</strong> ${escapeHtml((metadata.ports || []).join(', '))}</p>
+            <span id="ha-live-indicator" style="display:inline-block;padding:2px 8px;background:#28a745;color:#fff;border-radius:4px;font-size:12px;font-weight:600;">&#9679; LIVE</span>
+        </div>
+        <div id="ha-action-results"></div>
+        <div id="ha-attempts"></div>
+    `;
+}
+
+function renderHaActionResult(data) {
+    const actionResults = document.getElementById('ha-action-results');
+    if (!actionResults) return;
+
+    const panel = document.createElement('div');
+    panel.className = 'panel';
+    const portsMarkup = (data.ports || []).map(portResult => {
+        const outcome = portResult.success ? 'OK' : 'FAILED';
+        const detail = portResult.error
+            ? escapeHtml(portResult.error)
+            : `HTTP ${escapeHtml(portResult.status_code || 'n/a')}`;
+        return `<li>Port ${escapeHtml(portResult.port)} -> state ${escapeHtml(portResult.requested_state)}: ${outcome} (${detail})</li>`;
+    }).join('');
+
+    panel.innerHTML = `
+        <h4>${escapeHtml((data.action || 'action').toUpperCase())} command</h4>
+        <p>${escapeHtml(data.message || '')}</p>
+        <p><strong>Alteon:</strong> ${escapeHtml(data.alteon_ip || 'n/a')}</p>
+        <ul>${portsMarkup || '<li>No port results returned</li>'}</ul>
+        ${data.success ? '' : '<p class="error">One or more Alteon API calls failed.</p>'}
+        <p><small>${new Date().toLocaleString()}</small></p>
+    `;
+
+    actionResults.insertBefore(panel, actionResults.firstChild);
+}
+
+function callHaAction(actionName) {
+    fetch(`/api/scenario/ha_failover/${actionName}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!document.getElementById('ha-action-results')) {
+            return;
+        }
+        renderHaActionResult(data);
+    })
+    .catch(error => {
+        const actionResults = document.getElementById('ha-action-results');
+        if (!actionResults) return;
+        const panel = document.createElement('div');
+        panel.className = 'panel';
+        panel.innerHTML = `<h4>${escapeHtml(actionName.toUpperCase())} command</h4><p class="error">Error: ${escapeHtml(error)}</p>`;
+        actionResults.insertBefore(panel, actionResults.firstChild);
+    });
+}
+
+function startHaScenario() {
+    stopGslbStream();
+    stopHaStream();
+
+    fetch('/api/scenario/ha_failover/start', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            throw new Error(data.error || 'Unable to start HA monitoring');
+        }
+
+        renderHaShell(data);
+        ensureResultsActionButton('ha-stop-btn', 'Stop', stopHaStream);
+        haEventSource = new EventSource('/api/scenario/ha_failover/stream');
+
+        haEventSource.onmessage = function(event) {
+            const result = JSON.parse(event.data);
+            const attemptsDiv = document.getElementById('ha-attempts');
+            if (!attemptsDiv) return;
+            const panel = buildTrafficPanel(result, { titlePrefix: 'HA Attempt' });
+            attemptsDiv.insertBefore(panel, attemptsDiv.firstChild);
+        };
+
+        haEventSource.onerror = function() {
+            stopHaStream();
+        };
+    })
+    .catch(error => {
+        document.getElementById('results-content').innerHTML = `<p class="error">Error: ${escapeHtml(error)}</p>`;
+    });
+}
+
 // Scenario execution
 function executeScenario(scenarioId) {
     if (scenarioId === 'gslb_rr') {
         startGslbStream();
+        return;
+    }
+    if (scenarioId === 'ha_failover') {
+        startHaScenario();
         return;
     }
     fetch('/api/scenario/' + scenarioId, {
@@ -256,6 +416,5 @@ function executeScenario(scenarioId) {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
-    // Dark mode only
     document.body.setAttribute('data-theme', 'dark');
 });
