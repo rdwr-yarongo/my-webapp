@@ -24,7 +24,7 @@
                             <li><a href="#" data-section="scenario-2" class="nav-sub-link">HA Failover</a></li>
                         </ul>
                     </li>
-                    <li><a href="#" data-section="scenario-3">Scenario 2</a></li>
+                    <li><a href="#" data-section="scenario-3">Scenario 2 - HTTP Redirection</a></li>
                     <li><a href="#" data-section="settings"><i class="bi bi-sliders nav-item-icon"></i>Settings</a></li>
                 </ul>
             </nav>
@@ -233,10 +233,57 @@
                 </div>
             </section>
             <section id="scenario-3" class="content-section">
-                
+                <h1><i class="bi bi-arrow-left-right headline-icon"></i>Scenario 2</h1>
                 <div class="panel">
-                    <h3>Coming Soon</h3>
-                    <p>Add additional scenarios here and link them from the left sidebar.</p>
+                    <h3><i class="bi bi-box-arrow-up-right headline-icon"></i>Open Redirect Demo</h3>
+                    <p>Launch <strong>http://scenario2.radware.lab/</strong> in a new browser tab and watch the browser land on <strong>https://scenario2.radware.lab/</strong>.</p>
+                    <button class="btn btn-primary" onclick="openRedirectScenario()">Open HTTP Site</button>
+                </div>
+                <div class="panel">
+                    <h3><i class="bi bi-shield-lock headline-icon"></i>HTTP to HTTPS Demonstration</h3>
+                    <p>This scenario demonstrates HTTP redirection to HTTPS for <strong>scenario2.radware.lab</strong>.</p>
+                    <p>The customer experience should be direct and visual: click the button, observe the browser open the HTTP URL, and then see the final page arrive on HTTPS.</p>
+                    <p>The important proof is the browser URL itself changing from <strong>http://scenario2.radware.lab/</strong> to <strong>https://scenario2.radware.lab/</strong>.</p>
+                </div>
+                <div class="panel">
+                    <h3>Redirection Flow Diagram</h3>
+                    <svg viewBox="0 20 1000 300" width="100%" role="img" aria-label="HTTP to HTTPS redirection flow diagram">
+                        <defs>
+                            <marker id="redir-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#ffffff"/>
+                            </marker>
+                            <marker id="redir-arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#00ff88"/>
+                            </marker>
+                        </defs>
+
+                        <rect x="30" y="110" width="190" height="90" rx="6" fill="#a0a0a0" stroke="#607080" stroke-width="2"/>
+                        <text x="125" y="150" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="bold">Customer Browser</text>
+                        <text x="125" y="177" text-anchor="middle" fill="#ffffff" font-size="15">Opens new tab</text>
+
+                        <rect x="330" y="55" width="250" height="85" rx="6" fill="#808080" stroke="#607080" stroke-width="2"/>
+                        <text x="455" y="92" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="bold">HTTP Request</text>
+                        <text x="455" y="120" text-anchor="middle" fill="#ffffff" font-size="17">http://scenario2.radware.lab/</text>
+
+                        <rect x="330" y="185" width="250" height="85" rx="6" fill="#2d5a5a" stroke="#607080" stroke-width="2"/>
+                        <text x="455" y="220" text-anchor="middle" fill="#00ff88" font-size="22" font-weight="bold">HTTPS Destination</text>
+                        <text x="455" y="248" text-anchor="middle" fill="#ffffff" font-size="17">https://scenario2.radware.lab/</text>
+
+                        <rect x="700" y="110" width="240" height="90" rx="6" fill="#808080" stroke="#00ff88" stroke-width="3"/>
+                        <text x="820" y="148" text-anchor="middle" fill="#00ff88" font-size="22" font-weight="bold">Alteon Redirect</text>
+                        <text x="820" y="175" text-anchor="middle" fill="#ffffff" font-size="17">307 to HTTPS</text>
+
+                        <line x1="220" y1="130" x2="330" y2="95" stroke="#ffffff" stroke-width="3" marker-end="url(#redir-arrow)"/>
+                        <text x="232" y="112" fill="#ffffff" font-size="16" font-weight="bold">Start with HTTP</text>
+
+                        <line x1="580" y1="98" x2="700" y2="145" stroke="#ffffff" stroke-width="3" marker-end="url(#redir-arrow)"/>
+                        <text x="610" y="82" fill="#ffffff" font-size="16" font-weight="bold">Redirect response</text>
+
+                        <line x1="700" y1="170" x2="580" y2="225" stroke="#00ff88" stroke-width="4" marker-end="url(#redir-arrow-green)"/>
+                        <text x="610" y="245" fill="#00ff88" font-size="16" font-weight="bold">Land on HTTPS</text>
+
+                        <text x="80" y="290" fill="#ffffff" font-size="14">White: initial HTTP request and redirect | Green: final secure destination shown to the customer</text>
+                    </svg>
                 </div>
             </section>
             <section id="settings" class="content-section">

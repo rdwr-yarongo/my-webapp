@@ -305,6 +305,10 @@ function renderHaActionError(actionName, errorText) {
     attemptsDiv.insertBefore(panel, attemptsDiv.firstChild);
 }
 
+function openRedirectScenario() {
+    window.open('http://scenario2.radware.lab/', '_blank', 'noopener,noreferrer');
+}
+
 function callHaAction(actionName) {
     fetch(`/api/scenario/ha_failover/${actionName}`, {
         method: 'POST'
