@@ -235,15 +235,23 @@
             <section id="scenario-3" class="content-section">
                 <h1><i class="bi bi-arrow-left-right headline-icon"></i>Scenario 2</h1>
                 <div class="panel">
-                    <h3><i class="bi bi-box-arrow-up-right headline-icon"></i>Open Redirect Demo</h3>
-                    <p>Launch <strong>http://scenario2.radware.lab/</strong> in a new browser tab and watch the browser land on <strong>https://scenario2.radware.lab/</strong>.</p>
-                    <button class="btn btn-primary" onclick="openRedirectScenario()">Open HTTP Site</button>
+                    <h3><i class="bi bi-box-arrow-up-right headline-icon"></i>Redirect Demo Controls</h3>
+                    <p>Launch the redirect inside the controller to make the URL transition visible, or open the same HTTP address in a real browser tab for direct proof.</p>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" onclick="launchEmbeddedRedirectDemo()">Launch Embedded Demo</button>
+                        <button class="btn btn-secondary" onclick="openRedirectScenario()">Open in New Tab</button>
+                    </div>
                 </div>
                 <div class="panel">
                     <h3><i class="bi bi-shield-lock headline-icon"></i>HTTP to HTTPS Demonstration</h3>
                     <p>This scenario demonstrates HTTP redirection to HTTPS for <strong>scenario2.radware.lab</strong>.</p>
-                    <p>The customer experience should be direct and visual: click the button, observe the browser open the HTTP URL, and then see the final page arrive on HTTPS.</p>
-                    <p>The important proof is the browser URL itself changing from <strong>http://scenario2.radware.lab/</strong> to <strong>https://scenario2.radware.lab/</strong>.</p>
+                    <p>The embedded browser frame starts from <strong>http://scenario2.radware.lab/</strong> and then updates to <strong>https://scenario2.radware.lab/</strong> after the Alteon redirect is confirmed.</p>
+                    <p>The new-tab action remains available when you want the customer to see the real browser address bar perform the redirect naturally.</p>
+                </div>
+                <div class="panel">
+                    <h3><i class="bi bi-window headline-icon"></i>Execution Results Experience</h3>
+                    <p>When you click <strong>Launch Embedded Demo</strong>, the browser-style frame opens in the <strong>Execution Results</strong> pane on the right, consistent with the other scenarios.</p>
+                    <p>The results pane will show the visible URL transition, the redirect proof, and the final HTTPS page.</p>
                 </div>
                 <div class="panel">
                     <h3>Redirection Flow Diagram</h3>

@@ -234,6 +234,10 @@ function performDnsLookup() {
 
 let gslbEventSource = null;
 let haEventSource = null;
+const redirectScenarioState = {
+    launched: false,
+    proofLoaded: false
+};
 
 function stopGslbStream() {
     if (gslbEventSource) {
@@ -307,6 +311,107 @@ function renderHaActionError(actionName, errorText) {
 
 function openRedirectScenario() {
     window.open('http://scenario2.radware.lab/', '_blank', 'noopener,noreferrer');
+}
+
+function renderRedirectResultsShell() {
+    const resultsContent = document.getElementById('results-content');
+    if (!resultsContent) return;
+
+    resultsContent.innerHTML = `
+        <div class="panel">
+            <h3>Scenario 2 - HTTP Redirection</h3>
+            <p>Start from <strong>http://scenario2.radware.lab/</strong> and verify the redirect to <strong>https://scenario2.radware.lab/</strong> inside the embedded browser.</p>
+        </div>
+        <div class="panel">
+            <div id="redirect-browser-shell" class="browser-shell" data-state="idle">
+                <div class="browser-toolbar">
+                    <div class="browser-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div id="redirect-url-display" class="browser-url">http://scenario2.radware.lab/</div>
+                    <div id="redirect-status-text" class="browser-status">Ready to launch redirect demo</div>
+                </div>
+                <iframe
+                    id="redirect-demo-frame"
+                    class="browser-frame"
+                    title="Scenario 2 redirect demo"
+                    sandbox="allow-same-origin allow-scripts allow-forms"
+                    src="about:blank"></iframe>
+            </div>
+            <div id="redirect-proof" class="redirect-proof">
+                <p>Checking redirect proof will appear here before the secure page loads.</p>
+            </div>
+        </div>
+    `;
+}
+
+function setRedirectBrowserState(url, statusText, mode) {
+    const urlBar = document.getElementById('redirect-url-display');
+    const status = document.getElementById('redirect-status-text');
+    const shell = document.getElementById('redirect-browser-shell');
+    if (urlBar) {
+        urlBar.textContent = url;
+    }
+    if (status) {
+        status.textContent = statusText;
+    }
+    if (shell) {
+        shell.dataset.state = mode || 'idle';
+    }
+}
+
+function renderRedirectProof(data) {
+    const proof = document.getElementById('redirect-proof');
+    if (!proof) return;
+
+    if (!data.success) {
+        proof.innerHTML = `<p class="error">Proof check failed: ${escapeHtml(data.error || 'Unknown error')}</p>`;
+        return;
+    }
+
+    proof.innerHTML = `
+        <div class="redirect-proof-grid">
+            <div class="status-chip">Source: ${escapeHtml(data.source_url)}</div>
+            <div class="status-chip warning">Redirect: ${escapeHtml(data.redirect_status_code)}</div>
+            <div class="status-chip success">Destination: ${escapeHtml(data.destination_url)}</div>
+            <div class="status-chip">Final Status: ${escapeHtml(data.final_status_code)}</div>
+        </div>
+        <p><strong>Resolved IP:</strong> ${escapeHtml(data.target_ip || 'n/a')} &nbsp;|&nbsp; <strong>Location Header:</strong> ${escapeHtml(data.redirect_location || 'n/a')}</p>
+    `;
+}
+
+function launchEmbeddedRedirectDemo() {
+    renderRedirectResultsShell();
+
+    const iframe = document.getElementById('redirect-demo-frame');
+    const proof = document.getElementById('redirect-proof');
+    if (!iframe || !proof) return;
+
+    redirectScenarioState.launched = true;
+    redirectScenarioState.proofLoaded = false;
+
+    setRedirectBrowserState('http://scenario2.radware.lab/', 'Requesting HTTP page...', 'http');
+    proof.innerHTML = '<p>Checking redirect proof and loading the secure destination...</p>';
+    iframe.src = 'about:blank';
+
+    fetch('/api/scenario/http_redirect/proof')
+        .then(response => response.json())
+        .then(data => {
+            renderRedirectProof(data);
+            if (!data.success) {
+                throw new Error(data.error || 'Unable to validate redirect flow');
+            }
+
+            redirectScenarioState.proofLoaded = true;
+            setRedirectBrowserState('https://scenario2.radware.lab/', `Redirect ${data.redirect_status_code} observed. Secure page loaded.`, 'https');
+            iframe.src = '/api/scenario/http_redirect/page';
+        })
+        .catch(error => {
+            setRedirectBrowserState('http://scenario2.radware.lab/', 'Redirect validation failed', 'error');
+            proof.innerHTML = `<p class="error">Error: ${escapeHtml(error)}</p>`;
+        });
 }
 
 function callHaAction(actionName) {
@@ -395,4 +500,5 @@ function executeScenario(scenarioId) {
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     document.body.setAttribute('data-theme', 'dark');
+    setRedirectBrowserState('http://scenario2.radware.lab/', 'Ready to launch redirect demo', 'idle');
 });

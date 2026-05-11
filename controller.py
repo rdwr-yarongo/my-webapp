@@ -15,6 +15,7 @@ app = Flask(__name__)
 
 GSLB_TARGET_HOST = 'app1.radware.lab'
 HA_TARGET_HOST = 'app2.radware.lab'
+REDIRECT_TARGET_HOST = 'scenario2.radware.lab'
 DNS_SERVER = '10.100.1.30'
 ALTEON_1_MGMT_IP = '10.100.0.51'
 ALTEON_AUTH = HTTPBasicAuth('admin', 'admin')
@@ -30,7 +31,17 @@ def build_request_headers(target_host):
     }
 
 
-def rewrite_relative_resource_urls(body_html, target_ip, target_host):
+def build_backend_resource_url(target_ip, target_host, path, scheme='http'):
+    normalized_path = urljoin('/', path or '/')
+    return (
+        f'/api/backend_resource?target_ip={quote(target_ip)}'
+        f'&target_host={quote(target_host)}'
+        f'&scheme={quote(scheme)}'
+        f'&path={quote(normalized_path, safe="/")}'
+    )
+
+
+def rewrite_relative_resource_urls(body_html, target_ip, target_host, scheme='http'):
     if not body_html or not target_ip or not target_host:
         return body_html
 
@@ -48,12 +59,7 @@ def rewrite_relative_resource_urls(body_html, target_ip, target_host):
         ):
             return match.group(0)
 
-        normalized_path = urljoin('/', original_value)
-        proxy_url = (
-            f'/api/backend_resource?target_ip={quote(target_ip)}'
-            f'&target_host={quote(target_host)}'
-            f'&path={quote(normalized_path, safe="/")}'
-        )
+        proxy_url = build_backend_resource_url(target_ip, target_host, original_value, scheme=scheme)
         return f'{attr_name}="{proxy_url}"'
 
     return re.sub(r'(src|href|action)="([^"]+)"', replace_attr, body_html, flags=re.IGNORECASE)
@@ -254,6 +260,66 @@ def run_ha_action(action_name, target_state):
     }
 
 
+def resolve_target_ip(target_host):
+    answers = build_resolver().resolve(target_host, 'A')
+    ips = [rdata.address for rdata in answers]
+    if not ips:
+        raise ValueError(f'No A records returned for {target_host}')
+    return ips[0], ips
+
+
+def fetch_redirect_proof():
+    target_ip, resolved_records = resolve_target_ip(REDIRECT_TARGET_HOST)
+    request_headers = build_request_headers(REDIRECT_TARGET_HOST)
+
+    http_response = requests.get(
+        f'http://{target_ip}/',
+        headers=request_headers,
+        timeout=5,
+        allow_redirects=False
+    )
+    redirect_location = http_response.headers.get('Location')
+
+    https_response = requests.get(
+        f'https://{target_ip}/',
+        headers=request_headers,
+        timeout=5,
+        allow_redirects=True,
+        verify=False
+    )
+
+    return {
+        'success': True,
+        'target_host': REDIRECT_TARGET_HOST,
+        'target_ip': target_ip,
+        'resolved_records': resolved_records,
+        'source_url': f'http://{REDIRECT_TARGET_HOST}/',
+        'redirect_status_code': http_response.status_code,
+        'redirect_location': redirect_location,
+        'destination_url': f'https://{REDIRECT_TARGET_HOST}/',
+        'final_status_code': https_response.status_code,
+        'final_url': https_response.url
+    }
+
+
+def fetch_redirect_page():
+    target_ip, _ = resolve_target_ip(REDIRECT_TARGET_HOST)
+    response = requests.get(
+        f'https://{target_ip}/',
+        headers=build_request_headers(REDIRECT_TARGET_HOST),
+        timeout=5,
+        allow_redirects=True,
+        verify=False
+    )
+    body_html = rewrite_relative_resource_urls(
+        response.text,
+        target_ip,
+        REDIRECT_TARGET_HOST,
+        scheme='https'
+    )
+    return body_html, target_ip, response.status_code
+
+
 @app.route('/api/scenario/gslb_rr/stream')
 def gslb_rr_stream():
     def generate():
@@ -297,14 +363,17 @@ def backend_resource():
     target_ip = request.args.get('target_ip', '').strip()
     target_host = request.args.get('target_host', '').strip()
     path = request.args.get('path', '/').strip() or '/'
+    scheme = request.args.get('scheme', 'http').strip().lower() or 'http'
 
     if not target_ip or not target_host:
         return Response('Missing target parameters', status=400)
+    if scheme not in ('http', 'https'):
+        return Response('Unsupported scheme', status=400)
 
     if not path.startswith('/'):
         path = '/' + path
 
-    upstream_url = f'http://{target_ip}{path}'
+    upstream_url = f'{scheme}://{target_ip}{path}'
     upstream_headers = build_request_headers(target_host)
 
     try:
@@ -312,7 +381,8 @@ def backend_resource():
             upstream_url,
             headers=upstream_headers,
             timeout=5,
-            allow_redirects=True
+            allow_redirects=True,
+            verify=(scheme == 'http')
         )
     except Exception as exc:
         return Response(f'Upstream fetch failed: {exc}', status=502)
@@ -329,6 +399,39 @@ def backend_resource():
         upstream_response.content,
         status=upstream_response.status_code,
         headers=passthrough_headers
+    )
+
+
+@app.route('/api/scenario/http_redirect/proof')
+def http_redirect_proof():
+    try:
+        return jsonify(fetch_redirect_proof())
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 502
+
+
+@app.route('/api/scenario/http_redirect/page')
+def http_redirect_page():
+    try:
+        body_html, target_ip, status_code = fetch_redirect_page()
+    except Exception as exc:
+        return Response(f'Unable to fetch HTTPS page: {exc}', status=502)
+
+    html_document = (
+        '<!doctype html><html><head>'
+        '<meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width, initial-scale=1">'
+        '</head><body>'
+        f'{body_html}'
+        '</body></html>'
+    )
+    return Response(
+        html_document,
+        status=status_code,
+        headers={
+            'Content-Type': 'text/html; charset=utf-8',
+            'X-Redirect-Target-IP': target_ip
+        }
     )
 
 
