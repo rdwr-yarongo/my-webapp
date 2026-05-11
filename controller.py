@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, jsonify, Response, stream_with_context
 import json
 import re
-import socket
 import subprocess
 import time
 from urllib.parse import quote, urljoin
@@ -18,7 +17,6 @@ app = Flask(__name__)
 GSLB_TARGET_HOST = 'app1.radware.lab'
 HA_TARGET_HOST = 'app2.radware.lab'
 REDIRECT_TARGET_HOST = 'scenario2.radware.lab'
-OFFLOADING_TARGET_HOST = 'app2.radware.lab'
 DNS_SERVER = '10.100.1.30'
 ALTEON_1_MGMT_IP = '10.100.0.51'
 ALTEON_AUTH = HTTPBasicAuth('admin', 'admin')
@@ -105,19 +103,6 @@ def build_resolver():
     resolver.lifetime = 3
     return resolver
 
-
-def get_controller_outbound_ip(dest_ip):
-    """Return the local IP the controller routes toward dest_ip (no traffic sent)."""
-    s = None
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect((dest_ip, 80))
-        return s.getsockname()[0]
-    except Exception:
-        return None
-    finally:
-        if s:
-            s.close()
 
 def fetch_target_attempt(attempt, target_host):
     result = {
@@ -540,58 +525,6 @@ def ha_failover_stream():
         headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'}
     )
 
-
-@app.route('/api/scenario/offloading/proof')
-def offloading_proof():
-    result = {'success': False}
-    try:
-        answers = build_resolver().resolve(OFFLOADING_TARGET_HOST, 'A')
-        ips = [rdata.address for rdata in answers]
-        if not ips:
-            return jsonify({'success': False, 'error': 'DNS returned no A records'})
-        vip_ip = ips[0]
-        result['vip_ip'] = vip_ip
-        result['target_host'] = OFFLOADING_TARGET_HOST
-
-        controller_ip = get_controller_outbound_ip(vip_ip)
-        result['controller_ip'] = controller_ip
-
-        response = requests.get(
-            f'http://{vip_ip}/',
-            headers=build_request_headers(OFFLOADING_TARGET_HOST),
-            timeout=5,
-            allow_redirects=False
-        )
-        body_html = response.text
-
-        remote_addr = (
-            extract_backend_marker(body_html, 'Remote Address') or
-            extract_backend_marker(body_html, 'Remote Addr') or
-            extract_backend_marker(body_html, 'Client IP') or
-            extract_backend_marker(body_html, 'REMOTE_ADDR') or
-            extract_backend_marker(body_html, 'Remote-Addr')
-        )
-        xfwd = (
-            extract_backend_marker(body_html, 'X-Forwarded-For') or
-            extract_backend_marker(body_html, 'HTTP_X_FORWARDED_FOR')
-        )
-        srv_port = (
-            extract_backend_marker(body_html, 'Client Source Port') or
-            extract_backend_marker(body_html, 'Remote Port') or
-            extract_backend_marker(body_html, 'Source Port')
-        )
-
-        result.update({
-            'success': True,
-            'status_code': response.status_code,
-            'remote_addr_seen_by_server': remote_addr,
-            'x_forwarded_for': xfwd,
-            'remote_port_seen_by_server': srv_port,
-            'body_html': rewrite_relative_resource_urls(body_html, vip_ip, OFFLOADING_TARGET_HOST),
-        })
-    except Exception as exc:
-        result['error'] = str(exc)
-    return jsonify(result)
 
 @app.route('/')
 def index():

@@ -24,15 +24,7 @@
                             <li><a href="#" data-section="scenario-2" class="nav-sub-link">HA Failover</a></li>
                         </ul>
                     </li>
-                    <li class="nav-group">
-                        <div class="nav-group-header" onclick="toggleNavGroup(this)">
-                            <span class="nav-group-arrow">&#x25B8;</span>Scenario 2
-                        </div>
-                        <ul class="nav-sub-list">
-                            <li><a href="#" data-section="scenario-3" class="nav-sub-link">HTTP Redirection</a></li>
-                            <li><a href="#" data-section="scenario-offloading" class="nav-sub-link">Offloading</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="#" data-section="scenario-3">Scenario 2 - HTTP Redirection</a></li>
                     <li><a href="#" data-section="settings"><i class="bi bi-sliders nav-item-icon"></i>Settings</a></li>
                 </ul>
             </nav>
@@ -301,85 +293,6 @@
 
                         <text x="80" y="290" fill="#ffffff" font-size="14">White: initial HTTP request and redirect | Green: final secure destination shown to the customer</text>
                     </svg>
-                </div>
-            </section>
-            <section id="scenario-offloading" class="content-section">
-                <h1><i class="bi bi-diagram-2-fill headline-icon"></i>TCP Session Offloading</h1>
-                <div class="panel">
-                    <h3><i class="bi bi-caret-right-square headline-icon"></i>Run Live Proof</h3>
-                    <p>Click the button below to fetch <strong>app2.radware.lab</strong> through Alteon and compare what the backend server actually sees versus what the controller sent.</p>
-                    <button class="btn btn-primary" onclick="launchOffloadingProof()">Run Live Proof</button>
-                </div>
-                <div class="panel">
-                    <h3><i class="bi bi-bezier2 headline-icon"></i>What is TCP Session Offloading?</h3>
-                    <p>When a client connects to an Alteon Virtual IP, Alteon <strong>terminates</strong> the client TCP session and opens a <strong>separate, independent TCP session</strong> to the backend server. This is TCP session splitting (offloading).</p>
-                    <p>The backend server never sees the original client — it only sees Alteon. Three things prove this:</p>
-                    <ul>
-                        <li>The <strong>source IP</strong> on the server-side connection is Alteon&#x27;s SNAT address &#x2014; not the client&#x27;s IP</li>
-                        <li>The <strong>source port</strong> is a new ephemeral port assigned by Alteon &#x2014; not the client&#x27;s original port</li>
-                        <li>Alteon inserts an <strong>X-Forwarded-For</strong> header carrying the original client IP so the application can still see it</li>
-                    </ul>
-                </div>
-                <div class="panel">
-                    <h3>Session Split Diagram</h3>
-                    <svg viewBox="0 0 1000 320" width="100%" role="img" aria-label="TCP session splitting diagram">
-                        <defs>
-                            <marker id="off-arrow-a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                                <path d="M0,0 L0,6 L9,3 z" fill="#9cd4ff"/>
-                            </marker>
-                            <marker id="off-arrow-b" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                                <path d="M0,0 L0,6 L9,3 z" fill="#9cffb4"/>
-                            </marker>
-                        </defs>
-
-                        <!-- Client / Controller box -->
-                        <rect x="20" y="80" width="185" height="130" rx="6" fill="#a0a0a0" stroke="#607080" stroke-width="2"/>
-                        <text x="112" y="108" text-anchor="middle" fill="#ffffff" font-size="17" font-weight="bold">Client / Controller</text>
-                        <line x1="20" y1="118" x2="205" y2="118" stroke="#607080" stroke-width="1" opacity="0.5"/>
-                        <text x="112" y="138" text-anchor="middle" fill="#9cd4ff" font-size="13">srcIP: 10.100.0.9</text>
-                        <text x="112" y="156" text-anchor="middle" fill="#9cd4ff" font-size="13">sport: ephemeral</text>
-                        <text x="112" y="174" text-anchor="middle" fill="#9cd4ff" font-size="13">dst: VIP : 80</text>
-                        <text x="112" y="198" text-anchor="middle" fill="#ffffff" font-size="11" opacity="0.7">No X-Forwarded-For sent</text>
-
-                        <!-- Alteon ADC box -->
-                        <rect x="380" y="40" width="240" height="230" rx="6" fill="#2d3a5a" stroke="#c7a66a" stroke-width="3"/>
-                        <text x="500" y="70" text-anchor="middle" fill="#c7a66a" font-size="19" font-weight="bold">Alteon ADC</text>
-                        <line x1="380" y1="85" x2="620" y2="85" stroke="#c7a66a" stroke-width="1" opacity="0.35"/>
-
-                        <text x="500" y="108" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="600">&#9654; Session A terminates here</text>
-                        <text x="500" y="128" text-anchor="middle" fill="#9cd4ff" font-size="12">VIP : app2.radware.lab : 80</text>
-
-                        <line x1="380" y1="148" x2="620" y2="148" stroke="#c7a66a" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
-
-                        <text x="500" y="172" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="600">&#9654; Session B opened here</text>
-                        <text x="500" y="192" text-anchor="middle" fill="#9cffb4" font-size="12">srcIP: Alteon SNAT IP</text>
-                        <text x="500" y="210" text-anchor="middle" fill="#9cffb4" font-size="12">new ephemeral port</text>
-                        <text x="500" y="228" text-anchor="middle" fill="#ffd700" font-size="12">+ X-Forwarded-For: 10.100.0.9</text>
-                        <text x="500" y="246" text-anchor="middle" fill="#ffd700" font-size="11" opacity="0.85">inserts original client IP</text>
-
-                        <!-- Backend Server box -->
-                        <rect x="790" y="80" width="190" height="130" rx="6" fill="#2d5a3a" stroke="#00ff88" stroke-width="2"/>
-                        <text x="885" y="108" text-anchor="middle" fill="#00ff88" font-size="17" font-weight="bold">Backend Server</text>
-                        <line x1="790" y1="118" x2="980" y2="118" stroke="#00ff88" stroke-width="1" opacity="0.4"/>
-                        <text x="885" y="140" text-anchor="middle" fill="#9cffb4" font-size="13">sees srcIP: SNAT IP</text>
-                        <text x="885" y="158" text-anchor="middle" fill="#9cffb4" font-size="13">sport: Alteon-assigned</text>
-                        <text x="885" y="178" text-anchor="middle" fill="#ffd700" font-size="13">X-Fwd-For: orig client IP</text>
-                        <text x="885" y="198" text-anchor="middle" fill="#ffffff" font-size="11" opacity="0.7">Client never reaches server</text>
-
-                        <!-- Session A arrow: Client → Alteon (upper) -->
-                        <line x1="205" y1="118" x2="380" y2="108" stroke="#9cd4ff" stroke-width="3" marker-end="url(#off-arrow-a)"/>
-                        <text x="290" y="98" text-anchor="middle" fill="#9cd4ff" font-size="13" font-weight="bold">Session A</text>
-
-                        <!-- Session B arrow: Alteon → Backend (lower) -->
-                        <line x1="620" y1="200" x2="790" y2="170" stroke="#9cffb4" stroke-width="3" marker-end="url(#off-arrow-b)"/>
-                        <text x="705" y="200" text-anchor="middle" fill="#9cffb4" font-size="13" font-weight="bold">Session B</text>
-
-                        <!-- Legend -->
-                        <text x="20" y="300" fill="#9cd4ff" font-size="12">&#9632; Blue: client-side session</text>
-                        <text x="200" y="300" fill="#9cffb4" font-size="12">&#9632; Green: server-side session (Alteon SNAT)</text>
-                        <text x="530" y="300" fill="#ffd700" font-size="12">&#9632; Gold: header inserted by Alteon</text>
-                    </svg>
-                    <p><small>Two completely separate TCP connections. Alteon proxies between them, hides the backend, and preserves the original client IP via X-Forwarded-For.</small></p>
                 </div>
             </section>
             <section id="settings" class="content-section">

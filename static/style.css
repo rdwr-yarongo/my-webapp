@@ -499,55 +499,6 @@ h1 .headline-icon {
 }
 
 /* Responsive */
-
-/* ── Offloading scenario ────────────────────────────────────────────────────── */
-
-.offloading-compare-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-    margin-bottom: var(--spacing-12);
-}
-
-.offloading-compare-table th,
-.offloading-compare-table td {
-    padding: 7px 10px;
-    border: 1px solid rgba(162, 127, 81, 0.22);
-    text-align: left;
-    vertical-align: top;
-}
-
-.offloading-compare-table th {
-    background: rgba(30, 45, 70, 0.65);
-    color: var(--primary-color);
-    font-weight: 600;
-    font-size: 12px;
-}
-
-.offloading-compare-table .val-sent {
-    color: #9cd4ff;
-}
-
-.offloading-compare-table .val-recv {
-    color: #9cffb4;
-}
-
-.alteon-cli-sim {
-    background: #060a0e;
-    border: 1px solid #1a2e40;
-    border-radius: 6px;
-    padding: var(--spacing-12);
-    overflow-x: auto;
-    margin-top: var(--spacing-8);
-}
-
-.alteon-cli-sim .trace-block {
-    color: #00ff88;
-    font-size: 12px;
-    line-height: 1.65;
-    margin: 0;
-}
-
 @media (max-width: 768px) {
     .app-shell {
         flex-direction: column;
