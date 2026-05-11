@@ -239,6 +239,7 @@
                     <p>Launch the redirect inside the controller to make the URL transition visible, or open the same HTTP address in a real browser tab for direct proof.</p>
                     <div class="btn-row">
                         <button class="btn btn-primary" onclick="launchEmbeddedRedirectDemo()">Launch Embedded Demo</button>
+                        <button class="btn btn-info" onclick="runRedirectTcpdump()">TCPDump</button>
                         <button class="btn btn-secondary" onclick="openRedirectScenario()">Open in New Tab</button>
                     </div>
                 </div>
@@ -251,7 +252,7 @@
                 <div class="panel">
                     <h3><i class="bi bi-window headline-icon"></i>Execution Results Experience</h3>
                     <p>When you click <strong>Launch Embedded Demo</strong>, the browser-style frame opens in the <strong>Execution Results</strong> pane on the right, consistent with the other scenarios.</p>
-                    <p>The results pane will show the visible URL transition, the redirect proof, and the final HTTPS page.</p>
+                    <p>The <strong>TCPDump</strong> button opens a separate technical trace in the same results pane with the HTTP exchange and packet summary.</p>
                 </div>
                 <div class="panel">
                     <h3>Redirection Flow Diagram</h3>

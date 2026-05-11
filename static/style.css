@@ -371,6 +371,16 @@ svg {
     background-color: #a71d2a;
 }
 
+.btn-info {
+    background: linear-gradient(90deg, #1f6fd6 0%, #1696d2 100%);
+    color: white;
+    box-shadow: 0 8px 20px rgba(31, 111, 214, 0.24);
+}
+
+.btn-info:hover {
+    background: linear-gradient(90deg, #2d83ef 0%, #20a7e6 100%);
+}
+
 .badge {
     display: inline-block;
     padding: var(--spacing-4) var(--spacing-8);
@@ -698,6 +708,35 @@ h1 .headline-icon {
     margin-bottom: var(--spacing-12);
 }
 
+.trace-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-12);
+    margin-top: var(--spacing-16);
+}
+
+.trace-panel {
+    padding: var(--spacing-12);
+    border-radius: 10px;
+    border: 1px solid rgba(215, 177, 113, 0.16);
+    background: rgba(6, 12, 24, 0.78);
+}
+
+.trace-panel h4 {
+    margin-bottom: var(--spacing-8);
+    color: #d8bb82;
+}
+
+.trace-block {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #dfe8f3;
+}
+
 @media (max-width: 768px) {
     .browser-toolbar {
         grid-template-columns: 1fr;
@@ -709,5 +748,9 @@ h1 .headline-icon {
 
     .browser-frame {
         height: 480px;
+    }
+
+    .trace-grid {
+        grid-template-columns: 1fr;
     }
 }

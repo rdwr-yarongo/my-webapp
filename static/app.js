@@ -347,6 +347,23 @@ function renderRedirectResultsShell() {
     `;
 }
 
+function renderRedirectTraceShell() {
+    const resultsContent = document.getElementById('results-content');
+    if (!resultsContent) return;
+
+    resultsContent.innerHTML = `
+        <div class="panel">
+            <h3>Scenario 2 - TCPDump</h3>
+            <p>Collect a short packet summary for <strong>scenario2.radware.lab</strong> and show the raw redirect exchange from the controller.</p>
+        </div>
+        <div class="panel">
+            <div id="redirect-proof" class="redirect-proof">
+                <p>Collecting HTTP exchange and packet summary...</p>
+            </div>
+        </div>
+    `;
+}
+
 function setRedirectBrowserState(url, statusText, mode) {
     const urlBar = document.getElementById('redirect-url-display');
     const status = document.getElementById('redirect-status-text');
@@ -382,6 +399,39 @@ function renderRedirectProof(data) {
     `;
 }
 
+function renderRedirectTrace(data) {
+    const proof = document.getElementById('redirect-proof');
+    if (!proof) return;
+
+    if (!data.success) {
+        proof.innerHTML = `<p class="error">TCPDump check failed: ${escapeHtml(data.error || 'Unknown error')}</p>`;
+        return;
+    }
+
+    const httpExchange = (data.http_exchange_lines || []).map(line => escapeHtml(line)).join('\n');
+    const packetTrace = (data.packet_trace_lines || []).map(line => escapeHtml(line)).join('\n');
+
+    proof.innerHTML = `
+        <div class="redirect-proof-grid">
+            <div class="status-chip">Source: ${escapeHtml(data.source_url)}</div>
+            <div class="status-chip warning">Redirect: ${escapeHtml(data.redirect_status_code)}</div>
+            <div class="status-chip success">Destination: ${escapeHtml(data.destination_url)}</div>
+            <div class="status-chip">Final Status: ${escapeHtml(data.final_status_code)}</div>
+        </div>
+        <p><strong>Resolved IP:</strong> ${escapeHtml(data.target_ip || 'n/a')} &nbsp;|&nbsp; <strong>Location Header:</strong> ${escapeHtml(data.redirect_location || 'n/a')}</p>
+        <div class="trace-grid">
+            <div class="trace-panel">
+                <h4>HTTP Exchange</h4>
+                <pre class="trace-block">${httpExchange || 'No HTTP exchange captured.'}</pre>
+            </div>
+            <div class="trace-panel">
+                <h4>Packet Summary</h4>
+                <pre class="trace-block">${packetTrace || escapeHtml(data.packet_capture_error || 'No packet trace captured.')}</pre>
+            </div>
+        </div>
+    `;
+}
+
 function launchEmbeddedRedirectDemo() {
     renderRedirectResultsShell();
 
@@ -411,6 +461,22 @@ function launchEmbeddedRedirectDemo() {
         .catch(error => {
             setRedirectBrowserState('http://scenario2.radware.lab/', 'Redirect validation failed', 'error');
             proof.innerHTML = `<p class="error">Error: ${escapeHtml(error)}</p>`;
+        });
+}
+
+function runRedirectTcpdump() {
+    renderRedirectTraceShell();
+
+    fetch('/api/scenario/http_redirect/proof?include_packets=1')
+        .then(response => response.json())
+        .then(data => {
+            renderRedirectTrace(data);
+        })
+        .catch(error => {
+            const proof = document.getElementById('redirect-proof');
+            if (proof) {
+                proof.innerHTML = `<p class="error">Error: ${escapeHtml(error)}</p>`;
+            }
         });
 }
 

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, Response, stream_with_context
 import json
 import re
+import subprocess
 import time
 from urllib.parse import quote, urljoin
 
@@ -21,6 +22,10 @@ ALTEON_1_MGMT_IP = '10.100.0.51'
 ALTEON_AUTH = HTTPBasicAuth('admin', 'admin')
 ALTEON_TIMEOUT = 2
 HA_PORTS = (1, 2, 3)
+PACKET_CAPTURE_INTERFACE = 'any'
+PACKET_CAPTURE_COUNT = 12
+PACKET_CAPTURE_FILTER = 'host {target_ip} and (tcp port 80 or tcp port 443)'
+SUDO_PASSWORD = 'radware5?'
 
 
 def build_request_headers(target_host):
@@ -271,22 +276,87 @@ def resolve_target_ip(target_host):
 def fetch_redirect_proof():
     target_ip, resolved_records = resolve_target_ip(REDIRECT_TARGET_HOST)
     request_headers = build_request_headers(REDIRECT_TARGET_HOST)
+    include_packets = request.args.get('include_packets') in {'1', 'true', 'yes'}
 
-    http_response = requests.get(
-        f'http://{target_ip}/',
-        headers=request_headers,
-        timeout=5,
-        allow_redirects=False
-    )
-    redirect_location = http_response.headers.get('Location')
+    packet_trace_lines = []
+    packet_capture_error = None
+    tcpdump_process = None
 
-    https_response = requests.get(
-        f'https://{target_ip}/',
-        headers=request_headers,
-        timeout=5,
-        allow_redirects=True,
-        verify=False
-    )
+    try:
+        if include_packets:
+            capture_command = [
+                'sudo', '-S', '-p', '',
+                'tcpdump',
+                '-ni', PACKET_CAPTURE_INTERFACE,
+                '-l',
+                '-nn',
+                '-tttt',
+                '-c', str(PACKET_CAPTURE_COUNT),
+                PACKET_CAPTURE_FILTER.format(target_ip=target_ip)
+            ]
+            tcpdump_process = subprocess.Popen(
+                capture_command,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True
+            )
+            if tcpdump_process.stdin:
+                tcpdump_process.stdin.write(f'{SUDO_PASSWORD}\n')
+                tcpdump_process.stdin.flush()
+            time.sleep(0.5)
+
+        http_response = requests.get(
+            f'http://{target_ip}/',
+            headers=request_headers,
+            timeout=5,
+            allow_redirects=False
+        )
+        redirect_location = http_response.headers.get('Location')
+
+        https_response = requests.get(
+            f'https://{target_ip}/',
+            headers=request_headers,
+            timeout=5,
+            allow_redirects=True,
+            verify=False
+        )
+
+        if include_packets:
+            time.sleep(0.5)
+    finally:
+        if tcpdump_process is not None:
+            try:
+                tcpdump_output, _ = tcpdump_process.communicate(timeout=3)
+            except subprocess.TimeoutExpired:
+                tcpdump_process.terminate()
+                try:
+                    tcpdump_output, _ = tcpdump_process.communicate(timeout=2)
+                except subprocess.TimeoutExpired:
+                    tcpdump_process.kill()
+                    tcpdump_output, _ = tcpdump_process.communicate()
+
+            packet_trace_lines = [
+                line.strip()
+                for line in (tcpdump_output or '').splitlines()
+                if line.strip()
+            ]
+            if tcpdump_process.returncode not in (0, 124, 143) and not packet_trace_lines:
+                packet_capture_error = 'tcpdump did not return usable output'
+
+    http_exchange_lines = [
+        f'GET / HTTP/1.1',
+        f'Host: {REDIRECT_TARGET_HOST}',
+        f'Cache-Control: no-cache',
+        f'Pragma: no-cache',
+        '',
+        f'{format_http_version(http_response)} {http_response.status_code} {http_response.reason}',
+        f'Location: {redirect_location or "n/a"}',
+        '',
+        f'TLS follow-up: GET https://{target_ip}/ with Host: {REDIRECT_TARGET_HOST}',
+        f'{format_http_version(https_response)} {https_response.status_code} {https_response.reason}',
+        f'Final URL: {https_response.url}'
+    ]
 
     return {
         'success': True,
@@ -298,7 +368,10 @@ def fetch_redirect_proof():
         'redirect_location': redirect_location,
         'destination_url': f'https://{REDIRECT_TARGET_HOST}/',
         'final_status_code': https_response.status_code,
-        'final_url': https_response.url
+        'final_url': https_response.url,
+        'http_exchange_lines': http_exchange_lines,
+        'packet_trace_lines': packet_trace_lines,
+        'packet_capture_error': packet_capture_error
     }
 
 
