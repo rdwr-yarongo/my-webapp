@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, Response, stream_with_context
 import json
 import re
+import socket
 import subprocess
 import time
 from urllib.parse import quote, urljoin
@@ -24,6 +25,8 @@ ALTEON_TIMEOUT = 2
 HA_PORTS = (1, 2, 3)
 PACKET_CAPTURE_INTERFACE = 'any'
 PACKET_CAPTURE_COUNT = 12
+OFFLOADING_PACKET_COUNT = 30
+OFFLOADING_TARGET_HOST = 'app2.radware.lab'
 PACKET_CAPTURE_FILTER = 'host {target_ip} and (tcp port 80 or tcp port 443)'
 SUDO_PASSWORD = 'radware5?'
 
@@ -103,6 +106,19 @@ def build_resolver():
     resolver.lifetime = 3
     return resolver
 
+
+def get_controller_outbound_ip(dest_ip):
+    """Return local IP used to reach dest_ip (no packets sent)."""
+    s = None
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect((dest_ip, 80))
+        return s.getsockname()[0]
+    except Exception:
+        return None
+    finally:
+        if s:
+            s.close()
 
 def fetch_target_attempt(attempt, target_host):
     result = {
@@ -525,6 +541,113 @@ def ha_failover_stream():
         headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'}
     )
 
+
+@app.route('/api/scenario/offloading/stream')
+def offloading_stream():
+    def generate():
+        # --- resolve DNS ---
+        try:
+            answers = build_resolver().resolve(OFFLOADING_TARGET_HOST, 'A')
+            ips = [rdata.address for rdata in answers]
+            if not ips:
+                yield "event: error\ndata: \"No A records returned\"\n\n"
+                return
+        except Exception as exc:
+            yield f"event: error\ndata: {json.dumps(str(exc))}\n\n"
+            return
+
+        vip_ip = ips[0]
+        controller_ip = get_controller_outbound_ip(vip_ip) or 'unknown'
+
+        # --- emit meta so JS can update diagram immediately ---
+        yield f"event: meta\ndata: {json.dumps({'vip_ip': vip_ip, 'controller_ip': controller_ip, 'target_host': OFFLOADING_TARGET_HOST})}\n\n"
+
+        # --- start tcpdump BEFORE sending HTTP ---
+        capture_cmd = [
+            'sudo', '-S', '-p', '',
+            'tcpdump',
+            '-ni', PACKET_CAPTURE_INTERFACE,
+            '-l', '-nn', '-tttt',
+            '-c', str(OFFLOADING_PACKET_COUNT),
+            f'host {vip_ip} and tcp port 80'
+        ]
+        try:
+            proc = subprocess.Popen(
+                capture_cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True
+            )
+            if proc.stdin:
+                proc.stdin.write(f'{SUDO_PASSWORD}\n')
+                proc.stdin.flush()
+        except Exception as exc:
+            yield f"event: error\ndata: {json.dumps('tcpdump failed: ' + str(exc))}\n\n"
+            return
+
+        time.sleep(0.6)
+
+        # --- trigger HTTP in a background thread so stream stays live ---
+        import threading
+        fetch_result = {}
+        def do_fetch():
+            try:
+                resp = requests.get(
+                    f'http://{vip_ip}/',
+                    headers=build_request_headers(OFFLOADING_TARGET_HOST),
+                    timeout=8,
+                    allow_redirects=False
+                )
+                fetch_result['body_html'] = rewrite_relative_resource_urls(
+                    resp.text, vip_ip, OFFLOADING_TARGET_HOST
+                )
+                fetch_result['status_code'] = resp.status_code
+                fetch_result['remote_addr'] = (
+                    extract_backend_marker(resp.text, 'Client IP') or
+                    extract_backend_marker(resp.text, 'Remote Address') or
+                    extract_backend_marker(resp.text, 'REMOTE_ADDR')
+                )
+                fetch_result['x_forwarded_for'] = extract_backend_marker(resp.text, 'X-Forwarded-For')
+                fetch_result['client_source_port'] = extract_backend_marker(resp.text, 'Client Source Port')
+                fetch_result['served_by'] = extract_backend_marker(resp.text, 'Served By')
+            except Exception as exc:
+                fetch_result['error'] = str(exc)
+
+        t = threading.Thread(target=do_fetch, daemon=True)
+        t.start()
+
+        # --- stream tcpdump lines as they arrive ---
+        try:
+            for line in proc.stdout:
+                line = line.strip()
+                if line:
+                    yield f"event: tcpdump\ndata: {json.dumps({'line': line})}\n\n"
+        except Exception:
+            pass
+        finally:
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                proc.terminate()
+                proc.wait()
+
+        # --- wait for HTTP fetch to finish ---
+        t.join(timeout=10)
+
+        # --- emit page event ---
+        if 'error' in fetch_result:
+            yield f"event: error\ndata: {json.dumps('HTTP fetch: ' + fetch_result['error'])}\n\n"
+        else:
+            yield f"event: page\ndata: {json.dumps(fetch_result)}\n\n"
+
+        yield "event: done\ndata: {}\n\n"
+
+    return Response(
+        stream_with_context(generate()),
+        content_type='text/event-stream',
+        headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'}
+    )
 
 @app.route('/')
 def index():

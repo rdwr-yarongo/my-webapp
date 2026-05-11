@@ -24,7 +24,15 @@
                             <li><a href="#" data-section="scenario-2" class="nav-sub-link">HA Failover</a></li>
                         </ul>
                     </li>
-                    <li><a href="#" data-section="scenario-3">Scenario 2 - HTTP Redirection</a></li>
+                    <li class="nav-group">
+                        <div class="nav-group-header" onclick="toggleNavGroup(this)">
+                            <span class="nav-group-arrow">&#x25B8;</span>Scenario 2
+                        </div>
+                        <ul class="nav-sub-list">
+                            <li><a href="#" data-section="scenario-3" class="nav-sub-link">HTTP Redirection</a></li>
+                            <li><a href="#" data-section="scenario-offloading" class="nav-sub-link">Offloading</a></li>
+                        </ul>
+                    </li>
                     <li><a href="#" data-section="settings"><i class="bi bi-sliders nav-item-icon"></i>Settings</a></li>
                 </ul>
             </nav>
@@ -293,6 +301,79 @@
 
                         <text x="80" y="290" fill="#ffffff" font-size="14">White: initial HTTP request and redirect | Green: final secure destination shown to the customer</text>
                     </svg>
+                </div>
+            </section>
+            <section id="scenario-offloading" class="content-section offloading-page">
+                <h1><i class="bi bi-bezier2 headline-icon"></i>TCP Session Offloading &#x2014; Live Demo</h1>
+                <div class="panel">
+                    <div class="offloading-controls">
+                        <button class="btn btn-primary" id="off-launch-btn" onclick="launchOffloadingDemo()">
+                            <i class="bi bi-play-fill"></i> Launch Live Demo
+                        </button>
+                        <button class="btn btn-danger" id="off-stop-btn" style="display:none" onclick="stopOffloadingDemo()">
+                            <i class="bi bi-stop-fill"></i> Stop
+                        </button>
+                        <span id="off-status-badge" class="off-badge off-badge-idle">&#9679; Idle</span>
+                    </div>
+                    <p style="margin-top:8px">Click <strong>Launch</strong> to fetch <strong>app2.radware.lab</strong> through Alteon while tcpdump captures the exchange. The diagram updates with real IPs, the left panel streams packets, the right panel shows the backend page.</p>
+                </div>
+                <div class="panel offloading-diagram-panel">
+                    <svg id="off-diagram" viewBox="0 0 1000 230" width="100%" role="img" aria-label="TCP session split diagram">
+                        <defs>
+                            <marker id="oA" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#9cd4ff"/>
+                            </marker>
+                            <marker id="oB" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#9cffb4"/>
+                            </marker>
+                        </defs>
+                        <rect x="10" y="60" width="200" height="110" rx="6" fill="#2a3a52" stroke="#607080" stroke-width="2"/>
+                        <text x="110" y="88" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="bold">Controller</text>
+                        <line x1="10" y1="98" x2="210" y2="98" stroke="#607080" stroke-width="1" opacity="0.5"/>
+                        <text x="110" y="116" text-anchor="middle" fill="#9cd4ff" font-size="12">src IP:</text>
+                        <text x="110" y="133" text-anchor="middle" fill="#9cd4ff" font-size="13" font-weight="600" id="off-ctrl-ip">resolving&#x2026;</text>
+                        <text x="110" y="152" text-anchor="middle" fill="#aaaaaa" font-size="11">sport: ephemeral</text>
+                        <rect x="390" y="30" width="220" height="170" rx="6" fill="#1e2d1e" stroke="#c7a66a" stroke-width="2.5"/>
+                        <text x="500" y="58" text-anchor="middle" fill="#c7a66a" font-size="16" font-weight="bold">Alteon ADC</text>
+                        <line x1="390" y1="68" x2="610" y2="68" stroke="#c7a66a" stroke-width="1" opacity="0.3"/>
+                        <text x="500" y="88" text-anchor="middle" fill="#ffffff" font-size="12">VIP:</text>
+                        <text x="500" y="105" text-anchor="middle" fill="#9cd4ff" font-size="13" font-weight="600" id="off-vip-ip">resolving&#x2026;</text>
+                        <line x1="410" y1="120" x2="590" y2="120" stroke="#c7a66a" stroke-width="1" stroke-dasharray="4,3" opacity="0.35"/>
+                        <text x="500" y="140" text-anchor="middle" fill="#ffffff" font-size="12">SNAT (server sees):</text>
+                        <text x="500" y="157" text-anchor="middle" fill="#9cffb4" font-size="13" font-weight="600" id="off-snat-ip">waiting&#x2026;</text>
+                        <text x="500" y="178" text-anchor="middle" fill="#ffd700" font-size="11" id="off-xfwd-label">X-Fwd-For: &#x2014;</text>
+                        <rect x="790" y="60" width="200" height="110" rx="6" fill="#1e3a28" stroke="#00ff88" stroke-width="2"/>
+                        <text x="890" y="88" text-anchor="middle" fill="#00ff88" font-size="16" font-weight="bold">Application</text>
+                        <line x1="790" y1="98" x2="990" y2="98" stroke="#00ff88" stroke-width="1" opacity="0.4"/>
+                        <text x="890" y="116" text-anchor="middle" fill="#9cffb4" font-size="12">client IP seen:</text>
+                        <text x="890" y="133" text-anchor="middle" fill="#9cffb4" font-size="13" font-weight="600" id="off-server-sees-ip">waiting&#x2026;</text>
+                        <text x="890" y="152" text-anchor="middle" fill="#ffd700" font-size="11" id="off-server-port">port: &#x2014;</text>
+                        <line x1="210" y1="105" x2="390" y2="95" stroke="#9cd4ff" stroke-width="2.5" marker-end="url(#oA)"/>
+                        <text x="300" y="87" text-anchor="middle" fill="#9cd4ff" font-size="12" font-weight="bold">Session A</text>
+                        <line x1="610" y1="125" x2="790" y2="115" stroke="#9cffb4" stroke-width="2.5" marker-end="url(#oB)"/>
+                        <text x="700" y="110" text-anchor="middle" fill="#9cffb4" font-size="12" font-weight="bold">Session B</text>
+                        <line x1="500" y1="175" x2="890" y2="175" stroke="#ffd700" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+                        <text x="10" y="222" fill="#9cd4ff" font-size="11">&#9632; Blue = Session A (ctrl &#x2192; VIP)</text>
+                        <text x="270" y="222" fill="#9cffb4" font-size="11">&#9632; Green = Session B (Alteon SNAT &#x2192; backend)</text>
+                        <text x="620" y="222" fill="#ffd700" font-size="11">&#9632; Gold = X-Forwarded-For injected by Alteon</text>
+                    </svg>
+                </div>
+                <div class="offloading-split">
+                    <div class="offloading-term-wrap">
+                        <div class="offloading-term-header">
+                            <i class="bi bi-terminal"></i> Session A &#x2014; tcpdump (Controller &#x2194; VIP)
+                            <span id="off-pkt-count" style="float:right;font-size:11px;opacity:0.7"></span>
+                        </div>
+                        <div class="offloading-term" id="off-tcpdump-output">Waiting for capture&#x2026;</div>
+                    </div>
+                    <div class="offloading-iframe-wrap">
+                        <div class="offloading-term-header">
+                            <i class="bi bi-window"></i> Session B &#x2014; Backend page (what the server sees)
+                        </div>
+                        <div id="off-iframe-container" class="offloading-iframe-inner">
+                            <p class="offloading-waiting">Waiting for page&#x2026;</p>
+                        </div>
+                    </div>
                 </div>
             </section>
             <section id="settings" class="content-section">

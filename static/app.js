@@ -563,6 +563,133 @@ function executeScenario(scenarioId) {
     });
 }
 
+
+// ── Offloading Demo ───────────────────────────────────────────────────────────
+
+let offloadingEventSource = null;
+let offPktCount = 0;
+
+function stopOffloadingDemo() {
+    if (offloadingEventSource) {
+        offloadingEventSource.close();
+        offloadingEventSource = null;
+    }
+    const btn = document.getElementById('off-launch-btn');
+    const stopBtn = document.getElementById('off-stop-btn');
+    const badge = document.getElementById('off-status-badge');
+    if (btn) btn.style.display = '';
+    if (stopBtn) stopBtn.style.display = 'none';
+    if (badge) { badge.className = 'off-badge off-badge-idle'; badge.textContent = '\u25cf Stopped'; }
+}
+
+function offSetSvgText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value || '\u2014';
+}
+
+function launchOffloadingDemo() {
+    stopOffloadingDemo();
+    offPktCount = 0;
+
+    // Reset panels
+    const termDiv = document.getElementById('off-tcpdump-output');
+    const iframeDiv = document.getElementById('off-iframe-container');
+    const pktCount = document.getElementById('off-pkt-count');
+    if (termDiv) termDiv.textContent = '';
+    if (iframeDiv) iframeDiv.innerHTML = '<p class="offloading-waiting">Waiting for page\u2026</p>';
+    if (pktCount) pktCount.textContent = '';
+
+    // Reset diagram labels
+    offSetSvgText('off-ctrl-ip', 'resolving\u2026');
+    offSetSvgText('off-vip-ip', 'resolving\u2026');
+    offSetSvgText('off-snat-ip', 'waiting\u2026');
+    offSetSvgText('off-xfwd-label', 'X-Fwd-For: \u2014');
+    offSetSvgText('off-server-sees-ip', 'waiting\u2026');
+    offSetSvgText('off-server-port', 'port: \u2014');
+
+    const btn = document.getElementById('off-launch-btn');
+    const stopBtn = document.getElementById('off-stop-btn');
+    const badge = document.getElementById('off-status-badge');
+    if (btn) btn.style.display = 'none';
+    if (stopBtn) stopBtn.style.display = '';
+    if (badge) { badge.className = 'off-badge off-badge-live'; badge.textContent = '\u25cf LIVE'; }
+
+    offloadingEventSource = new EventSource('/api/scenario/offloading/stream');
+
+    offloadingEventSource.addEventListener('meta', function(e) {
+        const d = JSON.parse(e.data);
+        offSetSvgText('off-ctrl-ip', d.controller_ip || '\u2014');
+        offSetSvgText('off-vip-ip', d.vip_ip || '\u2014');
+    });
+
+    offloadingEventSource.addEventListener('tcpdump', function(e) {
+        const d = JSON.parse(e.data);
+        const line = d.line || '';
+        if (!line) return;
+        offPktCount++;
+        const termDiv = document.getElementById('off-tcpdump-output');
+        if (!termDiv) return;
+        const span = document.createElement('div');
+        span.className = 'off-pkt-line';
+        // Colour-code key TCP states
+        if (/Flags \[S\]/.test(line))       span.classList.add('off-pkt-syn');
+        else if (/Flags \[S\.\]/.test(line)) span.classList.add('off-pkt-synack');
+        else if (/Flags \[P\.\]/.test(line) || /Flags \[P\]/.test(line)) span.classList.add('off-pkt-data');
+        else if (/Flags \[\.\]/.test(line))  span.classList.add('off-pkt-ack');
+        else if (/Flags \[F/.test(line))     span.classList.add('off-pkt-fin');
+        span.textContent = line;
+        termDiv.appendChild(span);
+        termDiv.scrollTop = termDiv.scrollHeight;
+        const pktCount = document.getElementById('off-pkt-count');
+        if (pktCount) pktCount.textContent = offPktCount + ' packets';
+    });
+
+    offloadingEventSource.addEventListener('page', function(e) {
+        const d = JSON.parse(e.data);
+        // Update diagram with real values from backend
+        if (d.remote_addr) {
+            offSetSvgText('off-snat-ip', d.remote_addr);
+            offSetSvgText('off-server-sees-ip', d.remote_addr);
+        }
+        if (d.x_forwarded_for) {
+            offSetSvgText('off-xfwd-label', 'X-Fwd-For: ' + d.x_forwarded_for);
+        }
+        if (d.client_source_port) {
+            offSetSvgText('off-server-port', 'port: ' + d.client_source_port);
+        }
+        // Render iframe
+        const iframeDiv = document.getElementById('off-iframe-container');
+        if (iframeDiv && d.body_html) {
+            iframeDiv.innerHTML = '';
+            const iframe = document.createElement('iframe');
+            iframe.sandbox = 'allow-same-origin allow-scripts';
+            iframe.style.cssText = 'width:100%;height:100%;border:0;';
+            iframe.srcdoc = buildIframeDocument(d.body_html, window.location.origin + '/', '');
+            iframeDiv.appendChild(iframe);
+        }
+    });
+
+    offloadingEventSource.addEventListener('done', function() {
+        const badge = document.getElementById('off-status-badge');
+        if (badge) { badge.className = 'off-badge off-badge-done'; badge.textContent = '\u25cf Done'; }
+        stopOffloadingDemo();
+        const btn = document.getElementById('off-launch-btn');
+        if (btn) btn.style.display = '';
+    });
+
+    offloadingEventSource.addEventListener('error', function(e) {
+        let msg = 'Stream error';
+        try { msg = JSON.parse(e.data); } catch(_) {}
+        const termDiv = document.getElementById('off-tcpdump-output');
+        if (termDiv) termDiv.innerHTML += `<div class="off-pkt-line" style="color:#ff6b6b">Error: ${escapeHtml(msg)}</div>`;
+        stopOffloadingDemo();
+    });
+
+    offloadingEventSource.onerror = function() {
+        stopOffloadingDemo();
+    };
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     document.body.setAttribute('data-theme', 'dark');
