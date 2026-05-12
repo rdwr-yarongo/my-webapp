@@ -31,7 +31,6 @@
                         <ul class="nav-sub-list">
                             <li><a href="#" data-section="scenario-3" class="nav-sub-link">HTTP Redirection</a></li>
                             <li><a href="#" data-section="scenario-offloading" class="nav-sub-link">Offloading</a></li>
-                            <li><a href="#" data-section="scenario-http2-gateway" class="nav-sub-link">HTTP/2 Gateway</a></li>
                         </ul>
                     </li>
                     <li class="nav-group">
@@ -40,6 +39,14 @@
                         </div>
                         <ul class="nav-sub-list">
                             <li><a href="#" data-section="scenario-content-switching" class="nav-sub-link">Content-Switching</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-group">
+                        <div class="nav-group-header" onclick="toggleNavGroup(this)">
+                            <span class="nav-group-arrow">&#x25B8;</span>Scenario 4
+                        </div>
+                        <ul class="nav-sub-list">
+                            <li><a href="#" data-section="scenario-http2-gateway" class="nav-sub-link">HTTP/2 Gateway</a></li>
                         </ul>
                     </li>
                     <li><a href="#" data-section="settings"><i class="bi bi-sliders nav-item-icon"></i>Settings</a></li>
@@ -401,7 +408,7 @@
                 </div>
             </section>
             <section id="scenario-http2-gateway" class="content-section">
-                <h1><i class="bi bi-lightning-charge headline-icon"></i>Scenario 2 &mdash; HTTP/2 Gateway</h1>
+                <h1><i class="bi bi-lightning-charge headline-icon"></i>Scenario 4 &mdash; HTTP/2 Gateway</h1>
                 <div class="panel">
                     <h3><i class="bi bi-info-circle headline-icon"></i>What is HTTP/2 Gateway?</h3>
                     <p>Alteon acts as an <strong>HTTP/2 termination gateway</strong>. The client sends requests over HTTP/2 (multiplexed, binary, header-compressed), while Alteon communicates with backend servers over HTTP/1.1. This provides modern protocol benefits to clients without requiring backend changes.</p>
