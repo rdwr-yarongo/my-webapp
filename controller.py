@@ -17,6 +17,7 @@ app = Flask(__name__)
 GSLB_TARGET_HOST = 'app1.radware.lab'
 HA_TARGET_HOST = 'app2.radware.lab'
 REDIRECT_TARGET_HOST = 'scenario2.radware.lab'
+BYPASS_TARGET_HOST = 'site-a-servers.radware.lab'
 DNS_SERVER = '10.100.1.30'
 ALTEON_1_MGMT_IP = '10.100.0.51'
 ALTEON_AUTH = HTTPBasicAuth('admin', 'admin')
@@ -425,6 +426,34 @@ def offloading_data():
             'status_code': response.status_code,
             'body_html': body_html,
             'response_headers': headers_list
+        })
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 502
+
+
+@app.route('/api/scenario/offloading/bypass')
+def offloading_bypass():
+    """Fetch site-a-servers.radware.lab directly (bypassing Alteon) and return body HTML."""
+    try:
+        target_ip, _ = resolve_target_ip(BYPASS_TARGET_HOST)
+        response = requests.get(
+            f'https://{target_ip}/index.php',
+            headers=build_request_headers(BYPASS_TARGET_HOST),
+            timeout=5,
+            allow_redirects=True,
+            verify=False
+        )
+        body_html = rewrite_relative_resource_urls(
+            response.text,
+            target_ip,
+            BYPASS_TARGET_HOST,
+            scheme='https'
+        )
+        return jsonify({
+            'success': True,
+            'target_host': BYPASS_TARGET_HOST,
+            'status_code': response.status_code,
+            'body_html': body_html
         })
     except Exception as exc:
         return jsonify({'success': False, 'error': str(exc)}), 502

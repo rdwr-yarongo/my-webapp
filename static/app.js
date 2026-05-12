@@ -594,6 +594,37 @@ function loadOffloadingDemo() {
         });
 }
 
+
+// ── Bypass Demo ───────────────────────────────────────────────────────────────
+
+function loadBypassDemo() {
+    const btn = document.getElementById('bypass-btn');
+    const resultsContent = document.getElementById('results-content');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading…'; }
+    if (resultsContent) resultsContent.innerHTML = '<p>Loading page directly from <strong>https://site-a-servers.radware.lab/index.php</strong> (bypassing Alteon)…</p>';
+
+    fetch('/api/scenario/offloading/bypass')
+        .then(r => r.json())
+        .then(data => {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Reload Bypass'; }
+            if (!data.success) {
+                if (resultsContent) resultsContent.innerHTML = `<p class="error">Error: ${escapeHtml(data.error)}</p>`;
+                return;
+            }
+            if (!resultsContent) return;
+            const iframe = document.createElement('iframe');
+            iframe.sandbox = 'allow-same-origin allow-scripts';
+            iframe.style.cssText = 'width:100%;height:520px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
+            iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', '');
+            resultsContent.innerHTML = '';
+            resultsContent.appendChild(iframe);
+        })
+        .catch(err => {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-shield-x"></i> Bypass Alteon (Direct)'; }
+            if (resultsContent) resultsContent.innerHTML = `<p class="error">Request failed: ${escapeHtml(err.message)}</p>`;
+        });
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     document.body.setAttribute('data-theme', 'dark');
