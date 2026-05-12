@@ -280,10 +280,10 @@ svg {
     padding: 0;
 }
 
-/* Diagrams have white text/lines — give them a dark stage */
+/* Diagram SVG background */
 .panel svg,
 .panel > svg {
-    background: #1a2540;
+    background: #ffffff;
     border-radius: 8px;
     padding: 8px;
 }
