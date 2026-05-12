@@ -729,25 +729,30 @@ def content_switch():
     """Fetch content-switching VIP with the given Host header, return body HTML."""
     data = request.get_json(force=True, silent=True) or {}
     host = str(data.get('host', '')).strip()
+    scheme = str(data.get('scheme', 'http')).strip().lower()
     if host not in CONTENT_SWITCH_HOSTS:
         return jsonify({'success': False, 'error': f'Unknown host: {host}'}), 400
+    if scheme not in ('http', 'https'):
+        scheme = 'http'
     try:
         target_ip, _ = resolve_target_ip(host)
         response = requests.get(
-            f'http://{target_ip}/index.php',
+            f'{scheme}://{target_ip}/index.php',
             headers=build_request_headers(host),
             timeout=8,
-            allow_redirects=True
+            allow_redirects=True,
+            verify=False
         )
         body_html = rewrite_relative_resource_urls(
             response.text,
             target_ip,
             host,
-            scheme='http'
+            scheme=scheme
         )
         return jsonify({
             'success': True,
             'host': host,
+            'scheme': scheme,
             'env': CONTENT_SWITCH_HOSTS[host],
             'target_ip': target_ip,
             'status_code': response.status_code,

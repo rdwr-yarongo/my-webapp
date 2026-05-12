@@ -695,23 +695,24 @@ const CS_BTN_LABELS = {
 
 const CS_ENV_COLORS = { dev: '#7c3aed', stg: '#b45309', prod: '#16a34a' };
 
-function loadContentSwitch(host, btnId) {
+function loadContentSwitch(host, btnId, scheme) {
+    scheme = scheme || 'http';
     const btn = document.getElementById(btnId);
     const resultsContent = document.getElementById('results-content');
-    const allBtns = ['cs-dev-btn', 'cs-stg-btn', 'cs-prod-btn'];
+    const allBtns = ['cs-dev-btn', 'cs-stg-btn', 'cs-prod-btn', 'cs-dev-https-btn', 'cs-stg-https-btn', 'cs-prod-https-btn'];
     allBtns.forEach(id => { const b = document.getElementById(id); if (b) b.disabled = true; });
     if (btn) btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading…';
     if (resultsContent) resultsContent.innerHTML =
-        `<p>Sending request to <strong>${escapeHtml(host)}</strong> through Alteon VIP…</p>`;
+        `<p>Sending <strong>${escapeHtml(scheme.toUpperCase())}</strong> request to <strong>${escapeHtml(host)}</strong> through Alteon VIP…</p>`;
 
     fetch('/api/scenario/content_switch', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({host: host})
+        body: JSON.stringify({host: host, scheme: scheme})
     })
     .then(r => r.json())
     .then(data => {
-        allBtns.forEach(id => { const b = document.getElementById(id); if (b) { b.disabled = false; b.innerHTML = CS_BTN_LABELS[b.id === 'cs-dev-btn' ? 'Scenario3-dev.radware.lab' : b.id === 'cs-stg-btn' ? 'Scenario3-stg.radware.lab' : 'Scenario3.radware.lab'] || ''; } });
+        allBtns.forEach(id => { const b = document.getElementById(id); if (b) b.disabled = false; });
         if (btn) btn.innerHTML = CS_BTN_LABELS[host] || host;
         if (!data.success) {
             if (resultsContent) resultsContent.innerHTML =
