@@ -92,9 +92,9 @@ p + svg {
 }
 
 .sidebar {
-    width: 260px;
+    width: 230px;
     background: linear-gradient(180deg, #1e2a45 0%, #16213a 100%);
-    padding: var(--spacing-16);
+    padding: 12px 10px;
     border-right: 1px solid rgba(255,255,255,0.08);
     flex-shrink: 0;
 }
@@ -103,11 +103,11 @@ p + svg {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-24);
+    margin-bottom: 14px;
 }
 
 .sidebar-header h2 {
-    font-size: var(--font-size-lg);
+    font-size: 18px;
     margin-bottom: 0;
     letter-spacing: 0.2px;
 }
@@ -123,19 +123,19 @@ p + svg {
 }
 
 .sidebar-nav li {
-    margin-bottom: var(--spacing-8);
+    margin-bottom: 4px;
 }
 
 .sidebar-nav a {
     display: flex;
     align-items: center;
     gap: var(--spacing-4);
-    padding: 10px 12px;
+    padding: 7px 10px;
     text-decoration: none;
     color: #cbd5e1;
     border-radius: var(--border-radius);
     transition: background-color 0.2s, box-shadow 0.2s, border-color 0.2s;
-    font-size: var(--font-size-sm);
+    font-size: 15px;
     border: 1px solid transparent;
     font-weight: 600;
 }
@@ -630,12 +630,12 @@ h1 .headline-icon {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 10px 12px;
+    padding: 7px 10px;
     cursor: pointer;
     color: #cbd5e1;
     border-radius: var(--border-radius);
     border: 1px solid transparent;
-    font-size: var(--font-size-sm);
+    font-size: 15px;
     font-weight: 600;
     transition: background-color 0.2s, border-color 0.2s;
     user-select: none;
@@ -660,7 +660,7 @@ h1 .headline-icon {
 .nav-sub-list {
     display: none;
     list-style: none;
-    margin: 4px 0 0 0;
+    margin: 2px 0 0 0;
     padding: 0;
 }
 
@@ -669,7 +669,7 @@ h1 .headline-icon {
 }
 
 .nav-sub-link {
-    padding-left: 28px !important;
+    padding-left: 22px !important;
     font-weight: 400 !important;
 }
 
