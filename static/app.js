@@ -775,7 +775,29 @@ function loadHttp2Demo() {
         });
 }
 // Initialize
+function navToSection(sectionId) {
+    switchSection(sectionId);
+    // Clear all active nav links then mark the matching one
+    document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+    const link = document.querySelector('.sidebar-nav a[data-section="' + sectionId + '"]');
+    if (link) {
+        link.classList.add('active');
+        const group = link.closest('.nav-group');
+        if (group) group.classList.add('open');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     document.body.setAttribute('data-theme', 'dark');
     setRedirectBrowserState('http://scenario2.radware.lab/index.php', 'Ready to launch redirect demo', 'idle');
+
+    // Sidebar header click → go to home
+    const sidebarHeader = document.getElementById('sidebar-home-btn');
+    if (sidebarHeader) {
+        sidebarHeader.style.cursor = 'pointer';
+        sidebarHeader.addEventListener('click', function() {
+            switchSection('home');
+            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+        });
+    }
 });
