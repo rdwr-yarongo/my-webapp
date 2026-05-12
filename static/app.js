@@ -563,6 +563,93 @@ function executeScenario(scenarioId) {
     });
 }
 
+
+// ── Offloading Demo ───────────────────────────────────────────────────────────
+
+// Headers Alteon's SSL offloading adds or sets
+const OFF_SSL_HEADERS = new Set([
+    'x-forwarded-proto', 'x-forwarded-for', 'x-real-ip', 'x-ssl-client-verify',
+    'x-ssl-cipher', 'x-ssl-protocol'
+]);
+// Headers Alteon may inject or rewrite via content-modification rules
+const OFF_MODIFIED_HEADERS = new Set([
+    'server', 'via', 'x-cache', 'x-alteon', 'x-served-by',
+    'strict-transport-security', 'x-content-type-options', 'x-frame-options',
+    'x-xss-protection', 'referrer-policy', 'permissions-policy'
+]);
+// Headers Alteon content rules often strip
+const OFF_TYPICALLY_STRIPPED = ['x-powered-by', 'x-aspnet-version', 'x-generator', 'x-drupal-cache'];
+
+function loadOffloadingDemo() {
+    const btn = document.getElementById('off-load-btn');
+    const resultArea = document.getElementById('off-result-area');
+    const errorDiv = document.getElementById('off-error-msg');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading\u2026'; }
+    if (resultArea) resultArea.style.display = 'none';
+    if (errorDiv) errorDiv.style.display = 'none';
+
+    fetch('/api/scenario/offloading/data')
+        .then(r => r.json())
+        .then(data => {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Reload'; }
+            if (!data.success) {
+                if (errorDiv) { errorDiv.style.display = ''; errorDiv.textContent = 'Error: ' + data.error; }
+                return;
+            }
+
+            // ── Render headers table ──────────────────────────────────────────
+            const tbody = document.getElementById('off-headers-body');
+            if (tbody) {
+                tbody.innerHTML = '';
+                const present = new Set(data.response_headers.map(h => h.name.toLowerCase()));
+                data.response_headers.forEach(h => {
+                    const key = h.name.toLowerCase();
+                    const tr = document.createElement('tr');
+                    let tag = '';
+                    if (OFF_SSL_HEADERS.has(key)) {
+                        tag = '<span class="off-tag off-tag-ssl">SSL offloaded</span>';
+                        tr.classList.add('off-row-ssl');
+                    } else if (OFF_MODIFIED_HEADERS.has(key)) {
+                        tag = '<span class="off-tag off-tag-modified">modified/injected</span>';
+                        tr.classList.add('off-row-modified');
+                    }
+                    tr.innerHTML = `<td class="off-hdr-name"><strong>${escapeHtml(h.name)}</strong>${tag ? ' ' + tag : ''}</td><td class="off-hdr-val">${escapeHtml(h.value)}</td>`;
+                    tbody.appendChild(tr);
+                });
+
+                // Stripped headers (typically absent because Alteon removes them)
+                const strippedFound = OFF_TYPICALLY_STRIPPED.filter(k => !present.has(k));
+                const strippedSection = document.getElementById('off-stripped-section');
+                const strippedBody = document.getElementById('off-stripped-body');
+                if (strippedSection && strippedBody && strippedFound.length > 0) {
+                    strippedBody.innerHTML = strippedFound.map(k =>
+                        `<tr class="off-row-stripped"><td class="off-hdr-name"><strong>${escapeHtml(k)}</strong> <span class="off-tag off-tag-stripped">stripped</span></td><td class="off-hdr-val off-absent">(absent \u2014 removed by Alteon content rule)</td></tr>`
+                    ).join('');
+                    strippedSection.style.display = '';
+                } else if (strippedSection) {
+                    strippedSection.style.display = 'none';
+                }
+            }
+
+            // ── Render iframe ─────────────────────────────────────────────────
+            const container = document.getElementById('off-iframe-container');
+            if (container && data.body_html) {
+                container.innerHTML = '';
+                const iframe = document.createElement('iframe');
+                iframe.sandbox = 'allow-same-origin allow-scripts';
+                iframe.style.cssText = 'width:100%;height:520px;border:0;';
+                iframe.srcdoc = buildIframeDocument(data.body_html, window.location.origin + '/', '');
+                container.appendChild(iframe);
+            }
+
+            if (resultArea) resultArea.style.display = '';
+        })
+        .catch(err => {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-play-fill"></i> Load Page via Alteon'; }
+            if (errorDiv) { errorDiv.style.display = ''; errorDiv.textContent = 'Request failed: ' + err.message; }
+        });
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     document.body.setAttribute('data-theme', 'dark');

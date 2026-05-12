@@ -393,6 +393,42 @@ def fetch_redirect_page():
     return body_html, target_ip, response.status_code
 
 
+
+@app.route('/api/scenario/offloading/data')
+def offloading_data():
+    """Fetch scenario2.radware.lab via HTTPS and return body + response headers for offloading demo."""
+    try:
+        target_ip, _ = resolve_target_ip(REDIRECT_TARGET_HOST)
+        response = requests.get(
+            f'https://{target_ip}/',
+            headers=build_request_headers(REDIRECT_TARGET_HOST),
+            timeout=5,
+            allow_redirects=True,
+            verify=False
+        )
+        body_html = rewrite_relative_resource_urls(
+            response.text,
+            target_ip,
+            REDIRECT_TARGET_HOST,
+            scheme='https'
+        )
+        # Collect response headers (skip hop-by-hop)
+        skip = {'transfer-encoding', 'connection', 'keep-alive', 'te', 'trailers', 'upgrade'}
+        headers_list = [
+            {'name': k, 'value': v}
+            for k, v in response.headers.items()
+            if k.lower() not in skip
+        ]
+        return jsonify({
+            'success': True,
+            'target_host': REDIRECT_TARGET_HOST,
+            'status_code': response.status_code,
+            'body_html': body_html,
+            'response_headers': headers_list
+        })
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 502
+
 @app.route('/api/scenario/gslb_rr/stream')
 def gslb_rr_stream():
     def generate():
