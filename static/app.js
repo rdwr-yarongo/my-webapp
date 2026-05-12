@@ -80,7 +80,7 @@ function buildIframeDocument(html, baseHref, protocolFallback) {
 function createResponseIframe(result) {
     const iframe = document.createElement('iframe');
     iframe.sandbox = 'allow-same-origin allow-scripts';
-    iframe.style.cssText = 'width:100%;height:520px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
+    iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
     const baseHref = window.location.origin + '/';
     iframe.srcdoc = buildIframeDocument(result.body_html || '', baseHref, result.protocol_version || 'HTTP/1.1');
     return iframe;
@@ -583,7 +583,7 @@ function loadOffloadingDemo() {
             if (!resultsContent) return;
             const iframe = document.createElement('iframe');
             iframe.sandbox = 'allow-same-origin allow-scripts';
-            iframe.style.cssText = 'width:100%;height:520px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
+            iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
             iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', '');
             resultsContent.innerHTML = '';
             resultsContent.appendChild(iframe);
@@ -614,7 +614,7 @@ function loadBypassDemo() {
             if (!resultsContent) return;
             const iframe = document.createElement('iframe');
             iframe.sandbox = 'allow-same-origin allow-scripts';
-            iframe.style.cssText = 'width:100%;height:520px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
+            iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
             iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', '');
             resultsContent.innerHTML = '';
             resultsContent.appendChild(iframe);
