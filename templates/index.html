@@ -254,7 +254,7 @@
                 <div class="panel">
                     <h3><i class="bi bi-shield-lock headline-icon"></i>HTTP to HTTPS Demonstration</h3>
                     <p>This scenario demonstrates HTTP redirection to HTTPS for <strong>scenario2.radware.lab</strong>.</p>
-                    <p>The embedded browser frame starts from <strong>http://scenario2.radware.lab/</strong> and then updates to <strong>https://scenario2.radware.lab/</strong> after the Alteon redirect is confirmed.</p>
+                    <p>The embedded browser frame starts from <strong>http://scenario2.radware.lab/index.php</strong> and then updates to <strong>https://scenario2.radware.lab/index.php</strong> after the Alteon redirect is confirmed.</p>
                     <p>The new-tab action remains available when you want the customer to see the real browser address bar perform the redirect naturally.</p>
                 </div>
                 <div class="panel">
@@ -280,11 +280,11 @@
 
                         <rect x="330" y="55" width="250" height="85" rx="6" fill="#808080" stroke="#607080" stroke-width="2"/>
                         <text x="455" y="92" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="bold">HTTP Request</text>
-                        <text x="455" y="120" text-anchor="middle" fill="#ffffff" font-size="17">http://scenario2.radware.lab/</text>
+                        <text x="455" y="120" text-anchor="middle" fill="#ffffff" font-size="17">http://scenario2.radware.lab/index.php</text>
 
                         <rect x="330" y="185" width="250" height="85" rx="6" fill="#2d5a5a" stroke="#607080" stroke-width="2"/>
                         <text x="455" y="220" text-anchor="middle" fill="#00ff88" font-size="22" font-weight="bold">HTTPS Destination</text>
-                        <text x="455" y="248" text-anchor="middle" fill="#ffffff" font-size="17">https://scenario2.radware.lab/</text>
+                        <text x="455" y="248" text-anchor="middle" fill="#ffffff" font-size="17">https://scenario2.radware.lab/index.php</text>
 
                         <rect x="700" y="110" width="240" height="90" rx="6" fill="#808080" stroke="#00ff88" stroke-width="3"/>
                         <text x="820" y="148" text-anchor="middle" fill="#00ff88" font-size="22" font-weight="bold">Alteon Redirect</text>
@@ -308,12 +308,12 @@
                 <div class="panel">
                     <h3><i class="bi bi-info-circle headline-icon"></i>What is Content Offloading?</h3>
                     <p>Alteon can modify HTTP traffic in transit: <strong>removing sensitive headers from responses</strong>, <strong>stripping strings from the body</strong>, and <strong>injecting new content</strong> &#x2014; all without touching the backend server.</p>
-                    <p>Click <strong>Load Page via Alteon</strong> to fetch <strong>https://scenario2.radware.lab/</strong> through Alteon and view the page in the Execution Results pane.</p>
+                    <p>Click <strong>Load Page via Alteon</strong> to fetch <strong>https://scenario2.radware.lab/index.php</strong> through Alteon and view the page in the Execution Results pane.</p>
                     <div class="btn-row">
                         <button class="btn btn-primary" id="off-load-btn" onclick="loadOffloadingDemo()">
                             <i class="bi bi-play-fill"></i> Load Page via Alteon
                         </button>
-                        <button class="btn btn-secondary" onclick="window.open('https://scenario2.radware.lab/','_blank','noopener,noreferrer')">
+                        <button class="btn btn-secondary" onclick="window.open('https://scenario2.radware.lab/index.php','_blank','noopener,noreferrer')">
                             <i class="bi bi-box-arrow-up-right"></i> Open in New Tab
                         </button>
                     </div>

@@ -310,7 +310,7 @@ function renderHaActionError(actionName, errorText) {
 }
 
 function openRedirectScenario() {
-    window.open('http://scenario2.radware.lab/', '_blank', 'noopener,noreferrer');
+    window.open('http://scenario2.radware.lab/index.php', '_blank', 'noopener,noreferrer');
 }
 
 function renderRedirectResultsShell() {
@@ -320,7 +320,7 @@ function renderRedirectResultsShell() {
     resultsContent.innerHTML = `
         <div class="panel">
             <h3>Scenario 2 - HTTP Redirection</h3>
-            <p>Start from <strong>http://scenario2.radware.lab/</strong> and verify the redirect to <strong>https://scenario2.radware.lab/</strong> inside the embedded browser.</p>
+            <p>Start from <strong>http://scenario2.radware.lab/index.php</strong> and verify the redirect to <strong>https://scenario2.radware.lab/index.php</strong> inside the embedded browser.</p>
         </div>
         <div class="panel">
             <div id="redirect-browser-shell" class="browser-shell" data-state="idle">
@@ -330,7 +330,7 @@ function renderRedirectResultsShell() {
                         <span></span>
                         <span></span>
                     </div>
-                    <div id="redirect-url-display" class="browser-url">http://scenario2.radware.lab/</div>
+                    <div id="redirect-url-display" class="browser-url">http://scenario2.radware.lab/index.php</div>
                     <div id="redirect-status-text" class="browser-status">Ready to launch redirect demo</div>
                 </div>
                 <iframe
@@ -442,7 +442,7 @@ function launchEmbeddedRedirectDemo() {
     redirectScenarioState.launched = true;
     redirectScenarioState.proofLoaded = false;
 
-    setRedirectBrowserState('http://scenario2.radware.lab/', 'Requesting HTTP page...', 'http');
+    setRedirectBrowserState('http://scenario2.radware.lab/index.php', 'Requesting HTTP page...', 'http');
     proof.innerHTML = '<p>Checking redirect proof and loading the secure destination...</p>';
     iframe.src = 'about:blank';
 
@@ -455,11 +455,11 @@ function launchEmbeddedRedirectDemo() {
             }
 
             redirectScenarioState.proofLoaded = true;
-            setRedirectBrowserState('https://scenario2.radware.lab/', `Redirect ${data.redirect_status_code} observed. Secure page loaded.`, 'https');
+            setRedirectBrowserState('https://scenario2.radware.lab/index.php', `Redirect ${data.redirect_status_code} observed. Secure page loaded.`, 'https');
             iframe.src = '/api/scenario/http_redirect/page';
         })
         .catch(error => {
-            setRedirectBrowserState('http://scenario2.radware.lab/', 'Redirect validation failed', 'error');
+            setRedirectBrowserState('http://scenario2.radware.lab/index.php', 'Redirect validation failed', 'error');
             proof.innerHTML = `<p class="error">Error: ${escapeHtml(error)}</p>`;
         });
 }
@@ -570,7 +570,7 @@ function loadOffloadingDemo() {
     const btn = document.getElementById('off-load-btn');
     const resultsContent = document.getElementById('results-content');
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading…'; }
-    if (resultsContent) resultsContent.innerHTML = '<p>Loading page from <strong>https://scenario2.radware.lab/</strong> via Alteon…</p>';
+    if (resultsContent) resultsContent.innerHTML = '<p>Loading page from <strong>https://scenario2.radware.lab/index.php</strong> via Alteon…</p>';
 
     fetch('/api/scenario/offloading/data')
         .then(r => r.json())
@@ -597,5 +597,5 @@ function loadOffloadingDemo() {
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     document.body.setAttribute('data-theme', 'dark');
-    setRedirectBrowserState('http://scenario2.radware.lab/', 'Ready to launch redirect demo', 'idle');
+    setRedirectBrowserState('http://scenario2.radware.lab/index.php', 'Ready to launch redirect demo', 'idle');
 });

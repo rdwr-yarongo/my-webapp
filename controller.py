@@ -307,7 +307,7 @@ def fetch_redirect_proof():
             time.sleep(0.5)
 
         http_response = requests.get(
-            f'http://{target_ip}/',
+            f'http://{target_ip}/index.php',
             headers=request_headers,
             timeout=5,
             allow_redirects=False
@@ -315,7 +315,7 @@ def fetch_redirect_proof():
         redirect_location = http_response.headers.get('Location')
 
         https_response = requests.get(
-            f'https://{target_ip}/',
+            f'https://{target_ip}/index.php',
             headers=request_headers,
             timeout=5,
             allow_redirects=True,
@@ -345,7 +345,7 @@ def fetch_redirect_proof():
                 packet_capture_error = 'tcpdump did not return usable output'
 
     http_exchange_lines = [
-        f'GET / HTTP/1.1',
+        f'GET /index.php HTTP/1.1',
         f'Host: {REDIRECT_TARGET_HOST}',
         f'Cache-Control: no-cache',
         f'Pragma: no-cache',
@@ -353,7 +353,7 @@ def fetch_redirect_proof():
         f'{format_http_version(http_response)} {http_response.status_code} {http_response.reason}',
         f'Location: {redirect_location or "n/a"}',
         '',
-        f'TLS follow-up: GET https://{target_ip}/ with Host: {REDIRECT_TARGET_HOST}',
+        f'TLS follow-up: GET https://{target_ip}/index.php with Host: {REDIRECT_TARGET_HOST}',
         f'{format_http_version(https_response)} {https_response.status_code} {https_response.reason}',
         f'Final URL: {https_response.url}'
     ]
@@ -363,10 +363,10 @@ def fetch_redirect_proof():
         'target_host': REDIRECT_TARGET_HOST,
         'target_ip': target_ip,
         'resolved_records': resolved_records,
-        'source_url': f'http://{REDIRECT_TARGET_HOST}/',
+        'source_url': f'http://{REDIRECT_TARGET_HOST}/index.php',
         'redirect_status_code': http_response.status_code,
         'redirect_location': redirect_location,
-        'destination_url': f'https://{REDIRECT_TARGET_HOST}/',
+        'destination_url': f'https://{REDIRECT_TARGET_HOST}/index.php',
         'final_status_code': https_response.status_code,
         'final_url': https_response.url,
         'http_exchange_lines': http_exchange_lines,
@@ -378,7 +378,7 @@ def fetch_redirect_proof():
 def fetch_redirect_page():
     target_ip, _ = resolve_target_ip(REDIRECT_TARGET_HOST)
     response = requests.get(
-        f'https://{target_ip}/',
+        f'https://{target_ip}/index.php',
         headers=build_request_headers(REDIRECT_TARGET_HOST),
         timeout=5,
         allow_redirects=True,
