@@ -803,3 +803,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function showDiagramTab(btn, viewId) {
+    document.querySelectorAll('.dview').forEach(function(d) { d.style.display = 'none'; });
+    document.querySelectorAll('.dtab').forEach(function(t) { t.classList.remove('dtab-active'); });
+    document.getElementById(viewId).style.display = 'block';
+    btn.classList.add('dtab-active');
+}

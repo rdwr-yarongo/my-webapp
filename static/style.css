@@ -872,3 +872,32 @@ h1 .headline-icon {
     border-color: #90b0f0;
     background: #eef2ff;
 }
+
+/* ── Diagram Tabs ── */
+.diagram-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+.dtab {
+    padding: 6px 16px;
+    border: 1.5px solid #c8d4f0;
+    border-radius: 20px;
+    background: #f5f7ff;
+    color: #5570b0;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.dtab:hover {
+    background: #e8eeff;
+    border-color: #90a8e0;
+}
+.dtab.dtab-active {
+    background: #1565c0;
+    border-color: #1565c0;
+    color: #fff;
+}
+.dview { width: 100%; }
