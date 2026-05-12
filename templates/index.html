@@ -65,7 +65,8 @@
                         <li><strong>DNS Server</strong> — 10.100.0.30 &nbsp;|&nbsp; <strong>Cyber Controller</strong> — 10.100.0.200</li>
                     </ul>
                 </div>
-                <div class="panel">
+                <div style="display:flex;gap:20px;align-items:flex-start;">
+                <div class="panel" style="flex:1.4;min-width:0;">
                     <h3><i class="bi bi-map headline-icon"></i>Lab Topology</h3>
                     <svg viewBox="0 0 1000 560" width="100%" role="img" aria-label="Lab topology diagram" style="font-family:'Segoe UI',sans-serif;">
                         <defs>
@@ -202,9 +203,9 @@
                         <line x1="810" y1="406" x2="810" y2="450" stroke="#8899bb" stroke-width="1.5" marker-end="url(#hArrow)"/>
                     </svg>
                 </div>
-                <div class="panel">
+                <div class="panel" style="flex:1;min-width:280px;order:-1;">
                     <h3><i class="bi bi-grid-1x2 headline-icon"></i>Scenarios</h3>
-                    <div class="cards-grid" style="grid-template-columns:repeat(2,1fr);">
+                    <div class="cards-grid" style="grid-template-columns:1fr;">
                         <div class="scenario-card" style="cursor:pointer;" onclick="navToSection('scenario-1')">
                             <h3><i class="bi bi-globe2"></i> Scenario 1</h3>
                             <p><strong>Global Server Load Balancing (GSLB) &amp; HA Failover</strong><br>Observe DNS-driven traffic distribution across Site A and Site B, and test automatic failover between Alteon HA pairs.</p>
@@ -227,6 +228,7 @@
                         </div>
                     </div>
                 </div>
+                </div><!-- end flex row -->
             </section>
             <section id="scenario-1" class="content-section">
                 <h1><i class="bi bi-play-btn headline-icon"></i>Scenario 1</h1>
