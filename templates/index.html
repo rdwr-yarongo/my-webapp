@@ -307,8 +307,8 @@
                 <h1><i class="bi bi-layers headline-icon"></i>Scenario 2 &#x2014; Content Offloading</h1>
                 <div class="panel">
                     <h3><i class="bi bi-info-circle headline-icon"></i>What is Content Offloading?</h3>
-                    <p>Alteon can modify HTTP traffic in transit: <strong>stripping or adding response headers</strong>, <strong>removing sensitive strings from the body</strong>, and <strong>injecting new content</strong> &#x2014; all without touching the backend server.</p>
-                    <p>This demo fetches <strong>https://scenario2.radware.lab/</strong> through Alteon and shows the live page alongside its response headers. Headers or body text that Alteon has <strong class="off-highlight">modified or offloaded</strong> are highlighted.</p>
+                    <p>Alteon can modify HTTP traffic in transit: <strong>removing sensitive headers from responses</strong>, <strong>stripping strings from the body</strong>, and <strong>injecting new content</strong> &#x2014; all without touching the backend server.</p>
+                    <p>Click <strong>Load Page via Alteon</strong> to fetch <strong>https://scenario2.radware.lab/</strong> through Alteon and view the page in the Execution Results pane.</p>
                     <div class="btn-row">
                         <button class="btn btn-primary" id="off-load-btn" onclick="loadOffloadingDemo()">
                             <i class="bi bi-play-fill"></i> Load Page via Alteon
@@ -319,38 +319,7 @@
                     </div>
                 </div>
 
-                <div id="off-result-area" style="display:none">
-                    <div class="off-split">
-                        <div class="panel off-headers-panel">
-                            <h3><i class="bi bi-card-list headline-icon"></i>HTTP Response Headers</h3>
-                            <p class="off-legend">
-                                <span class="off-tag off-tag-ssl">SSL offloaded</span>
-                                <span class="off-tag off-tag-modified">modified/injected</span>
-                                <span class="off-tag off-tag-stripped">typically stripped</span>
-                            </p>
-                            <table class="off-headers-table" id="off-headers-table">
-                                <thead><tr><th>Header</th><th>Value</th></tr></thead>
-                                <tbody id="off-headers-body"></tbody>
-                            </table>
-                            <div id="off-stripped-section" style="display:none">
-                                <h4 style="margin-top:14px;font-size:13px;color:#ff9977">
-                                    <i class="bi bi-scissors"></i> Headers stripped by Alteon content rules
-                                </h4>
-                                <table class="off-headers-table">
-                                    <tbody id="off-stripped-body"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="panel off-iframe-panel">
-                            <h3><i class="bi bi-window headline-icon"></i>Page served through Alteon</h3>
-                            <div id="off-iframe-wrap" class="off-iframe-wrap">
-                                <div id="off-iframe-container"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div id="off-error-msg" class="panel" style="display:none;color:#ff6b6b"></div>
             </section>
             <section id="settings" class="content-section">
                 <h1><i class="bi bi-gear headline-icon"></i>Settings</h1>
