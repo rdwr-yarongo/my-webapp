@@ -742,6 +742,40 @@ function loadContentSwitch(host, btnId, scheme) {
     });
 }
 
+
+function loadHttp2Demo() {
+    const btn = document.getElementById('http2-load-btn');
+    const resultsArea = document.getElementById('http2-results');
+    const resultsContent = document.getElementById('http2-results-content');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...'; }
+    if (resultsArea) resultsArea.style.display = 'none';
+
+    fetch('/api/scenario/http2_gateway')
+        .then(r => r.json())
+        .then(data => {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-lightning-charge"></i> Load via Alteon HTTP/2 Gateway'; }
+            if (!resultsContent || !resultsArea) return;
+            resultsArea.style.display = 'block';
+            if (!data.success) {
+                resultsContent.innerHTML = `<p class="error">Error: ${escapeHtml(data.error || 'Unknown error')}</p>`;
+                return;
+            }
+            const label = document.createElement('div');
+            label.style.cssText = 'font-size:12px;color:var(--text-muted);margin-bottom:4px;';
+            label.innerHTML = `<strong>HTTP/2 Gateway</strong> &rarr; <code>${escapeHtml(data.target_host)}</code> &mdash; HTTP ${data.status_code}`;
+            const iframe = document.createElement('iframe');
+            iframe.sandbox = 'allow-same-origin allow-scripts';
+            iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:4px;background:#fff;';
+            iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', 'https');
+            resultsContent.innerHTML = '';
+            resultsContent.appendChild(label);
+            resultsContent.appendChild(iframe);
+        })
+        .catch(err => {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-lightning-charge"></i> Load via Alteon HTTP/2 Gateway'; }
+            if (resultsContent) resultsContent.innerHTML = `<p class="error">Request failed: ${escapeHtml(err.message)}</p>`;
+        });
+}
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     document.body.setAttribute('data-theme', 'dark');

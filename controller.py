@@ -18,6 +18,7 @@ GSLB_TARGET_HOST = 'app1.radware.lab'
 HA_TARGET_HOST = 'app2.radware.lab'
 REDIRECT_TARGET_HOST = 'scenario2.radware.lab'
 BYPASS_TARGET_HOST = 'site-a-servers.radware.lab'
+HTTP2_TARGET_HOST = 'scenario4.radware.lab'
 DNS_SERVER = '10.100.1.30'
 ALTEON_1_MGMT_IP = '10.100.0.51'
 ALTEON_AUTH = HTTPBasicAuth('admin', 'admin')
@@ -755,6 +756,34 @@ def content_switch():
             'scheme': scheme,
             'env': CONTENT_SWITCH_HOSTS[host],
             'target_ip': target_ip,
+            'status_code': response.status_code,
+            'body_html': body_html
+        })
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 502
+
+
+@app.route('/api/scenario/http2_gateway')
+def http2_gateway():
+    """Fetch scenario4.radware.lab via HTTPS (HTTP/2 gateway VIP) and return body HTML."""
+    try:
+        target_ip, _ = resolve_target_ip(HTTP2_TARGET_HOST)
+        response = requests.get(
+            f'https://{target_ip}/index.php',
+            headers=build_request_headers(HTTP2_TARGET_HOST),
+            timeout=5,
+            allow_redirects=True,
+            verify=False
+        )
+        body_html = rewrite_relative_resource_urls(
+            response.text,
+            target_ip,
+            HTTP2_TARGET_HOST,
+            scheme='https'
+        )
+        return jsonify({
+            'success': True,
+            'target_host': HTTP2_TARGET_HOST,
             'status_code': response.status_code,
             'body_html': body_html
         })

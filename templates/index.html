@@ -32,6 +32,7 @@
                             <li><a href="#" data-section="scenario-3" class="nav-sub-link">HTTP Redirection</a></li>
                             <li><a href="#" data-section="scenario-offloading" class="nav-sub-link">Offloading</a></li>
                             <li><a href="#" data-section="scenario-content-switching" class="nav-sub-link">Content-Switching</a></li>
+                            <li><a href="#" data-section="scenario-http2-gateway" class="nav-sub-link">HTTP/2 Gateway</a></li>
                         </ul>
                     </li>
                     <li><a href="#" data-section="settings"><i class="bi bi-sliders nav-item-icon"></i>Settings</a></li>
@@ -389,6 +390,32 @@
                         <button class="btn btn-warning" id="cs-prod-https-btn" onclick="loadContentSwitch('Scenario3.radware.lab','cs-prod-https-btn','https')">
                             <i class="bi bi-shield-lock"></i> PROD &mdash; scenario3.radware.lab
                         </button>
+                    </div>
+                </div>
+            </section>
+            <section id="scenario-http2-gateway" class="content-section">
+                <h1><i class="bi bi-lightning-charge headline-icon"></i>Scenario 2 &mdash; HTTP/2 Gateway</h1>
+                <div class="panel">
+                    <h3><i class="bi bi-info-circle headline-icon"></i>What is HTTP/2 Gateway?</h3>
+                    <p>Alteon acts as an <strong>HTTP/2 termination gateway</strong>. The client sends requests over HTTP/2 (multiplexed, binary, header-compressed), while Alteon communicates with backend servers over HTTP/1.1. This provides modern protocol benefits to clients without requiring backend changes.</p>
+                    <ul style="margin:8px 0 0 18px;line-height:1.8;">
+                        <li>Client &rarr; <strong>HTTP/2 (TLS)</strong> &rarr; Alteon</li>
+                        <li>Alteon &rarr; <strong>HTTP/1.1</strong> &rarr; Backend servers</li>
+                        <li>VIP: <code>scenario4.radware.lab</code></li>
+                    </ul>
+                </div>
+                <div class="panel">
+                    <h3><i class="bi bi-play-circle headline-icon"></i>Load Page via HTTP/2 Gateway</h3>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" id="http2-load-btn" onclick="loadHttp2Demo()">
+                            <i class="bi bi-lightning-charge"></i> Load via Alteon HTTP/2 Gateway
+                        </button>
+                        <a href="https://scenario4.radware.lab/index.php" target="_blank" class="btn btn-outline">
+                            <i class="bi bi-box-arrow-up-right"></i> Open in New Tab
+                        </a>
+                    </div>
+                    <div id="http2-results" class="results-area" style="display:none;">
+                        <div id="http2-results-content"></div>
                     </div>
                 </div>
             </section>
