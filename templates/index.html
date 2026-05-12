@@ -56,15 +56,7 @@
         <main class="main-content">
             <section id="home" class="content-section active">
                 <h1><i class="bi bi-diagram-3 headline-icon"></i>Alteon ADC Lab &mdash; Demo Dashboard</h1>
-                <div class="panel">
-                    <h3><i class="bi bi-info-circle headline-icon"></i>About This Lab</h3>
-                    <p>This interactive dashboard showcases <strong>Alteon Application Delivery Controller</strong> capabilities across four scenarios. The lab topology includes two sites (Site A &amp; Site B), three Alteon appliances, a DNS server for GSLB, and a Cyber Controller for management. Use the sidebar to navigate between scenarios, or click a card below to jump directly.</p>
-                    <ul style="margin:6px 0 0 18px;line-height:2;">
-                        <li><strong>Alteon 1</strong> (10.100.0.51) &amp; <strong>Alteon 2</strong> (10.100.0.52) — Site A, dual-ISP</li>
-                        <li><strong>Alteon 3</strong> (10.100.0.100) — Site B</li>
-                        <li><strong>DNS Server</strong> — 10.100.0.30 &nbsp;|&nbsp; <strong>Cyber Controller</strong> — 10.100.0.200</li>
-                    </ul>
-                </div>
+                <p style="margin:-8px 0 14px;color:#aab;font-size:13px;">Three Alteon ADCs &nbsp;&bull;&nbsp; Two sites (Site A + Site B) &nbsp;&bull;&nbsp; GSLB, HA, Offloading, Content-Switching &amp; HTTP/2 Gateway</p>
                 <div style="display:flex;gap:20px;align-items:flex-start;">
                 <div class="panel" style="flex:1.4;min-width:0;">
                     <h3><i class="bi bi-map headline-icon"></i>Lab Topology</h3>
@@ -80,8 +72,6 @@
                         <rect x="40" y="20" width="160" height="70" rx="6" fill="rgba(220,50,60,0.18)" stroke="#cc3344" stroke-width="1.5"/>
                         <text x="120" y="48" text-anchor="middle" fill="#ff8899" font-size="17" font-weight="600">Test Client</text>
                         <text x="120" y="66" text-anchor="middle" fill="#cccccc" font-size="15">10.100.0.3</text>
-                        <rect x="60" y="72" width="120" height="14" rx="3" fill="rgba(220,50,60,0.25)"/>
-                        <text x="120" y="83" text-anchor="middle" fill="#ff8899" font-size="17">monitor screen</text>
 
                         <!-- DNS Server box -->
                         <rect x="800" y="20" width="160" height="70" rx="6" fill="rgba(60,120,220,0.18)" stroke="#3366cc" stroke-width="1.5"/>
@@ -94,9 +84,9 @@
                         <text x="500" y="68" text-anchor="middle" fill="#6699cc" font-size="14">Internet</text>
 
                         <!-- Client → Cloud -->
-                        <line x1="200" y1="55" x2="410" y2="55" stroke="#8899bb" stroke-width="1.5" marker-end="url(#hArrow)"/>
+                        <line x1="200" y1="55" x2="410" y2="55" stroke="#8899bb" stroke-width="1.5"/>
                         <!-- DNS → Cloud -->
-                        <line x1="800" y1="55" x2="590" y2="55" stroke="#8899bb" stroke-width="1.5" marker-end="url(#hArrow)"/>
+                        <line x1="800" y1="55" x2="590" y2="55" stroke="#8899bb" stroke-width="1.5"/>
 
                         <!-- ===== ROW 2: ISP Routers ===== -->
                         <!-- ISP Router A circle -->
@@ -110,8 +100,8 @@
                         <text x="720" y="178" text-anchor="middle" fill="#88bbff" font-size="17">Router B</text>
 
                         <!-- Cloud → ISP Routers -->
-                        <line x1="440" y1="80" x2="305" y2="142" stroke="#8899bb" stroke-width="1.5" marker-end="url(#hArrow)"/>
-                        <line x1="560" y1="80" x2="695" y2="142" stroke="#8899bb" stroke-width="1.5" marker-end="url(#hArrow)"/>
+                        <line x1="440" y1="80" x2="305" y2="142" stroke="#8899bb" stroke-width="1.5"/>
+                        <line x1="560" y1="80" x2="695" y2="142" stroke="#8899bb" stroke-width="1.5"/>
 
                         <!-- ISP Label bars -->
                         <rect x="60" y="205" width="200" height="26" rx="5" fill="#1a3a6a"/>
@@ -149,13 +139,13 @@
                         <circle cx="770" cy="303" r="5" fill="rgba(51,102,204,0.4)"/>
 
                         <!-- ISP Router A → Alteon 1 (straight) -->
-                        <line x1="263" y1="193" x2="180" y2="268" stroke="#8899bb" stroke-width="1.5" marker-end="url(#hArrow)"/>
+                        <line x1="263" y1="193" x2="180" y2="268" stroke="#8899bb" stroke-width="1.5"/>
                         <!-- ISP Router A → Alteon 2 (cross) -->
-                        <line x1="296" y1="193" x2="450" y2="268" stroke="#8899bb" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#hArrow)"/>
+                        <line x1="296" y1="193" x2="450" y2="268" stroke="#8899bb" stroke-width="1.5" stroke-dasharray="4,3"/>
                         <!-- ISP Router B → Alteon 2 (cross) -->
-                        <line x1="703" y1="193" x2="550" y2="268" stroke="#8899bb" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#hArrow)"/>
+                        <line x1="703" y1="193" x2="550" y2="268" stroke="#8899bb" stroke-width="1.5" stroke-dasharray="4,3"/>
                         <!-- ISP Router B → Alteon 3 (straight) -->
-                        <line x1="737" y1="193" x2="820" y2="268" stroke="#8899bb" stroke-width="1.5" marker-end="url(#hArrow)"/>
+                        <line x1="737" y1="193" x2="820" y2="268" stroke="#8899bb" stroke-width="1.5"/>
 
                         <!-- ===== ROW 4: LAN bars + Cyber Controller ===== -->
                         <!-- Main LAN bar -->
@@ -173,13 +163,13 @@
                         <text x="500" y="420" text-anchor="middle" fill="#aa88dd" font-size="14">10.100.0.200</text>
 
                         <!-- Alteon 1 → Main LAN -->
-                        <line x1="155" y1="340" x2="155" y2="378" stroke="#8899bb" stroke-width="1.5" marker-end="url(#hArrow)"/>
+                        <line x1="155" y1="340" x2="155" y2="378" stroke="#8899bb" stroke-width="1.5"/>
                         <!-- Alteon 2 → Main LAN -->
-                        <line x1="460" y1="340" x2="370" y2="378" stroke="#8899bb" stroke-width="1.5" marker-end="url(#hArrow)"/>
+                        <line x1="460" y1="340" x2="370" y2="378" stroke="#8899bb" stroke-width="1.5"/>
                         <!-- Alteon 2 → Site B LAN -->
-                        <line x1="540" y1="340" x2="700" y2="378" stroke="#8899bb" stroke-width="1.5" marker-end="url(#hArrow)"/>
+                        <line x1="540" y1="340" x2="700" y2="378" stroke="#8899bb" stroke-width="1.5"/>
                         <!-- Alteon 3 → Site B LAN -->
-                        <line x1="845" y1="340" x2="845" y2="378" stroke="#8899bb" stroke-width="1.5" marker-end="url(#hArrow)"/>
+                        <line x1="845" y1="340" x2="845" y2="378" stroke="#8899bb" stroke-width="1.5"/>
 
                         <!-- ===== ROW 5: WebApp Servers ===== -->
                         <!-- Site A server stacks -->
@@ -198,32 +188,32 @@
                         <line x1="750" y1="513" x2="880" y2="513" stroke="#3366aa" stroke-width="1"/>
 
                         <!-- Main LAN → WebApp A -->
-                        <line x1="190" y1="406" x2="190" y2="450" stroke="#8899bb" stroke-width="1.5" marker-end="url(#hArrow)"/>
+                        <line x1="190" y1="406" x2="190" y2="450" stroke="#8899bb" stroke-width="1.5"/>
                         <!-- Site B LAN → WebApp B -->
-                        <line x1="810" y1="406" x2="810" y2="450" stroke="#8899bb" stroke-width="1.5" marker-end="url(#hArrow)"/>
+                        <line x1="810" y1="406" x2="810" y2="450" stroke="#8899bb" stroke-width="1.5"/>
                     </svg>
                 </div>
                 <div class="panel" style="flex:1;min-width:280px;order:-1;">
                     <h3><i class="bi bi-grid-1x2 headline-icon"></i>Scenarios</h3>
                     <div class="cards-grid" style="grid-template-columns:1fr;">
-                        <div class="scenario-card" style="cursor:pointer;" onclick="navToSection('scenario-1')">
+                        <div class="scenario-card" style="cursor:pointer;padding:10px 14px;" onclick="navToSection('scenario-1')">
                             <h3><i class="bi bi-globe2"></i> Scenario 1</h3>
-                            <p><strong>Global Server Load Balancing (GSLB) &amp; HA Failover</strong><br>Observe DNS-driven traffic distribution across Site A and Site B, and test automatic failover between Alteon HA pairs.</p>
+                            <p style="margin:4px 0 8px;font-size:12px;">DNS-driven GSLB across two sites + automatic HA failover.</p>
                             <button class="btn btn-primary" onclick="event.stopPropagation();navToSection('scenario-1')">Launch &rarr;</button>
                         </div>
-                        <div class="scenario-card" style="cursor:pointer;" onclick="navToSection('scenario-3')">
+                        <div class="scenario-card" style="cursor:pointer;padding:10px 14px;" onclick="navToSection('scenario-3')">
                             <h3><i class="bi bi-layers"></i> Scenario 2</h3>
-                            <p><strong>HTTP Redirection &amp; Content Offloading</strong><br>Demonstrate HTTP&rarr;HTTPS redirection, SSL offloading via Alteon, and custom HTTP header injection using the Alteon REST API.</p>
+                            <p style="margin:4px 0 8px;font-size:12px;">HTTP&rarr;HTTPS redirect, SSL offloading &amp; custom header injection.</p>
                             <button class="btn btn-primary" onclick="event.stopPropagation();navToSection('scenario-3')">Launch &rarr;</button>
                         </div>
-                        <div class="scenario-card" style="cursor:pointer;" onclick="navToSection('scenario-content-switching')">
+                        <div class="scenario-card" style="cursor:pointer;padding:10px 14px;" onclick="navToSection('scenario-content-switching')">
                             <h3><i class="bi bi-signpost-split"></i> Scenario 3</h3>
-                            <p><strong>Content-Switching</strong><br>Route traffic to DEV, STG, or PROD environments based on the HTTP Host header — all through the same Alteon VIP.</p>
+                            <p style="margin:4px 0 8px;font-size:12px;">Route DEV / STG / PROD via Host header on one VIP.</p>
                             <button class="btn btn-primary" onclick="event.stopPropagation();navToSection('scenario-content-switching')">Launch &rarr;</button>
                         </div>
-                        <div class="scenario-card" style="cursor:pointer;" onclick="navToSection('scenario-http2-gateway')">
+                        <div class="scenario-card" style="cursor:pointer;padding:10px 14px;" onclick="navToSection('scenario-http2-gateway')">
                             <h3><i class="bi bi-lightning-charge"></i> Scenario 4</h3>
-                            <p><strong>HTTP/2 Gateway</strong><br>Alteon terminates HTTP/2 from the client and forwards to backends over HTTP/1.1, providing modern protocol benefits without backend changes.</p>
+                            <p style="margin:4px 0 8px;font-size:12px;">HTTP/2 termination at Alteon, HTTP/1.1 to backends.</p>
                             <button class="btn btn-primary" onclick="event.stopPropagation();navToSection('scenario-http2-gateway')">Launch &rarr;</button>
                         </div>
                     </div>
