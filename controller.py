@@ -21,6 +21,7 @@ BYPASS_TARGET_HOST = 'site-a-servers.radware.lab'
 DNS_SERVER = '10.100.1.30'
 ALTEON_1_MGMT_IP = '10.100.0.51'
 ALTEON_AUTH = HTTPBasicAuth('admin', 'admin')
+ALTEON_HTTPMOD_AUTH = HTTPBasicAuth('radware', 'Radware1!')
 ALTEON_TIMEOUT = 2
 HA_PORTS = (1, 2, 3)
 PACKET_CAPTURE_INTERFACE = 'any'
@@ -629,6 +630,87 @@ def execute_scenario(scenario_id):
     }
     message = scenarios.get(scenario_id, 'Unknown scenario')
     return jsonify({'success': True, 'message': message})
+
+
+@app.route('/api/scenario/offloading/set_header', methods=['POST'])
+def offloading_set_header():
+    """Update Alteon HTTP mod rule header name/value, apply config, then fetch page."""
+    import re as _re
+    data = request.get_json(force=True, silent=True) or {}
+    header_name = str(data.get('header_name', '')).strip()
+    header_value = str(data.get('header_value', '')).strip()
+
+    # Validate header name: printable ASCII, no control chars or separators
+    if not header_name:
+        return jsonify({'success': False, 'error': 'header_name is required'}), 400
+    if len(header_name) > 64:
+        return jsonify({'success': False, 'error': 'header_name too long (max 64)'}), 400
+    if not _re.match(r'^[A-Za-z0-9\-_]+$', header_name):
+        return jsonify({'success': False, 'error': 'header_name must contain only letters, digits, hyphens or underscores'}), 400
+    if len(header_value) > 256:
+        return jsonify({'success': False, 'error': 'header_value too long (max 256)'}), 400
+
+    alteon_base = f'https://{ALTEON_1_MGMT_IP}'
+    hdr_url = f'{alteon_base}/config/Layer7NewCfgHttpmodRuleHdrTable/Scenario2/10'
+    apply_url = f'{alteon_base}/config?action=apply'
+
+    try:
+        # Step 1: Update the header rule on Alteon
+        put_resp = requests.put(
+            hdr_url,
+            auth=ALTEON_HTTPMOD_AUTH,
+            json={'Insert': header_name, 'Value': header_value},
+            timeout=5,
+            verify=False
+        )
+        alteon_ok = 200 <= put_resp.status_code < 300 and '"ok"' in put_resp.text
+        if not alteon_ok:
+            return jsonify({
+                'success': False,
+                'error': f'Alteon PUT failed (HTTP {put_resp.status_code})',
+                'alteon_raw': put_resp.text[:500]
+            }), 502
+
+        # Step 2: Apply the pending config
+        apply_resp = requests.post(
+            apply_url,
+            auth=ALTEON_HTTPMOD_AUTH,
+            timeout=10,
+            verify=False
+        )
+        apply_ok = '"ok"' in apply_resp.text
+
+        # Step 3: Fetch the page through Alteon and return body
+        import time as _time
+        _time.sleep(1)  # brief pause for apply to take effect
+        target_ip, _ = resolve_target_ip(REDIRECT_TARGET_HOST)
+        page_resp = requests.get(
+            f'https://{target_ip}/index.php',
+            headers=build_request_headers(REDIRECT_TARGET_HOST),
+            timeout=8,
+            allow_redirects=True,
+            verify=False
+        )
+        body_html = rewrite_relative_resource_urls(
+            page_resp.text,
+            target_ip,
+            REDIRECT_TARGET_HOST,
+            scheme='https'
+        )
+
+        return jsonify({
+            'success': True,
+            'header_name': header_name,
+            'header_value': header_value,
+            'alteon_status_code': put_resp.status_code,
+            'apply_ok': apply_ok,
+            'apply_raw': apply_resp.text[:200],
+            'page_status_code': page_resp.status_code,
+            'body_html': body_html
+        })
+
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 502
 
 
 if __name__ == '__main__':

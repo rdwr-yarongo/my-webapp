@@ -327,6 +327,27 @@
                         </button>
                     </div>
                 </div>
+                <div class="panel">
+                    <h3><i class="bi bi-pencil-square headline-icon"></i>Custom Header Injection via Alteon API</h3>
+                    <p>Set a <strong>custom response header</strong> on Alteon in real-time using the HTTP modification rule API. Enter a header name and value below — Alteon will inject this header into every response for <strong>https://scenario2.radware.lab/index.php</strong>.</p>
+                    <div class="form-group" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:12px;">
+                        <div style="display:flex;flex-direction:column;gap:4px;">
+                            <label for="hdr-name-input" style="font-size:13px;font-weight:600;color:var(--text-color);">Header Name</label>
+                            <input type="text" id="hdr-name-input" placeholder="X-My-Header" maxlength="64"
+                                   style="padding:8px 10px;border:1px solid var(--border-color);border-radius:6px;font-size:14px;width:200px;background:var(--card-bg);color:var(--text-color);">
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:4px;">
+                            <label for="hdr-value-input" style="font-size:13px;font-weight:600;color:var(--text-color);">Header Value</label>
+                            <input type="text" id="hdr-value-input" placeholder="HelloFromAlteon" maxlength="256"
+                                   style="padding:8px 10px;border:1px solid var(--border-color);border-radius:6px;font-size:14px;width:240px;background:var(--card-bg);color:var(--text-color);">
+                        </div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" id="inject-hdr-btn" onclick="applyCustomHeader()">
+                            <i class="bi bi-send-fill"></i> Apply Header &amp; Fetch Page
+                        </button>
+                    </div>
+                </div>
 
 
             </section>

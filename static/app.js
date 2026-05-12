@@ -625,6 +625,65 @@ function loadBypassDemo() {
         });
 }
 
+
+// ── Custom Header Injection ───────────────────────────────────────────────────
+
+function applyCustomHeader() {
+    const nameInput = document.getElementById('hdr-name-input');
+    const valueInput = document.getElementById('hdr-value-input');
+    const btn = document.getElementById('inject-hdr-btn');
+    const resultsContent = document.getElementById('results-content');
+
+    const headerName = (nameInput ? nameInput.value.trim() : '');
+    const headerValue = (valueInput ? valueInput.value.trim() : '');
+
+    if (!headerName) {
+        if (nameInput) nameInput.focus();
+        if (resultsContent) resultsContent.innerHTML = '<p class="error">Please enter a Header Name.</p>';
+        return;
+    }
+
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Applying…'; }
+    if (resultsContent) resultsContent.innerHTML =
+        `<p>Sending header <strong>${escapeHtml(headerName)}: ${escapeHtml(headerValue)}</strong> to Alteon, then fetching page…</p>`;
+
+    fetch('/api/scenario/offloading/set_header', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({header_name: headerName, header_value: headerValue})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-send-fill"></i> Apply Header & Fetch Page'; }
+        if (!data.success) {
+            const raw = data.alteon_raw ? `<pre style="font-size:11px;margin-top:8px;overflow:auto;">${escapeHtml(data.alteon_raw)}</pre>` : '';
+            if (resultsContent) resultsContent.innerHTML =
+                `<p class="error">Error: ${escapeHtml(data.error)}</p>${raw}`;
+            return;
+        }
+        if (!resultsContent) return;
+        const applyNote = data.apply_ok
+            ? `<span style="color:#16a34a;font-weight:600;">&#x2713; Config applied</span>`
+            : `<span style="color:#f59e0b;font-weight:600;">&#x26a0; Apply status uncertain</span>`;
+        const label = document.createElement('p');
+        label.style.cssText = 'margin:0 0 6px 0;font-size:13px;';
+        label.innerHTML =
+            `Alteon injected header <strong>${escapeHtml(data.header_name)}: ${escapeHtml(data.header_value)}</strong> &mdash; ${applyNote}`;
+        const iframe = document.createElement('iframe');
+        iframe.sandbox = 'allow-same-origin allow-scripts';
+        iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:4px;background:#fff;';
+        iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', '');
+        resultsContent.innerHTML = '';
+        resultsContent.appendChild(label);
+        resultsContent.appendChild(iframe);
+    })
+    .catch(err => {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-send-fill"></i> Apply Header & Fetch Page'; }
+        if (resultsContent) resultsContent.innerHTML =
+            `<p class="error">Request failed: ${escapeHtml(err.message)}</p>`;
+    });
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     document.body.setAttribute('data-theme', 'dark');
