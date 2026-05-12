@@ -61,14 +61,6 @@
                 <div class="panel" style="flex:1;min-width:0;border:none;box-shadow:none;">
                     <h3><i class="bi bi-map headline-icon"></i>Lab Topology</h3>
                     <svg viewBox="0 0 1000 590" width="100%" role="img" aria-label="Lab topology diagram" style="font-family:'Segoe UI',sans-serif;">
-                        <defs>
-                            <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
-                                <path d="M0,0 L0,6 L8,3 z" fill="#9e9e9e"/>
-                            </marker>
-                            <marker id="arr2" markerWidth="8" markerHeight="8" refX="1" refY="3" orient="auto">
-                                <path d="M8,0 L8,6 L0,3 z" fill="#9e9e9e"/>
-                            </marker>
-                        </defs>
                         <!-- Background -->
                         <rect x="0" y="0" width="1000" height="590" fill="#eef2f9" rx="10"/>
                         <!-- Legend -->
@@ -80,117 +72,98 @@
                         <text x="746" y="24" fill="#555" font-size="13">Infrastructure</text>
                         <rect x="852" y="12" width="14" height="14" rx="3" fill="#ede7f6" stroke="#9575cd" stroke-width="1"/>
                         <text x="870" y="24" fill="#555" font-size="13">Network</text>
-                        <!-- === CONNECTIONS (drawn first, behind nodes) === -->
-                        <!-- Client <-> Cloud -->
-                        <line x1="210" y1="88" x2="411" y2="88" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3" marker-start="url(#arr2)" marker-end="url(#arr)"/>
-                        <!-- Cloud <-> DNS -->
-                        <line x1="589" y1="88" x2="790" y2="88" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3" marker-start="url(#arr2)" marker-end="url(#arr)"/>
-                        <!-- Cloud -> Router A -->
-                        <line x1="445" y1="130" x2="272" y2="149" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
-                        <!-- Cloud -> Router B -->
-                        <line x1="555" y1="130" x2="728" y2="149" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
-                        <!-- Router A -> Alteon 1 -->
-                        <line x1="245" y1="226" x2="160" y2="298" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
-                        <!-- Router A -> Alteon 2 (cross dashed) -->
-                        <line x1="278" y1="226" x2="465" y2="298" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arr)"/>
-                        <!-- Router B -> Alteon 2 (cross dashed) -->
-                        <line x1="722" y1="226" x2="535" y2="298" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arr)"/>
-                        <!-- Router B -> Alteon 3 -->
-                        <line x1="755" y1="226" x2="840" y2="298" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
-                        <!-- Alteon 1 -> Main LAN -->
-                        <line x1="125" y1="378" x2="125" y2="418" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
-                        <!-- Alteon 2 -> Main LAN -->
-                        <line x1="460" y1="378" x2="310" y2="418" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
-                        <!-- Alteon 2 -> Site B LAN -->
-                        <line x1="530" y1="378" x2="670" y2="418" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
-                        <!-- Alteon 3 -> Site B LAN -->
-                        <line x1="865" y1="378" x2="865" y2="418" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
-                        <!-- Main LAN -> WebApp A -->
-                        <line x1="160" y1="446" x2="160" y2="470" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
-                        <!-- Site B LAN -> WebApp B -->
-                        <line x1="840" y1="446" x2="840" y2="470" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+                        <!-- === CONNECTIONS - plain dashed sticks, no arrowheads === -->
+                        <line x1="210" y1="88" x2="411" y2="88" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="589" y1="88" x2="790" y2="88" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="445" y1="130" x2="272" y2="149" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="555" y1="130" x2="728" y2="149" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="245" y1="226" x2="160" y2="298" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="278" y1="226" x2="465" y2="298" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="4,4"/>
+                        <line x1="722" y1="226" x2="535" y2="298" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="4,4"/>
+                        <line x1="755" y1="226" x2="840" y2="298" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="125" y1="378" x2="125" y2="418" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="460" y1="378" x2="310" y2="418" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="530" y1="378" x2="670" y2="418" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="865" y1="378" x2="865" y2="418" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="160" y1="446" x2="160" y2="470" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="840" y1="446" x2="840" y2="470" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
                         <!-- === ROW 1: Test Client, Internet Cloud, DNS Server === -->
-                        <!-- Test Client -->
+                        <!-- Test Client: icon 64x64 in 180x72 box -->
                         <rect x="30" y="52" width="180" height="72" rx="8" fill="#fff0f0" stroke="#ef9a9a" stroke-width="1.5"/>
-                        <rect x="33" y="55" width="50" height="50" rx="4" fill="#ffffff"/>
-                        <image href="{{ url_for('static', filename='desktop.svg') }}" x="33" y="55" width="50" height="50"/>
-                        <text x="152" y="83" text-anchor="middle" fill="#c62828" font-size="15" font-weight="700">Test Client</text>
-                        <text x="152" y="103" text-anchor="middle" fill="#888888" font-size="13">10.100.0.3</text>
+                        <rect x="31" y="54" width="64" height="64" rx="4" fill="#ffffff"/>
+                        <image href="{{ url_for('static', filename='desktop.svg') }}" x="31" y="54" width="64" height="64"/>
+                        <text x="154" y="81" text-anchor="middle" fill="#c62828" font-size="15" font-weight="700">Test Client</text>
+                        <text x="154" y="101" text-anchor="middle" fill="#888888" font-size="13">10.100.0.3</text>
                         <!-- Internet Cloud -->
                         <ellipse cx="500" cy="82" rx="90" ry="48" fill="#f5f8ff" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
                         <image href="{{ url_for('static', filename='cloud.svg') }}" x="462" y="54" width="76" height="48"/>
                         <text x="500" y="118" text-anchor="middle" fill="#607d8b" font-size="13">Internet</text>
-                        <!-- DNS Server -->
+                        <!-- DNS Server: enlarged cylinder icon -->
                         <rect x="790" y="52" width="180" height="72" rx="8" fill="#e0f2f1" stroke="#4db6ac" stroke-width="1.5"/>
-                        <!-- DNS cylinder icon -->
-                        <ellipse cx="825" cy="70" rx="17" ry="7" fill="none" stroke="#4db6ac" stroke-width="1.5"/>
-                        <line x1="808" y1="70" x2="808" y2="90" stroke="#4db6ac" stroke-width="1.5"/>
-                        <line x1="842" y1="70" x2="842" y2="90" stroke="#4db6ac" stroke-width="1.5"/>
-                        <ellipse cx="825" cy="80" rx="17" ry="7" fill="none" stroke="#4db6ac" stroke-width="1.5"/>
-                        <ellipse cx="825" cy="90" rx="17" ry="7" fill="#b2dfdb" stroke="#4db6ac" stroke-width="1.5"/>
-                        <text x="870" y="81" text-anchor="middle" fill="#00695c" font-size="15" font-weight="700">DNS Server</text>
-                        <text x="870" y="101" text-anchor="middle" fill="#888888" font-size="13">10.100.0.30</text>
+                        <ellipse cx="828" cy="69" rx="20" ry="8" fill="none" stroke="#4db6ac" stroke-width="1.5"/>
+                        <line x1="808" y1="69" x2="808" y2="93" stroke="#4db6ac" stroke-width="1.5"/>
+                        <line x1="848" y1="69" x2="848" y2="93" stroke="#4db6ac" stroke-width="1.5"/>
+                        <ellipse cx="828" cy="81" rx="20" ry="8" fill="none" stroke="#4db6ac" stroke-width="1.5"/>
+                        <ellipse cx="828" cy="93" rx="20" ry="8" fill="#b2dfdb" stroke="#4db6ac" stroke-width="1.5"/>
+                        <text x="909" y="79" text-anchor="middle" fill="#00695c" font-size="15" font-weight="700">DNS Server</text>
+                        <text x="909" y="99" text-anchor="middle" fill="#888888" font-size="13">10.100.0.30</text>
                         <!-- === ROW 2: Routers === -->
-                        <!-- Router A -->
                         <circle cx="270" cy="188" r="40" fill="#ede7f6" stroke="#9575cd" stroke-width="1.5"/>
                         <path d="M256,182 L284,182 M278,175 L284,182 L278,189 M284,196 L256,196 M262,189 L256,196 L262,203" stroke="#7e57c2" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
                         <text x="270" y="216" text-anchor="middle" fill="#4527a0" font-size="13" font-weight="600">Router A</text>
-                        <!-- Router B -->
                         <circle cx="730" cy="188" r="40" fill="#ede7f6" stroke="#9575cd" stroke-width="1.5"/>
                         <path d="M716,182 L744,182 M738,175 L744,182 L738,189 M744,196 L716,196 M722,189 L716,196 L722,203" stroke="#7e57c2" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
                         <text x="730" y="216" text-anchor="middle" fill="#4527a0" font-size="13" font-weight="600">Router B</text>
                         <!-- === ISP Label Bars === -->
                         <rect x="30" y="248" width="200" height="26" rx="6" fill="#e8e0f5"/>
-                        <text x="130" y="266" text-anchor="middle" fill="#5e35b1" font-size="12" font-weight="600">Site A ISP1 — 10.100.4.0/24</text>
+                        <text x="130" y="266" text-anchor="middle" fill="#5e35b1" font-size="12" font-weight="600">Site A ISP1 &#x2014; 10.100.4.0/24</text>
                         <rect x="258" y="248" width="214" height="26" rx="6" fill="#e8e0f5"/>
-                        <text x="365" y="266" text-anchor="middle" fill="#5e35b1" font-size="12" font-weight="600">Site A ISP2 — 10.100.5.0/24</text>
+                        <text x="365" y="266" text-anchor="middle" fill="#5e35b1" font-size="12" font-weight="600">Site A ISP2 &#x2014; 10.100.5.0/24</text>
                         <rect x="740" y="248" width="220" height="26" rx="6" fill="#e8e0f5"/>
-                        <text x="850" y="266" text-anchor="middle" fill="#5e35b1" font-size="12" font-weight="600">Site B ISP — 10.100.7.0/24</text>
-                        <!-- === ROW 3: Alteon Boxes === -->
+                        <text x="850" y="266" text-anchor="middle" fill="#5e35b1" font-size="12" font-weight="600">Site B ISP &#x2014; 10.100.7.0/24</text>
+                        <!-- === ROW 3: Alteon Boxes - icon 66x66 in 190x80 box === -->
                         <!-- Alteon 1 -->
                         <rect x="30" y="298" width="190" height="80" rx="8" fill="#e3f2fd" stroke="#64b5f6" stroke-width="2"/>
-                        <rect x="33" y="301" width="56" height="56" rx="4" fill="#ffffff"/>
-                        <image href="{{ url_for('static', filename='adc.svg') }}" x="33" y="301" width="56" height="56"/>
-                        <text x="163" y="329" text-anchor="middle" fill="#1565c0" font-size="15" font-weight="700">Alteon 1</text>
-                        <text x="163" y="350" text-anchor="middle" fill="#888888" font-size="13">10.100.0.51</text>
+                        <rect x="32" y="300" width="66" height="66" rx="4" fill="#ffffff"/>
+                        <image href="{{ url_for('static', filename='adc.svg') }}" x="32" y="300" width="66" height="66"/>
+                        <text x="159" y="327" text-anchor="middle" fill="#1565c0" font-size="15" font-weight="700">Alteon 1</text>
+                        <text x="159" y="348" text-anchor="middle" fill="#888888" font-size="13">10.100.0.51</text>
                         <!-- Alteon 2 -->
                         <rect x="395" y="298" width="190" height="80" rx="8" fill="#e3f2fd" stroke="#64b5f6" stroke-width="2"/>
-                        <rect x="398" y="301" width="56" height="56" rx="4" fill="#ffffff"/>
-                        <image href="{{ url_for('static', filename='adc.svg') }}" x="398" y="301" width="56" height="56"/>
-                        <text x="528" y="329" text-anchor="middle" fill="#1565c0" font-size="15" font-weight="700">Alteon 2</text>
-                        <text x="528" y="350" text-anchor="middle" fill="#888888" font-size="13">10.100.0.52</text>
-                        <!-- Alteon 3 -->
+                        <rect x="397" y="300" width="66" height="66" rx="4" fill="#ffffff"/>
+                        <image href="{{ url_for('static', filename='adc.svg') }}" x="397" y="300" width="66" height="66"/>
+                        <text x="524" y="327" text-anchor="middle" fill="#1565c0" font-size="15" font-weight="700">Alteon 2</text>
+                        <text x="524" y="348" text-anchor="middle" fill="#888888" font-size="13">10.100.0.52</text>
+                        <!-- Alteon 3 (202 wide) -->
                         <rect x="758" y="298" width="202" height="80" rx="8" fill="#e3f2fd" stroke="#64b5f6" stroke-width="2"/>
-                        <rect x="761" y="301" width="56" height="56" rx="4" fill="#ffffff"/>
-                        <image href="{{ url_for('static', filename='adc.svg') }}" x="761" y="301" width="56" height="56"/>
-                        <text x="891" y="329" text-anchor="middle" fill="#1565c0" font-size="15" font-weight="700">Alteon 3</text>
-                        <text x="891" y="350" text-anchor="middle" fill="#888888" font-size="13">10.100.0.100</text>
+                        <rect x="760" y="300" width="66" height="66" rx="4" fill="#ffffff"/>
+                        <image href="{{ url_for('static', filename='adc.svg') }}" x="760" y="300" width="66" height="66"/>
+                        <text x="893" y="327" text-anchor="middle" fill="#1565c0" font-size="15" font-weight="700">Alteon 3</text>
+                        <text x="893" y="348" text-anchor="middle" fill="#888888" font-size="13">10.100.0.100</text>
                         <!-- === ROW 4: LAN Bars + Control === -->
-                        <!-- Main LAN -->
                         <rect x="30" y="418" width="430" height="28" rx="6" fill="#dde3ec"/>
-                        <text x="245" y="437" text-anchor="middle" fill="#455a64" font-size="13" font-weight="600">Main LAN — 10.100.3.0/24</text>
-                        <!-- Control / Cyber Controller -->
+                        <text x="245" y="437" text-anchor="middle" fill="#455a64" font-size="13" font-weight="600">Main LAN &#x2014; 10.100.3.0/24</text>
+                        <!-- Control / Cyber Controller: icon 58x58 in 76x76 box -->
                         <rect x="462" y="396" width="76" height="76" rx="8" fill="#eceff1" stroke="#90a4ae" stroke-width="1.5"/>
-                        <rect x="467" y="399" width="46" height="46" rx="4" fill="#ffffff"/>
-                        <image href="{{ url_for('static', filename='cc.png') }}" x="467" y="399" width="46" height="46"/>
-                        <text x="500" y="460" text-anchor="middle" fill="#455a64" font-size="12" font-weight="600">Control</text>
-                        <text x="500" y="474" text-anchor="middle" fill="#90a4ae" font-size="11">10.100.0.200</text>
-                        <!-- Site B LAN -->
+                        <rect x="471" y="399" width="58" height="58" rx="4" fill="#ffffff"/>
+                        <image href="{{ url_for('static', filename='cc.png') }}" x="471" y="399" width="58" height="58"/>
+                        <text x="500" y="466" text-anchor="middle" fill="#455a64" font-size="12" font-weight="600">Control</text>
+                        <text x="500" y="480" text-anchor="middle" fill="#90a4ae" font-size="11">10.100.0.200</text>
                         <rect x="600" y="418" width="370" height="28" rx="6" fill="#dde3ec"/>
-                        <text x="785" y="437" text-anchor="middle" fill="#455a64" font-size="13" font-weight="600">Site B LAN — 10.100.6.0/24</text>
-                        <!-- === ROW 5: WebApp Servers === -->
+                        <text x="785" y="437" text-anchor="middle" fill="#455a64" font-size="13" font-weight="600">Site B LAN &#x2014; 10.100.6.0/24</text>
+                        <!-- === ROW 5: WebApp Servers - icon 66x66 in 220x80 box === -->
                         <!-- Site A WebApp -->
                         <rect x="30" y="470" width="220" height="80" rx="8" fill="#e0f2f1" stroke="#4db6ac" stroke-width="1.5"/>
-                        <rect x="33" y="473" width="54" height="54" rx="4" fill="#ffffff"/>
-                        <image href="{{ url_for('static', filename='servers.png') }}" x="33" y="473" width="54" height="54"/>
-                        <text x="185" y="500" text-anchor="middle" fill="#00695c" font-size="14" font-weight="700">WebApp Servers</text>
-                        <text x="185" y="520" text-anchor="middle" fill="#888888" font-size="13">10.100.0.10&#x2013;15</text>
+                        <rect x="32" y="472" width="66" height="66" rx="4" fill="#ffffff"/>
+                        <image href="{{ url_for('static', filename='servers.png') }}" x="32" y="472" width="66" height="66"/>
+                        <text x="174" y="499" text-anchor="middle" fill="#00695c" font-size="14" font-weight="700">WebApp Servers</text>
+                        <text x="174" y="519" text-anchor="middle" fill="#888888" font-size="13">10.100.0.10&#x2013;15</text>
                         <!-- Site B WebApp -->
                         <rect x="730" y="470" width="220" height="80" rx="8" fill="#e0f2f1" stroke="#4db6ac" stroke-width="1.5"/>
-                        <rect x="733" y="473" width="54" height="54" rx="4" fill="#ffffff"/>
-                        <image href="{{ url_for('static', filename='servers.png') }}" x="733" y="473" width="54" height="54"/>
-                        <text x="883" y="500" text-anchor="middle" fill="#00695c" font-size="14" font-weight="700">WebApp Servers</text>
-                        <text x="883" y="520" text-anchor="middle" fill="#888888" font-size="13">10.100.0.20&#x2013;25</text>
+                        <rect x="732" y="472" width="66" height="66" rx="4" fill="#ffffff"/>
+                        <image href="{{ url_for('static', filename='servers.png') }}" x="732" y="472" width="66" height="66"/>
+                        <text x="874" y="499" text-anchor="middle" fill="#00695c" font-size="14" font-weight="700">WebApp Servers</text>
+                        <text x="874" y="519" text-anchor="middle" fill="#888888" font-size="13">10.100.0.20&#x2013;25</text>
                     </svg>
                 </div>
                 </div><!-- end flex row -->
