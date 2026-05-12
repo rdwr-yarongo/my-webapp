@@ -745,17 +745,15 @@ function loadContentSwitch(host, btnId, scheme) {
 
 function loadHttp2Demo() {
     const btn = document.getElementById('http2-load-btn');
-    const resultsArea = document.getElementById('http2-results');
-    const resultsContent = document.getElementById('http2-results-content');
+    const resultsContent = document.getElementById('results-content');
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...'; }
-    if (resultsArea) resultsArea.style.display = 'none';
+    if (resultsContent) resultsContent.innerHTML = '<p>Loading page from <strong>https://scenario4.radware.lab/index.php</strong> via Alteon HTTP/2 Gateway…</p>';
 
     fetch('/api/scenario/http2_gateway')
         .then(r => r.json())
         .then(data => {
             if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-lightning-charge"></i> Load via Alteon HTTP/2 Gateway'; }
-            if (!resultsContent || !resultsArea) return;
-            resultsArea.style.display = 'block';
+            if (!resultsContent) return;
             if (!data.success) {
                 resultsContent.innerHTML = `<p class="error">Error: ${escapeHtml(data.error || 'Unknown error')}</p>`;
                 return;
