@@ -651,11 +651,16 @@ def offloading_set_header():
         return jsonify({'success': False, 'error': 'header_value too long (max 256)'}), 400
 
     alteon_base = f'https://{ALTEON_1_MGMT_IP}'
+    rule_url = f'{alteon_base}/config/Layer7NewCfgHttpmodRuleTable/Scenario2/10'
     hdr_url = f'{alteon_base}/config/Layer7NewCfgHttpmodRuleHdrTable/Scenario2/10'
     apply_url = f'{alteon_base}/config?action=apply'
 
     try:
-        # Step 1: Update the header rule on Alteon
+        # Step 1: Ensure rule direction is Request (Directn=1)
+        requests.put(rule_url, auth=ALTEON_HTTPMOD_AUTH,
+                     json={'Directn': 1}, timeout=5, verify=False)
+
+        # Step 2: Update the header name/value on Alteon
         put_resp = requests.put(
             hdr_url,
             auth=ALTEON_HTTPMOD_AUTH,
