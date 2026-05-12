@@ -29,6 +29,8 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 function switchSection(section) {
     document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
     document.getElementById(section).classList.add('active');
+    const sidebar = document.getElementById('results-sidebar');
+    if (sidebar) sidebar.style.display = (section === 'home') ? 'none' : '';
 }
 
 function switchTab(tab) {
