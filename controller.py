@@ -400,7 +400,7 @@ def offloading_data():
     try:
         target_ip, _ = resolve_target_ip(REDIRECT_TARGET_HOST)
         response = requests.get(
-            f'https://{target_ip}/',
+            f'https://{target_ip}/index.php',
             headers=build_request_headers(REDIRECT_TARGET_HOST),
             timeout=5,
             allow_redirects=True,
