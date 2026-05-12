@@ -1,20 +1,20 @@
 :root {
-    /* Design Tokens - Inspired Dark Neon Theme */
-    --primary-color: #c7a66a;
-    --secondary-color: #6c757d;
-    --success-color: #28a745;
-    --warning-color: #ffc107;
-    --danger-color: #dc3545;
-    --info-color: #17a2b8;
-    
-    --bg-color: #060c18;
-    --text-color: #ffffff;
-    --sidebar-bg: rgba(13, 23, 42, 0.72);
-    --card-bg: rgba(10, 20, 40, 0.62);
-    --border-color: rgba(162, 127, 81, 0.24);
-    
-    --border-radius: 6px;
-    
+    /* Design Tokens - Bright Modern Theme */
+    --primary-color: #1a56db;
+    --secondary-color: #6b7280;
+    --success-color: #057a55;
+    --warning-color: #d97706;
+    --danger-color: #e02424;
+    --info-color: #0694a2;
+
+    --bg-color: #f0f4f8;
+    --text-color: #111827;
+    --sidebar-bg: #1e2a45;
+    --card-bg: #ffffff;
+    --border-color: #d1d5db;
+
+    --border-radius: 8px;
+
     /* 8px grid spacing system */
     --spacing-4: 4px;
     --spacing-8: 8px;
@@ -22,17 +22,17 @@
     --spacing-16: 16px;
     --spacing-24: 24px;
     --spacing-32: 32px;
-    
-    --shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-    --shadow-lg: 0 18px 36px rgba(0, 0, 0, 0.45);
-    
+
+    --shadow: 0 1px 3px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.07);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.13);
+
     --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --font-size-base: 13px;
     --font-size-sm: 13px;
     --font-size-md: 14px;
     --font-size-lg: 16px;
     --font-size-xl: 20px;
-    
+
     --line-height-base: 1.5;
 }
 
@@ -47,10 +47,6 @@ body {
     font-size: var(--font-size-base);
     line-height: var(--line-height-base);
     background-color: var(--bg-color);
-    background-image:
-        radial-gradient(circle at 4% 88%, rgba(190, 28, 42, 0.36), transparent 36%),
-        radial-gradient(circle at 74% 2%, rgba(255, 192, 94, 0.12), transparent 34%),
-        linear-gradient(120deg, #060b16 0%, #090f1e 42%, #08101d 100%);
     color: var(--text-color);
 }
 
@@ -97,11 +93,10 @@ p + svg {
 
 .sidebar {
     width: 260px;
-    background: linear-gradient(180deg, rgba(8, 16, 30, 0.88) 0%, rgba(20, 10, 16, 0.76) 100%);
+    background: linear-gradient(180deg, #1e2a45 0%, #16213a 100%);
     padding: var(--spacing-16);
-    border-right: 1px solid var(--border-color);
+    border-right: 1px solid rgba(255,255,255,0.08);
     flex-shrink: 0;
-    backdrop-filter: blur(8px);
 }
 
 .sidebar-header {
@@ -119,7 +114,7 @@ p + svg {
 
 .sidebar-header h2 i,
 .results-sidebar-header h2 i {
-    color: #d5b980;
+    color: #93c5fd;
     margin-right: var(--spacing-8);
 }
 
@@ -137,7 +132,7 @@ p + svg {
     gap: var(--spacing-4);
     padding: 10px 12px;
     text-decoration: none;
-    color: var(--text-color);
+    color: #cbd5e1;
     border-radius: var(--border-radius);
     transition: background-color 0.2s, box-shadow 0.2s, border-color 0.2s;
     font-size: var(--font-size-sm);
@@ -147,7 +142,7 @@ p + svg {
 
 .sidebar-nav a::before {
     content: '\25B8';
-    color: #c8ab75;
+    color: #60a5fa;
     font-size: 11px;
     margin-right: 0;
     opacity: 0.95;
@@ -155,10 +150,10 @@ p + svg {
 
 .sidebar-nav a:hover,
 .sidebar-nav a.active {
-    background: linear-gradient(90deg, rgba(132, 101, 48, 0.45) 0%, rgba(198, 40, 40, 0.68) 100%);
-    color: white;
-    border-color: rgba(216, 170, 97, 0.35);
-    box-shadow: 0 10px 20px rgba(127, 21, 32, 0.28);
+    background: rgba(255,255,255,0.1);
+    color: #ffffff;
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: none;
 }
 
 .sidebar-nav a:hover::before,
@@ -173,7 +168,7 @@ p + svg {
 
 .headline-icon {
     margin-right: var(--spacing-8);
-    color: #d8bb82;
+    color: var(--primary-color);
     font-size: 0.95em;
     vertical-align: -1px;
 }
@@ -188,13 +183,12 @@ p + svg {
 .results-sidebar {
     width: min(46vw, 760px);
     min-width: 460px;
-    background: linear-gradient(180deg, rgba(8, 18, 35, 0.8) 0%, rgba(20, 13, 24, 0.72) 100%);
-    border-left: 1px solid var(--border-color);
+    background: #f8fafc;
+    border-left: 1px solid #e2e8f0;
     padding: var(--spacing-16);
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    backdrop-filter: blur(8px);
 }
 
 .results-sidebar-header {
@@ -230,19 +224,19 @@ p + svg {
 }
 
 .content-section.active::-webkit-scrollbar-track {
-    background: rgba(162, 127, 81, 0.1);
+    background: #e5e7eb;
     border-radius: 6px;
 }
 
 .content-section.active::-webkit-scrollbar-thumb {
-    background: rgba(199, 166, 106, 0.5);
+    background: #9ca3af;
     border-radius: 6px;
     border: 2px solid transparent;
     background-clip: content-box;
 }
 
 .content-section.active::-webkit-scrollbar-thumb:hover {
-    background: rgba(199, 166, 106, 0.8);
+    background: #6b7280;
     background-clip: content-box;
 }
 
@@ -254,8 +248,8 @@ p + svg {
 }
 
 .card, .scenario-card {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
     border-radius: 12px;
     padding: var(--spacing-16);
     box-shadow: var(--shadow);
@@ -269,7 +263,7 @@ p + svg {
 }
 
 .card h3, .scenario-card h3 {
-    color: var(--primary-color);
+    color: #1a56db;
     margin-bottom: var(--spacing-8);
 }
 
@@ -348,13 +342,13 @@ svg {
 }
 
 .btn-primary {
-    background: linear-gradient(90deg, #7d5d2e 0%, #b33a38 100%);
+    background: linear-gradient(90deg, #1a56db 0%, #1d4ed8 100%);
     color: white;
-    box-shadow: 0 8px 20px rgba(125, 93, 46, 0.24);
+    box-shadow: 0 4px 12px rgba(26,86,219,0.30);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(90deg, #94703a 0%, #cb4b48 100%);
+    background: linear-gradient(90deg, #1e40af 0%, #1e3a8a 100%);
 }
 
 .btn-secondary {
@@ -396,8 +390,8 @@ svg {
 }
 
 .panel {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
     border-radius: 12px;
     padding: var(--spacing-16);
     margin-bottom: var(--spacing-16);
@@ -418,9 +412,9 @@ svg {
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    background: linear-gradient(145deg, rgba(137, 103, 53, 0.4) 0%, rgba(63, 34, 43, 0.54) 100%);
-    border: 1px solid rgba(214, 169, 95, 0.3);
-    color: #e7cf9e;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
     margin-right: 0;
     font-size: 16px;
 }
@@ -451,16 +445,16 @@ svg {
     padding: var(--spacing-8);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    background-color: rgba(7, 13, 24, 0.84);
-    color: var(--text-color);
+    background-color: #ffffff;
+    color: #111827;
     font-size: var(--font-size-sm);
 }
 
 #dns-result {
     margin-top: var(--spacing-8);
     padding: var(--spacing-12);
-    background-color: rgba(8, 14, 27, 0.74);
-    border: 1px solid var(--border-color);
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
     border-radius: var(--border-radius);
     font-size: var(--font-size-sm);
 }
@@ -478,8 +472,8 @@ h1 .headline-icon {
     align-items: center;
     justify-content: center;
     border-radius: 6px;
-    border: 1px solid rgba(213, 165, 91, 0.35);
-    background: rgba(56, 35, 28, 0.5);
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
     margin-right: 0;
     font-size: 14px;
 }
@@ -536,19 +530,19 @@ h1 .headline-icon {
 .off-headers-table th {
     text-align: left;
     padding: 5px 8px;
-    border-bottom: 1px solid rgba(162,127,81,0.3);
+    border-bottom: 1px solid #e5e7eb;
     color: var(--primary-color);
     font-size: 11px;
     text-transform: uppercase;
 }
 .off-headers-table td {
     padding: 4px 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid #f3f4f6;
     vertical-align: top;
 }
 .off-hdr-name { width: 42%; word-break: break-all; }
-.off-hdr-val  { color: #ccc; word-break: break-all; }
-.off-absent   { color: #ff9977; font-style: italic; }
+.off-hdr-val  { color: #4b5563; word-break: break-all; }
+.off-absent   { color: #b45309; font-style: italic; }
 
 .off-row-ssl      td { background: rgba(0,120,255,0.07); }
 .off-row-modified td { background: rgba(199,166,106,0.07); }
@@ -606,21 +600,21 @@ h1 .headline-icon {
     align-items: center;
     padding: 5px 10px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(216, 170, 97, 0.22);
-    color: #ffffff;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    color: #374151;
     font-size: 12px;
     font-weight: 600;
 }
 
 .status-chip.success {
-    background: rgba(40, 167, 69, 0.2);
-    border-color: rgba(40, 167, 69, 0.4);
+    background: #d1fae5;
+    border-color: #6ee7b7;
 }
 
 .status-chip.warning {
-    background: rgba(255, 193, 7, 0.16);
-    border-color: rgba(255, 193, 7, 0.34);
+    background: #fef3c7;
+    border-color: #fcd34d;
 }
 
 /* Nav group (collapsible) */
@@ -630,7 +624,7 @@ h1 .headline-icon {
     gap: 6px;
     padding: 10px 12px;
     cursor: pointer;
-    color: var(--text-color);
+    color: #cbd5e1;
     border-radius: var(--border-radius);
     border: 1px solid transparent;
     font-size: var(--font-size-sm);
@@ -640,12 +634,12 @@ h1 .headline-icon {
 }
 
 .nav-group > .nav-group-header:hover {
-    background: linear-gradient(90deg, rgba(132, 101, 48, 0.45) 0%, rgba(198, 40, 40, 0.68) 100%);
-    border-color: rgba(216, 170, 97, 0.35);
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.15);
 }
 
 .nav-group-arrow {
-    color: #c8ab75;
+    color: #60a5fa;
     font-size: 11px;
     display: inline-block;
     transition: transform 0.2s;
@@ -672,10 +666,10 @@ h1 .headline-icon {
 }
 
 .browser-shell {
-    border: 1px solid rgba(215, 177, 113, 0.32);
+    border: 1px solid #d1d5db;
     border-radius: 14px;
     overflow: hidden;
-    background: rgba(4, 10, 20, 0.85);
+    background: #f9fafb;
     box-shadow: var(--shadow-lg);
 }
 
@@ -685,8 +679,8 @@ h1 .headline-icon {
     gap: var(--spacing-12);
     align-items: center;
     padding: 12px 14px;
-    border-bottom: 1px solid rgba(215, 177, 113, 0.18);
-    background: linear-gradient(180deg, rgba(18, 30, 48, 0.96) 0%, rgba(9, 18, 31, 0.96) 100%);
+    border-bottom: 1px solid #e5e7eb;
+    background: #f3f4f6;
 }
 
 .browser-dots {
@@ -717,11 +711,11 @@ h1 .headline-icon {
     min-width: 0;
     padding: 8px 12px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #ffffff;
+    border: 1px solid #d1d5db;
     font-family: Consolas, 'Courier New', monospace;
     font-size: 12px;
-    color: #e8edf8;
+    color: #374151;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -730,22 +724,22 @@ h1 .headline-icon {
 .browser-status {
     font-size: 12px;
     font-weight: 600;
-    color: #d8bb82;
+    color: #374151;
 }
 
 .browser-shell[data-state="http"] .browser-url {
-    border-color: rgba(255, 193, 7, 0.4);
-    color: #ffe08a;
+    border-color: #fcd34d;
+    color: #78350f;
 }
 
 .browser-shell[data-state="https"] .browser-url {
-    border-color: rgba(81, 207, 102, 0.55);
-    color: #b9fbc8;
+    border-color: #6ee7b7;
+    color: #065f46;
 }
 
 .browser-shell[data-state="error"] .browser-url {
-    border-color: rgba(220, 53, 69, 0.55);
-    color: #ff9aa2;
+    border-color: #fca5a5;
+    color: #7f1d1d;
 }
 
 .browser-frame {
@@ -759,8 +753,8 @@ h1 .headline-icon {
     margin-top: var(--spacing-16);
     padding: var(--spacing-16);
     border-radius: 10px;
-    border: 1px solid rgba(215, 177, 113, 0.18);
-    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
 }
 
 .redirect-proof-grid {
@@ -780,13 +774,13 @@ h1 .headline-icon {
 .trace-panel {
     padding: var(--spacing-12);
     border-radius: 10px;
-    border: 1px solid rgba(215, 177, 113, 0.16);
-    background: rgba(6, 12, 24, 0.78);
+    border: 1px solid #e5e7eb;
+    background: #f1f5f9;
 }
 
 .trace-panel h4 {
     margin-bottom: var(--spacing-8);
-    color: #d8bb82;
+    color: #1e40af;
 }
 
 .trace-block {
@@ -796,7 +790,7 @@ h1 .headline-icon {
     font-family: Consolas, 'Courier New', monospace;
     font-size: 12px;
     line-height: 1.5;
-    color: #dfe8f3;
+    color: #1e293b;
 }
 
 @media (max-width: 768px) {
