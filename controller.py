@@ -718,5 +718,44 @@ def offloading_set_header():
         return jsonify({'success': False, 'error': str(exc)}), 502
 
 
+CONTENT_SWITCH_HOSTS = {
+    'Scenario3-dev.radware.lab': 'dev',
+    'Scenario3-stg.radware.lab': 'stg',
+    'Scenario3.radware.lab':     'prod',
+}
+
+@app.route('/api/scenario/content_switch', methods=['POST'])
+def content_switch():
+    """Fetch content-switching VIP with the given Host header, return body HTML."""
+    data = request.get_json(force=True, silent=True) or {}
+    host = str(data.get('host', '')).strip()
+    if host not in CONTENT_SWITCH_HOSTS:
+        return jsonify({'success': False, 'error': f'Unknown host: {host}'}), 400
+    try:
+        target_ip, _ = resolve_target_ip(host)
+        response = requests.get(
+            f'http://{target_ip}/index.php',
+            headers=build_request_headers(host),
+            timeout=8,
+            allow_redirects=True
+        )
+        body_html = rewrite_relative_resource_urls(
+            response.text,
+            target_ip,
+            host,
+            scheme='http'
+        )
+        return jsonify({
+            'success': True,
+            'host': host,
+            'env': CONTENT_SWITCH_HOSTS[host],
+            'target_ip': target_ip,
+            'status_code': response.status_code,
+            'body_html': body_html
+        })
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)}), 502
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

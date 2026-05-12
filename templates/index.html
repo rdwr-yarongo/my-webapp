@@ -31,6 +31,7 @@
                         <ul class="nav-sub-list">
                             <li><a href="#" data-section="scenario-3" class="nav-sub-link">HTTP Redirection</a></li>
                             <li><a href="#" data-section="scenario-offloading" class="nav-sub-link">Offloading</a></li>
+                            <li><a href="#" data-section="scenario-content-switching" class="nav-sub-link">Content-Switching</a></li>
                         </ul>
                     </li>
                     <li><a href="#" data-section="settings"><i class="bi bi-sliders nav-item-icon"></i>Settings</a></li>
@@ -350,6 +351,33 @@
                 </div>
 
 
+            </section>
+            <section id="scenario-content-switching" class="content-section">
+                <h1><i class="bi bi-signpost-split headline-icon"></i>Scenario 2 &#x2014; Content-Switching</h1>
+                <div class="panel">
+                    <h3><i class="bi bi-info-circle headline-icon"></i>What is Content-Switching?</h3>
+                    <p>Alteon inspects each incoming request and routes it to a <strong>different backend server group</strong> based on the HTTP <strong>Host header</strong>. This allows a single VIP (<code>10.100.4.56</code>) to serve multiple environments simultaneously:</p>
+                    <ul>
+                        <li><strong>scenario3-dev.radware.lab</strong> &rarr; Development backend</li>
+                        <li><strong>scenario3-stg.radware.lab</strong> &rarr; Staging backend</li>
+                        <li><strong>scenario3.radware.lab</strong> &rarr; Production backend</li>
+                    </ul>
+                    <p>Click any button below to send a real request through the Alteon VIP with the corresponding Host header and view the page served by that environment in the Execution Results pane.</p>
+                </div>
+                <div class="panel">
+                    <h3><i class="bi bi-play-circle headline-icon"></i>Send Request via Alteon</h3>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" id="cs-dev-btn" onclick="loadContentSwitch('Scenario3-dev.radware.lab','cs-dev-btn')">
+                            <i class="bi bi-code-slash"></i> DEV &mdash; scenario3-dev.radware.lab
+                        </button>
+                        <button class="btn btn-secondary" id="cs-stg-btn" onclick="loadContentSwitch('Scenario3-stg.radware.lab','cs-stg-btn')">
+                            <i class="bi bi-layers"></i> STG &mdash; scenario3-stg.radware.lab
+                        </button>
+                        <button class="btn btn-warning" id="cs-prod-btn" onclick="loadContentSwitch('Scenario3.radware.lab','cs-prod-btn')">
+                            <i class="bi bi-globe2"></i> PROD &mdash; scenario3.radware.lab
+                        </button>
+                    </div>
+                </div>
             </section>
             <section id="settings" class="content-section">
                 <h1><i class="bi bi-gear headline-icon"></i>Settings</h1>

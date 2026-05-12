@@ -684,6 +684,63 @@ function applyCustomHeader() {
     });
 }
 
+
+// ── Content-Switching Demo ────────────────────────────────────────────────────
+
+const CS_BTN_LABELS = {
+    'Scenario3-dev.radware.lab': '<i class="bi bi-code-slash"></i> DEV &mdash; scenario3-dev.radware.lab',
+    'Scenario3-stg.radware.lab': '<i class="bi bi-layers"></i> STG &mdash; scenario3-stg.radware.lab',
+    'Scenario3.radware.lab':     '<i class="bi bi-globe2"></i> PROD &mdash; scenario3.radware.lab'
+};
+
+const CS_ENV_COLORS = { dev: '#7c3aed', stg: '#b45309', prod: '#16a34a' };
+
+function loadContentSwitch(host, btnId) {
+    const btn = document.getElementById(btnId);
+    const resultsContent = document.getElementById('results-content');
+    const allBtns = ['cs-dev-btn', 'cs-stg-btn', 'cs-prod-btn'];
+    allBtns.forEach(id => { const b = document.getElementById(id); if (b) b.disabled = true; });
+    if (btn) btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading…';
+    if (resultsContent) resultsContent.innerHTML =
+        `<p>Sending request to <strong>${escapeHtml(host)}</strong> through Alteon VIP…</p>`;
+
+    fetch('/api/scenario/content_switch', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({host: host})
+    })
+    .then(r => r.json())
+    .then(data => {
+        allBtns.forEach(id => { const b = document.getElementById(id); if (b) { b.disabled = false; b.innerHTML = CS_BTN_LABELS[b.id === 'cs-dev-btn' ? 'Scenario3-dev.radware.lab' : b.id === 'cs-stg-btn' ? 'Scenario3-stg.radware.lab' : 'Scenario3.radware.lab'] || ''; } });
+        if (btn) btn.innerHTML = CS_BTN_LABELS[host] || host;
+        if (!data.success) {
+            if (resultsContent) resultsContent.innerHTML =
+                `<p class="error">Error: ${escapeHtml(data.error)}</p>`;
+            return;
+        }
+        if (!resultsContent) return;
+        const env = data.env || '';
+        const color = CS_ENV_COLORS[env] || '#1a56db';
+        const badge = `<span style="display:inline-block;padding:2px 10px;border-radius:12px;background:${color};color:#fff;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">${escapeHtml(env)}</span>`;
+        const label = document.createElement('p');
+        label.style.cssText = 'margin:0 0 6px 0;font-size:13px;';
+        label.innerHTML = `${badge} Response from <strong>${escapeHtml(data.host)}</strong> &rarr; VIP IP <code>${escapeHtml(data.target_ip || '')}</code> &mdash; HTTP ${escapeHtml(String(data.status_code || ''))}`;
+        const iframe = document.createElement('iframe');
+        iframe.sandbox = 'allow-same-origin allow-scripts';
+        iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:4px;background:#fff;';
+        iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', '');
+        resultsContent.innerHTML = '';
+        resultsContent.appendChild(label);
+        resultsContent.appendChild(iframe);
+    })
+    .catch(err => {
+        allBtns.forEach(id => { const b = document.getElementById(id); if (b) b.disabled = false; });
+        if (btn) btn.innerHTML = CS_BTN_LABELS[host] || host;
+        if (resultsContent) resultsContent.innerHTML =
+            `<p class="error">Request failed: ${escapeHtml(err.message)}</p>`;
+    });
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     document.body.setAttribute('data-theme', 'dark');

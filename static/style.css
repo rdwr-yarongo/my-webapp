@@ -374,6 +374,15 @@ svg {
     background-color: #a71d2a;
 }
 
+.btn-warning {
+    background: linear-gradient(90deg, #d97706 0%, #b45309 100%);
+    color: white;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(90deg, #b45309 0%, #92400e 100%);
+}
+
 .btn-info {
     background: linear-gradient(90deg, #1f6fd6 0%, #1696d2 100%);
     color: white;
