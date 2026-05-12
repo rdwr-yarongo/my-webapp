@@ -123,7 +123,7 @@ def fetch_target_attempt(attempt, target_host):
 
         try:
             response = requests.get(
-                f'http://{chosen_ip}/',
+                f'http://{chosen_ip}/index.php',
                 headers=build_request_headers(target_host),
                 timeout=5,
                 allow_redirects=True
