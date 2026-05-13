@@ -53,7 +53,7 @@ function buildIframeDocument(html, baseHref, protocolFallback) {
     const safeProtocol = String(protocolFallback || '').replace(/"/g, '&quot;');
 
     const protocolPatchScript = safeProtocol
-        ? `<script>(function(){function apply(){var el=document.getElementById('ProtocolVer');if(!el)return;var v=(el.textContent||'').trim();if(!v||/^Detecting\.\.\.$/i.test(v)||/^Unavailable$/i.test(v)){el.textContent='${safeProtocol}';}}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){setTimeout(apply,150);});}else{setTimeout(apply,150);}})();<\/script>`
+        ? `<script>(function(){function apply(){var el=document.getElementById('ProtocolVer');if(!el)return;el.textContent='${safeProtocol}';}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){setTimeout(apply,150);});}else{setTimeout(apply,150);}})();<\/script>`
         : '';
 
     function addProtocolPatch(doc) {
@@ -766,7 +766,7 @@ function loadHttp2Demo() {
             const iframe = document.createElement('iframe');
             iframe.sandbox = 'allow-same-origin allow-scripts';
             iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:4px;background:#fff;';
-            iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', 'https');
+            iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', data.protocol_version || 'HTTP/2');
             resultsContent.innerHTML = '';
             resultsContent.appendChild(label);
             resultsContent.appendChild(iframe);

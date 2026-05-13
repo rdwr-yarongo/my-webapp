@@ -785,6 +785,7 @@ def http2_gateway():
             'success': True,
             'target_host': HTTP2_TARGET_HOST,
             'status_code': response.status_code,
+            'protocol_version': format_http_version(response),
             'body_html': body_html
         })
     except Exception as exc:
