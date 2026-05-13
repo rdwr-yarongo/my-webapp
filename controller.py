@@ -391,19 +391,4 @@ def execute_scenario(scenario_id):
 
 
 if __name__ == '__main__':
-    import ssl as _ssl_mod
-    import threading as _threading
-
-    _ssl_ctx = _ssl_mod.SSLContext(_ssl_mod.PROTOCOL_TLS_SERVER)
-    _ssl_ctx.load_cert_chain(
-        '/home/radware/my-webapp/ssl/radware.crt',
-        '/home/radware/my-webapp/ssl/radware.key',
-        password='radware'
-    )
-
-    def _run_http():
-        app.run(host='0.0.0.0', port=5000, use_reloader=False, debug=False)
-
-    _http_thread = _threading.Thread(target=_run_http, daemon=True)
-    _http_thread.start()
-    app.run(host='0.0.0.0', port=443, ssl_context=_ssl_ctx, use_reloader=False, debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=True)
