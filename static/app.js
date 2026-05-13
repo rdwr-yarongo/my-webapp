@@ -709,7 +709,7 @@ function loadContentSwitch(host, btnId, scheme) {
     scheme = scheme || 'http';
     const resultsContent = document.getElementById('results-content');
     if (!resultsContent) return;
-    const url = scheme + '://' + host.toLowerCase() + '/';
+    const url = scheme + '://' + host.toLowerCase() + '/index.php';
     const envKey = host.toLowerCase().includes('-dev') ? 'dev' : host.toLowerCase().includes('-stg') ? 'stg' : 'prod';
     const color = CS_ENV_COLORS[envKey] || '#1a56db';
     const badge = `<span style="display:inline-block;padding:2px 10px;border-radius:12px;background:${color};color:#fff;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">${envKey.toUpperCase()}</span>`;
