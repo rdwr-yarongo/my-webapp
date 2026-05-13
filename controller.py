@@ -145,7 +145,17 @@ def fetch_target_attempt(attempt, target_host):
         except Exception as exc:
             result['http_error'] = str(exc)
     except Exception as exc:
-        result['dns_error'] = str(exc)
+        msg = str(exc)
+        if 'lifetime expired' in msg or 'timed out' in msg.lower():
+            result['dns_error'] = 'DNS timeout'
+        elif 'NXDOMAIN' in msg:
+            result['dns_error'] = 'DNS: domain not found'
+        elif 'NoAnswer' in msg or 'no A records' in msg.lower():
+            result['dns_error'] = 'DNS: no A records'
+        elif 'NoNameservers' in msg:
+            result['dns_error'] = 'DNS: no nameservers available'
+        else:
+            result['dns_error'] = 'DNS error'
 
     return result
 

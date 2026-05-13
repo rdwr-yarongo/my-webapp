@@ -114,7 +114,7 @@ function buildTrafficPanel(result, options = {}) {
     const titlePrefix = options.titlePrefix || 'Attempt';
 
     if (result.dns_error) {
-        panel.innerHTML = `<h4>${escapeHtml(titlePrefix)} ${escapeHtml(result.attempt)}</h4><p class="error">DNS Error: ${escapeHtml(result.dns_error)}</p><p><small>${formatTimestamp(result.timestamp)}</small></p>`;
+        panel.innerHTML = `<h4>${escapeHtml(titlePrefix)} ${escapeHtml(result.attempt)}</h4><div class="status-chip-row"><span class="status-chip error">⚠️ ${escapeHtml(result.dns_error)}</span><span style="margin-left:8px;font-size:12px;color:#6b7280;">${formatTimestamp(result.timestamp)}</span></div>`;
         return panel;
     }
 
