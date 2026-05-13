@@ -266,15 +266,20 @@ p + svg {
     color: #2563eb;
 }
 .nav-group-flat-sub {
-    display: none;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
     padding-left: 14px;
     margin-top: 2px;
+    transition: max-height 0.28s ease, opacity 0.22s ease;
 }
 .nav-group-flat.open > .nav-group-flat-sub {
-    display: block;
+    max-height: 200px;
+    opacity: 1;
 }
 .nav-group-flat:hover > .nav-group-flat-sub {
-    display: block;
+    max-height: 200px;
+    opacity: 1;
 }
 .nav-group-flat:hover > .nav-group-flat-header {
     background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.35) 100%);
