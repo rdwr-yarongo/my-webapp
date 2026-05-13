@@ -205,6 +205,75 @@ p + svg {
 .nav-flat-item.active .nav-flat-desc {
     color: #93c5fd;
 }
+/* Grouped nav (flat accordion style) */
+.nav-group-flat {
+    margin-bottom: 2px;
+}
+.nav-group-flat-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    border: 1px solid transparent;
+}
+.nav-group-flat-header:hover {
+    background: rgba(255,255,255,0.06);
+    color: #f3f4f6;
+}
+.nav-group-flat.open > .nav-group-flat-header {
+    background: rgba(255,255,255,0.06);
+    color: #f3f4f6;
+}
+.nav-group-flat-arrow {
+    margin-left: auto;
+    font-size: 10px;
+    color: #4b5563;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+.nav-group-flat.open > .nav-group-flat-header .nav-group-flat-arrow {
+    transform: rotate(90deg);
+    color: #93c5fd;
+}
+.nav-group-flat-sub {
+    display: none;
+    padding-left: 14px;
+    margin-top: 2px;
+}
+.nav-group-flat.open > .nav-group-flat-sub {
+    display: block;
+}
+.nav-sub-flat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    text-decoration: none;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s;
+    margin-bottom: 1px;
+    border: 1px solid transparent;
+}
+.nav-sub-flat-item:hover {
+    background: rgba(255,255,255,0.05);
+    color: #d1d5db;
+}
+.nav-sub-flat-item.active {
+    background: rgba(37,99,235,0.2);
+    color: #93c5fd;
+    border-color: rgba(37,99,235,0.3);
+}
+.nav-sub-flat-icon {
+    font-size: 12px;
+    opacity: 0.7;
+}
 
 /* Keep legacy references intact */
 .sidebar-header h2 i,

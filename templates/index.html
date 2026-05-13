@@ -29,48 +29,72 @@
                     </div>
                 </a>
                 <div class="nav-section-label" style="margin-top:18px;">SCENARIOS</div>
-                <a href="#" data-section="scenario-1" class="nav-flat-item">
-                    <div class="nav-flat-icon"><i class="bi bi-diagram-3"></i></div>
-                    <div class="nav-flat-text">
-                        <div class="nav-flat-name">Scenario 1</div>
-                        <div class="nav-flat-desc">GSLB Classic</div>
+                <div class="nav-group-flat" id="ng-s1">
+                    <div class="nav-group-flat-header" onclick="toggleFlatGroup('ng-s1')">
+                        <div class="nav-flat-icon"><i class="bi bi-diagram-3"></i></div>
+                        <div class="nav-flat-text">
+                            <div class="nav-flat-name">Scenario 1</div>
+                            <div class="nav-flat-desc">GSLB &amp; HA</div>
+                        </div>
+                        <i class="bi bi-chevron-right nav-group-flat-arrow"></i>
                     </div>
-                </a>
-                <a href="#" data-section="scenario-2" class="nav-flat-item">
-                    <div class="nav-flat-icon"><i class="bi bi-shield-check"></i></div>
-                    <div class="nav-flat-text">
-                        <div class="nav-flat-name">Scenario 2</div>
-                        <div class="nav-flat-desc">HA Failover</div>
+                    <div class="nav-group-flat-sub">
+                        <a href="#" data-section="scenario-1" class="nav-sub-flat-item">
+                            <i class="bi bi-diagram-3 nav-sub-flat-icon"></i>GSLB Classic
+                        </a>
+                        <a href="#" data-section="scenario-2" class="nav-sub-flat-item">
+                            <i class="bi bi-shield-check nav-sub-flat-icon"></i>HA Failover
+                        </a>
                     </div>
-                </a>
-                <a href="#" data-section="scenario-3" class="nav-flat-item">
-                    <div class="nav-flat-icon"><i class="bi bi-arrow-repeat"></i></div>
-                    <div class="nav-flat-text">
-                        <div class="nav-flat-name">Scenario 3</div>
-                        <div class="nav-flat-desc">HTTP Redirect</div>
+                </div>
+                <div class="nav-group-flat" id="ng-s2">
+                    <div class="nav-group-flat-header" onclick="toggleFlatGroup('ng-s2')">
+                        <div class="nav-flat-icon"><i class="bi bi-arrow-repeat"></i></div>
+                        <div class="nav-flat-text">
+                            <div class="nav-flat-name">Scenario 2</div>
+                            <div class="nav-flat-desc">Redirect &amp; Offloading</div>
+                        </div>
+                        <i class="bi bi-chevron-right nav-group-flat-arrow"></i>
                     </div>
-                </a>
-                <a href="#" data-section="scenario-offloading" class="nav-flat-item">
-                    <div class="nav-flat-icon"><i class="bi bi-cpu"></i></div>
-                    <div class="nav-flat-text">
-                        <div class="nav-flat-name">Scenario 4</div>
-                        <div class="nav-flat-desc">Offloading</div>
+                    <div class="nav-group-flat-sub">
+                        <a href="#" data-section="scenario-3" class="nav-sub-flat-item">
+                            <i class="bi bi-arrow-repeat nav-sub-flat-icon"></i>HTTP Redirect
+                        </a>
+                        <a href="#" data-section="scenario-offloading" class="nav-sub-flat-item">
+                            <i class="bi bi-cpu nav-sub-flat-icon"></i>Offloading
+                        </a>
                     </div>
-                </a>
-                <a href="#" data-section="scenario-content-switching" class="nav-flat-item">
-                    <div class="nav-flat-icon"><i class="bi bi-signpost-split"></i></div>
-                    <div class="nav-flat-text">
-                        <div class="nav-flat-name">Scenario 5</div>
-                        <div class="nav-flat-desc">Content-Switching</div>
+                </div>
+                <div class="nav-group-flat" id="ng-s3">
+                    <div class="nav-group-flat-header" onclick="toggleFlatGroup('ng-s3')">
+                        <div class="nav-flat-icon"><i class="bi bi-signpost-split"></i></div>
+                        <div class="nav-flat-text">
+                            <div class="nav-flat-name">Scenario 3</div>
+                            <div class="nav-flat-desc">Content-Switching</div>
+                        </div>
+                        <i class="bi bi-chevron-right nav-group-flat-arrow"></i>
                     </div>
-                </a>
-                <a href="#" data-section="scenario-http2-gateway" class="nav-flat-item">
-                    <div class="nav-flat-icon"><i class="bi bi-lightning-charge"></i></div>
-                    <div class="nav-flat-text">
-                        <div class="nav-flat-name">Scenario 6</div>
-                        <div class="nav-flat-desc">HTTP/2 Gateway</div>
+                    <div class="nav-group-flat-sub">
+                        <a href="#" data-section="scenario-content-switching" class="nav-sub-flat-item">
+                            <i class="bi bi-signpost-split nav-sub-flat-icon"></i>Content-Switching
+                        </a>
                     </div>
-                </a>
+                </div>
+                <div class="nav-group-flat" id="ng-s4">
+                    <div class="nav-group-flat-header" onclick="toggleFlatGroup('ng-s4')">
+                        <div class="nav-flat-icon"><i class="bi bi-lightning-charge"></i></div>
+                        <div class="nav-flat-text">
+                            <div class="nav-flat-name">Scenario 4</div>
+                            <div class="nav-flat-desc">HTTP/2 Gateway</div>
+                        </div>
+                        <i class="bi bi-chevron-right nav-group-flat-arrow"></i>
+                    </div>
+                    <div class="nav-group-flat-sub">
+                        <a href="#" data-section="scenario-http2-gateway" class="nav-sub-flat-item">
+                            <i class="bi bi-lightning-charge nav-sub-flat-icon"></i>HTTP/2 Gateway
+                        </a>
+                    </div>
+                </div>
                 <div class="nav-section-label" style="margin-top:18px;">SYSTEM</div>
                 <a href="#" data-section="settings" class="nav-flat-item">
                     <div class="nav-flat-icon"><i class="bi bi-sliders"></i></div>

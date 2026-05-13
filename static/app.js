@@ -4,16 +4,21 @@ document.querySelectorAll('.sidebar-nav a').forEach(link => {
         e.preventDefault();
         const section = this.getAttribute('data-section');
         switchSection(section);
-        document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+        clearNavActive();
         this.classList.add('active');
-        // Auto-expand parent group if sub-link
-        const group = this.closest('.nav-group');
+        // Auto-expand parent group
+        const group = this.closest('.nav-group-flat');
         if (group) group.classList.add('open');
     });
 });
 
-function toggleNavGroup(header) {
-    header.closest('.nav-group').classList.toggle('open');
+function clearNavActive() {
+    document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+}
+
+function toggleFlatGroup(id) {
+    const g = document.getElementById(id);
+    if (g) g.classList.toggle('open');
 }
 
 // Tab switching
@@ -729,12 +734,11 @@ function loadContentSwitch(host, btnId, scheme) {
 // Initialize
 function navToSection(sectionId) {
     switchSection(sectionId);
-    // Clear all active nav links then mark the matching one
-    document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+    clearNavActive();
     const link = document.querySelector('.sidebar-nav a[data-section="' + sectionId + '"]');
     if (link) {
         link.classList.add('active');
-        const group = link.closest('.nav-group');
+        const group = link.closest('.nav-group-flat');
         if (group) group.classList.add('open');
     }
 }
@@ -749,7 +753,7 @@ document.addEventListener('DOMContentLoaded', function() {
         sidebarHeader.style.cursor = 'pointer';
         sidebarHeader.addEventListener('click', function() {
             switchSection('home');
-            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+            clearNavActive();
         });
     }
 });
