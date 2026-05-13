@@ -366,6 +366,12 @@ p + svg {
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 12px;
+    animation: sectionFadeIn 0.22s ease forwards;
+}
+
+@keyframes sectionFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Custom scrollbar styling */
