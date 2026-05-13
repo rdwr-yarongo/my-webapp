@@ -713,16 +713,6 @@ function loadContentSwitch(host, btnId, scheme) {
     const envKey = host.toLowerCase().includes('-dev') ? 'dev' : host.toLowerCase().includes('-stg') ? 'stg' : 'prod';
     const color = CS_ENV_COLORS[envKey] || '#1a56db';
     const badge = `<span style="display:inline-block;padding:2px 10px;border-radius:12px;background:${color};color:#fff;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">${envKey.toUpperCase()}</span>`;
-    if (scheme === 'https') {
-        // Browsers block iframes with untrusted certs — open in a new tab instead
-        window.open(url, '_blank');
-        resultsContent.innerHTML = '';
-        const label = document.createElement('p');
-        label.style.cssText = 'margin:0 0 6px 0;font-size:13px;';
-        label.innerHTML = `${badge} Opened <strong>${escapeHtml(url)}</strong> in a new tab. Accept the certificate warning to view the page.`;
-        resultsContent.appendChild(label);
-        return;
-    }
     const label = document.createElement('p');
     label.style.cssText = 'margin:0 0 6px 0;font-size:13px;';
     label.innerHTML = `${badge} Browser connects directly to <strong>${escapeHtml(url)}</strong>`;
