@@ -127,7 +127,7 @@ function buildTrafficPanel(result, options = {}) {
         ? `<span class="status-chip success">Served By: ${escapeHtml(result.served_by)}</span>`
         : '';
     const wanlinkBadge = result.wanlink
-        ? `<span class="status-chip" style="background:#f59e0b;color:#1a1a1a;">Alteon: ${escapeHtml(result.wanlink)}</span>`
+        ? `<span class="status-chip" style="background:#f59e0b;color:#1a1a1a;">${escapeHtml(result.wanlink)}</span>`
         : '';
 
     panel.innerHTML = `
