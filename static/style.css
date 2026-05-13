@@ -93,9 +93,9 @@ p + svg {
 
 .sidebar {
     width: 220px;
-    background: #111827;
+    background: #f0f7ff;
     padding: 0;
-    border-right: 1px solid rgba(255,255,255,0.07);
+    border-right: 1px solid #c7dff7;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
@@ -107,7 +107,7 @@ p + svg {
     align-items: center;
     gap: 10px;
     padding: 18px 16px 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
+    border-bottom: 1px solid #c7dff7;
     cursor: pointer;
 }
 .sidebar-brand-icon {
@@ -123,12 +123,12 @@ p + svg {
 .sidebar-brand-name {
     font-size: 14px;
     font-weight: 700;
-    color: #f9fafb;
+    color: #0f172a;
     line-height: 1.2;
 }
 .sidebar-brand-sub {
     font-size: 11px;
-    color: #6b7280;
+    color: #64748b;
     line-height: 1.2;
     margin-top: 1px;
 }
@@ -145,7 +145,7 @@ p + svg {
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 1px;
-    color: #4b5563;
+    color: #94a3b8;
     padding: 4px 8px 6px;
     text-transform: uppercase;
 }
@@ -158,37 +158,40 @@ p + svg {
     padding: 8px 10px;
     border-radius: 8px;
     text-decoration: none;
-    color: #9ca3af;
+    color: #475569;
     transition: background 0.15s, color 0.15s;
     margin-bottom: 2px;
     border: 1px solid transparent;
 }
 .nav-flat-item:hover {
-    background: rgba(255,255,255,0.06);
-    color: #f3f4f6;
+    background: #dbeafe;
+    color: #1e40af;
 }
 .nav-flat-item.active {
-    background: rgba(37,99,235,0.25);
+    background: #2563eb;
     color: #ffffff;
-    border-color: rgba(37,99,235,0.4);
+    border-color: #1d4ed8;
 }
 .nav-flat-icon {
     width: 30px;
     height: 30px;
     border-radius: 7px;
-    background: rgba(255,255,255,0.06);
+    background: #dbeafe;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 14px;
     flex-shrink: 0;
-    color: #6b7280;
+    color: #3b82f6;
     transition: background 0.15s, color 0.15s;
 }
-.nav-flat-item:hover .nav-flat-icon,
+.nav-flat-item:hover .nav-flat-icon {
+    background: #bfdbfe;
+    color: #1d4ed8;
+}
 .nav-flat-item.active .nav-flat-icon {
-    background: rgba(37,99,235,0.3);
-    color: #93c5fd;
+    background: rgba(255,255,255,0.25);
+    color: #ffffff;
 }
 .nav-flat-name {
     font-size: 13px;
@@ -198,12 +201,15 @@ p + svg {
 }
 .nav-flat-desc {
     font-size: 11px;
-    color: #6b7280;
+    color: #94a3b8;
     line-height: 1.2;
     margin-top: 1px;
 }
+.nav-flat-item:hover .nav-flat-desc {
+    color: #3b82f6;
+}
 .nav-flat-item.active .nav-flat-desc {
-    color: #93c5fd;
+    color: #bfdbfe;
 }
 /* Grouped nav (flat accordion style) */
 .nav-group-flat {
@@ -215,29 +221,29 @@ p + svg {
     gap: 10px;
     padding: 8px 10px;
     border-radius: 8px;
-    color: #9ca3af;
+    color: #475569;
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
     border: 1px solid transparent;
 }
 .nav-group-flat-header:hover {
-    background: rgba(255,255,255,0.06);
-    color: #f3f4f6;
+    background: #dbeafe;
+    color: #1e40af;
 }
 .nav-group-flat.open > .nav-group-flat-header {
-    background: rgba(255,255,255,0.06);
-    color: #f3f4f6;
+    background: #dbeafe;
+    color: #1e40af;
 }
 .nav-group-flat-arrow {
     margin-left: auto;
     font-size: 10px;
-    color: #4b5563;
+    color: #94a3b8;
     transition: transform 0.2s;
     flex-shrink: 0;
 }
 .nav-group-flat.open > .nav-group-flat-header .nav-group-flat-arrow {
     transform: rotate(90deg);
-    color: #93c5fd;
+    color: #2563eb;
 }
 .nav-group-flat-sub {
     display: none;
@@ -254,7 +260,7 @@ p + svg {
     padding: 7px 10px;
     border-radius: 7px;
     text-decoration: none;
-    color: #6b7280;
+    color: #64748b;
     font-size: 12px;
     font-weight: 500;
     transition: background 0.15s, color 0.15s;
@@ -262,13 +268,13 @@ p + svg {
     border: 1px solid transparent;
 }
 .nav-sub-flat-item:hover {
-    background: rgba(255,255,255,0.05);
-    color: #d1d5db;
+    background: #dbeafe;
+    color: #1e40af;
 }
 .nav-sub-flat-item.active {
-    background: rgba(37,99,235,0.2);
-    color: #93c5fd;
-    border-color: rgba(37,99,235,0.3);
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #1d4ed8;
 }
 .nav-sub-flat-icon {
     font-size: 12px;
