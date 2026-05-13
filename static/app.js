@@ -745,42 +745,7 @@ function loadContentSwitch(host, btnId, scheme) {
 }
 
 
-function loadHttp2Demo() {
-    const btn = document.getElementById('http2-load-btn');
-    const resultsContent = document.getElementById('results-content');
-    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...'; }
-    if (resultsContent) resultsContent.innerHTML = '<p>Loading page from <strong>https://scenario4.radware.lab/index.php</strong> via Alteon HTTP/2 Gateway…</p>';
 
-    fetch('/api/scenario/http2_gateway')
-        .then(r => r.json())
-        .then(data => {
-            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-lightning-charge"></i> Load via Alteon HTTP/2 Gateway'; }
-            if (!resultsContent) return;
-            if (!data.success) {
-                resultsContent.innerHTML = `<p class="error">Error: ${escapeHtml(data.error || 'Unknown error')}</p>`;
-                return;
-            }
-            resultsContent.innerHTML = `
-                <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;">
-                    <div style="background:var(--panel-bg,#1e2a3a);border:1px solid var(--border-color,#334);border-radius:8px;padding:16px 24px;min-width:180px;">
-                        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Protocol Version</div>
-                        <div style="font-size:22px;font-weight:700;color:#4fc3f7;">${escapeHtml(data.protocol_version || 'HTTP/2')}</div>
-                    </div>
-                    <div style="background:var(--panel-bg,#1e2a3a);border:1px solid var(--border-color,#334);border-radius:8px;padding:16px 24px;min-width:180px;">
-                        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">HTTP Status</div>
-                        <div style="font-size:22px;font-weight:700;color:#81c784;">${data.status_code}</div>
-                    </div>
-                    <div style="background:var(--panel-bg,#1e2a3a);border:1px solid var(--border-color,#334);border-radius:8px;padding:16px 24px;min-width:220px;">
-                        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Target Host</div>
-                        <div style="font-size:15px;font-weight:600;color:#e0e0e0;">${escapeHtml(data.target_host)}</div>
-                    </div>
-                </div>`;
-        })
-        .catch(err => {
-            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-lightning-charge"></i> Load via Alteon HTTP/2 Gateway'; }
-            if (resultsContent) resultsContent.innerHTML = `<p class="error">Request failed: ${escapeHtml(err.message)}</p>`;
-        });
-}
 // Initialize
 function navToSection(sectionId) {
     switchSection(sectionId);
