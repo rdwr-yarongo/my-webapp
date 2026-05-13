@@ -125,7 +125,7 @@ function buildTrafficPanel(result, options = {}) {
 
     const servedByBadge = result.served_by
         ? `<span class="status-chip success">Served By: ${escapeHtml(result.served_by)}</span>`
-        : `<span class="status-chip warning">Served By: unavailable</span>`;
+        : '';
     const wanlinkBadge = result.wanlink
         ? `<span class="status-chip">Wanlink: ${escapeHtml(result.wanlink)}</span>`
         : '';
