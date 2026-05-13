@@ -114,8 +114,8 @@ p + svg {
     cursor: pointer;
 }
 .sidebar-brand-icon {
-    width: 38px;
-    height: 38px;
+    width: 52px;
+    height: 52px;
     background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     border-radius: 10px;
     display: flex;
@@ -125,14 +125,14 @@ p + svg {
     box-shadow: 0 2px 4px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 .sidebar-brand-name {
-    font-size: 14px;
+    font-size: 17px;
     font-weight: 700;
     color: #1a1f2e;
     line-height: 1.2;
     text-shadow: 0 1px 0 rgba(255,255,255,0.8);
 }
 .sidebar-brand-sub {
-    font-size: 11px;
+    font-size: 13px;
     color: #6b7280;
     line-height: 1.2;
     margin-top: 1px;
