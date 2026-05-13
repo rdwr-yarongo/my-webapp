@@ -132,9 +132,11 @@ function buildTrafficPanel(result, options = {}) {
 
     panel.innerHTML = `
         <h4>${escapeHtml(titlePrefix)} ${escapeHtml(result.attempt)} — ${escapeHtml(result.target_ip || 'n/a')}</h4>
-        <p>Resolved: ${escapeHtml((result.resolved_records || []).join(', ') || 'n/a')} &nbsp;|&nbsp; Status: ${escapeHtml(result.status_code)} &nbsp;|&nbsp; <small>${formatTimestamp(result.timestamp)}</small></p>
         <div class="status-chip-row">${servedByBadge}${wanlinkBadge}</div>
+        <details class="ha-details"><summary>Details</summary>
+        <p>Resolved: ${escapeHtml((result.resolved_records || []).join(', ') || 'n/a')} &nbsp;|&nbsp; Status: ${escapeHtml(result.status_code)} &nbsp;|&nbsp; <small>${formatTimestamp(result.timestamp)}</small></p>
         <p>Server: ${escapeHtml(result.server_name || 'n/a')} &nbsp;|&nbsp; Server IP: ${escapeHtml(result.server_ip || 'n/a')} &nbsp;|&nbsp; URL: ${escapeHtml(result.final_url || 'n/a')}</p>
+        </details>
     `;
     panel.appendChild(createResponseIframe(result));
     return panel;

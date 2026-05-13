@@ -102,6 +102,36 @@ p + svg {
     box-shadow: inset -1px 0 0 rgba(255,255,255,0.6);
 }
 
+/* HA attempt collapsible details */
+.ha-details {
+    margin-top: 6px;
+    border-top: 1px solid #e2e5ea;
+    padding-top: 4px;
+}
+.ha-details summary {
+    cursor: pointer;
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 600;
+    user-select: none;
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.ha-details summary::-webkit-details-marker { display: none; }
+.ha-details summary::before {
+    content: "▶";
+    font-size: 9px;
+    transition: transform 0.15s;
+}
+.ha-details[open] summary::before { transform: rotate(90deg); }
+.ha-details p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #555;
+}
+
 /* Brand / header */
 .sidebar-brand {
     display: flex;
