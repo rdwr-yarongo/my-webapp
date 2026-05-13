@@ -93,12 +93,13 @@ p + svg {
 
 .sidebar {
     width: 220px;
-    background: #2d2d2d;
+    background: linear-gradient(180deg, #e8eaed 0%, #d4d7dc 50%, #c8ccd2 100%);
     padding: 0;
-    border-right: 1px solid #1a1a1a;
+    border-right: 1px solid #a8adb5;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
+    box-shadow: inset -1px 0 0 rgba(255,255,255,0.6);
 }
 
 /* Brand / header */
@@ -107,7 +108,9 @@ p + svg {
     align-items: center;
     gap: 10px;
     padding: 18px 16px 16px;
-    border-bottom: 1px solid #1a1a1a;
+    border-bottom: 1px solid #b0b5bc;
+    background: linear-gradient(180deg, #f0f2f5 0%, #e2e5ea 100%);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset;
     cursor: pointer;
 }
 .sidebar-brand-icon {
@@ -119,16 +122,18 @@ p + svg {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 .sidebar-brand-name {
     font-size: 14px;
     font-weight: 700;
-    color: #f3f4f6;
+    color: #1a1f2e;
     line-height: 1.2;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
 }
 .sidebar-brand-sub {
     font-size: 11px;
-    color: #9ca3af;
+    color: #6b7280;
     line-height: 1.2;
     margin-top: 1px;
 }
@@ -145,9 +150,10 @@ p + svg {
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 1px;
-    color: #6b6b6b;
+    color: #888e97;
     padding: 4px 8px 6px;
     text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.9);
 }
 
 /* Flat nav items */
@@ -158,55 +164,66 @@ p + svg {
     padding: 8px 10px;
     border-radius: 8px;
     text-decoration: none;
-    color: #d1d5db;
-    transition: background 0.15s, color 0.15s;
+    color: #2d3340;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
     margin-bottom: 2px;
     border: 1px solid transparent;
 }
 .nav-flat-item:hover {
-    background: rgba(255,255,255,0.08);
-    color: #ffffff;
+    background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.4) 100%);
+    color: #111827;
+    border-color: rgba(255,255,255,0.8);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
 }
 .nav-flat-item.active {
-    background: #2563eb;
+    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
     color: #ffffff;
     border-color: #1d4ed8;
+    box-shadow: 0 2px 6px rgba(37,99,235,0.45), inset 0 1px 0 rgba(255,255,255,0.25);
 }
 .nav-flat-icon {
     width: 30px;
     height: 30px;
     border-radius: 7px;
-    background: rgba(255,255,255,0.07);
+    background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(200,205,210,0.5) 100%);
+    border: 1px solid rgba(150,155,165,0.4);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 14px;
     flex-shrink: 0;
-    color: #9ca3af;
+    color: #4b5563;
     transition: background 0.15s, color 0.15s;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
 }
 .nav-flat-item:hover .nav-flat-icon {
-    background: rgba(255,255,255,0.12);
-    color: #e5e7eb;
+    background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(220,225,230,0.7) 100%);
+    color: #1f2937;
 }
 .nav-flat-item.active .nav-flat-icon {
     background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.3);
     color: #ffffff;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
 }
 .nav-flat-name {
     font-size: 13px;
     font-weight: 600;
     color: inherit;
     line-height: 1.2;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+}
+.nav-flat-item.active .nav-flat-name {
+    text-shadow: none;
 }
 .nav-flat-desc {
     font-size: 11px;
-    color: #6b6b6b;
+    color: #7b8494;
     line-height: 1.2;
     margin-top: 1px;
 }
 .nav-flat-item:hover .nav-flat-desc {
-    color: #9ca3af;
+    color: #4b5563;
 }
 .nav-flat-item.active .nav-flat-desc {
     color: #bfdbfe;
@@ -221,29 +238,32 @@ p + svg {
     gap: 10px;
     padding: 8px 10px;
     border-radius: 8px;
-    color: #d1d5db;
+    color: #2d3340;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
     border: 1px solid transparent;
 }
 .nav-group-flat-header:hover {
-    background: rgba(255,255,255,0.08);
-    color: #ffffff;
+    background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.4) 100%);
+    color: #111827;
+    border-color: rgba(255,255,255,0.8);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
 }
 .nav-group-flat.open > .nav-group-flat-header {
-    background: rgba(255,255,255,0.08);
-    color: #ffffff;
+    background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.35) 100%);
+    color: #111827;
+    border-color: rgba(200,205,210,0.6);
 }
 .nav-group-flat-arrow {
     margin-left: auto;
     font-size: 10px;
-    color: #6b6b6b;
+    color: #888e97;
     transition: transform 0.2s;
     flex-shrink: 0;
 }
 .nav-group-flat.open > .nav-group-flat-header .nav-group-flat-arrow {
     transform: rotate(90deg);
-    color: #93c5fd;
+    color: #2563eb;
 }
 .nav-group-flat-sub {
     display: none;
@@ -260,7 +280,7 @@ p + svg {
     padding: 7px 10px;
     border-radius: 7px;
     text-decoration: none;
-    color: #9ca3af;
+    color: #4b5563;
     font-size: 12px;
     font-weight: 500;
     transition: background 0.15s, color 0.15s;
@@ -268,13 +288,16 @@ p + svg {
     border: 1px solid transparent;
 }
 .nav-sub-flat-item:hover {
-    background: rgba(255,255,255,0.07);
-    color: #e5e7eb;
+    background: linear-gradient(180deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.35) 100%);
+    color: #111827;
+    border-color: rgba(255,255,255,0.8);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
 }
 .nav-sub-flat-item.active {
-    background: #2563eb;
+    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
     color: #ffffff;
     border-color: #1d4ed8;
+    box-shadow: 0 2px 5px rgba(37,99,235,0.4);
 }
 .nav-sub-flat-icon {
     font-size: 12px;
