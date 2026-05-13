@@ -273,6 +273,18 @@ p + svg {
 .nav-group-flat.open > .nav-group-flat-sub {
     display: block;
 }
+.nav-group-flat:hover > .nav-group-flat-sub {
+    display: block;
+}
+.nav-group-flat:hover > .nav-group-flat-header {
+    background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.35) 100%);
+    color: #111827;
+    border-color: rgba(200,205,210,0.6);
+}
+.nav-group-flat:hover > .nav-group-flat-header .nav-group-flat-arrow {
+    transform: rotate(90deg);
+    color: #2563eb;
+}
 .nav-sub-flat-item {
     display: flex;
     align-items: center;
