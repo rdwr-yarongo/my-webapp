@@ -206,7 +206,7 @@ function ensureResultsActionButton(buttonId, label, onClick) {
     button.id = buttonId;
     button.className = 'btn btn-danger';
     button.textContent = label;
-    button.style.cssText = 'padding:4px 12px;font-size:12px;';
+    button.style.cssText = 'padding:10px 24px;font-size:15px;font-weight:700;border-radius:6px;min-width:90px;';
     button.onclick = onClick;
     sidebar.appendChild(button);
 }
