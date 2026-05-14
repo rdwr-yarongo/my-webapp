@@ -1127,3 +1127,85 @@ h1 .headline-icon {
     color: #fff;
 }
 .dview { width: 100%; }
+
+/* ═══════════════════════════════════════════════════
+   GSLB LIVE DIAGRAM
+═══════════════════════════════════════════════════ */
+@keyframes dashFlow {
+    to { stroke-dashoffset: -16; }
+}
+
+.gslb-path-active {
+    stroke-dasharray: 8 4 !important;
+    animation: dashFlow 0.45s linear infinite !important;
+    stroke-width: 3 !important;
+    opacity: 1 !important;
+}
+
+.gslb-vip-node {
+    transition: opacity 0.3s;
+}
+
+.gslb-node-active {
+    opacity: 1 !important;
+}
+
+.gslb-history-dot {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    cursor: default;
+    transition: transform 0.15s;
+    border: 1.5px solid rgba(255,255,255,0.2);
+}
+
+.gslb-history-dot:hover {
+    transform: scale(1.4);
+}
+
+#gslb-live-diagram-panel {
+    overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════
+   GSLB LIVE DIAGRAM
+═══════════════════════════════════════════════════ */
+@keyframes dashFlow {
+    to { stroke-dashoffset: -16; }
+}
+
+.gslb-path-active {
+    stroke-dasharray: 8 4 !important;
+    animation: dashFlow 0.45s linear infinite !important;
+    stroke-width: 3 !important;
+    opacity: 1 !important;
+}
+
+.gslb-vip-node {
+    transition: opacity 0.3s;
+}
+
+.gslb-node-active {
+    opacity: 1 !important;
+}
+
+.gslb-history-dot {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    cursor: default;
+    transition: transform 0.15s;
+    border: 1.5px solid rgba(255,255,255,0.2);
+}
+
+.gslb-history-dot:hover {
+    transform: scale(1.4);
+}
+
+#gslb-live-diagram-panel {
+    overflow: hidden;
+}
