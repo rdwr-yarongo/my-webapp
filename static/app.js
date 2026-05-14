@@ -716,19 +716,36 @@ function loadContentSwitch(host, btnId, scheme) {
     scheme = scheme || 'http';
     const resultsContent = document.getElementById('results-content');
     if (!resultsContent) return;
-    const url = scheme + '://' + host.toLowerCase() + '/index.php';
-    const envKey = host.toLowerCase().includes('-dev') ? 'dev' : host.toLowerCase().includes('-stg') ? 'stg' : 'prod';
-    const color = CS_ENV_COLORS[envKey] || '#1a56db';
-    const badge = `<span style="display:inline-block;padding:2px 10px;border-radius:12px;background:${color};color:#fff;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">${envKey.toUpperCase()}</span>`;
-    const label = document.createElement('p');
-    label.style.cssText = 'margin:0 0 6px 0;font-size:13px;';
-    label.innerHTML = `${badge} Browser connects directly to <strong>${escapeHtml(url)}</strong>`;
-    const iframe = document.createElement('iframe');
-    iframe.src = url;
-    iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:4px;background:#fff;';
-    resultsContent.innerHTML = '';
-    resultsContent.appendChild(label);
-    resultsContent.appendChild(iframe);
+    const btn = document.getElementById(btnId);
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading…'; }
+    resultsContent.innerHTML = '<p>Loading…</p>';
+
+    fetch('/api/scenario/content_switch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ host: host, scheme: scheme })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (btn) { btn.disabled = false; btn.innerHTML = CS_BTN_LABELS[host] || host; }
+        if (!data.success) {
+            resultsContent.innerHTML = `<p class="error">Error: ${escapeHtml(data.error)}</p>`;
+            return;
+        }
+        const envKey = (data.env || 'prod');
+        const color = CS_ENV_COLORS[envKey] || '#1a56db';
+        const badge = `<span style="display:inline-block;padding:2px 10px;border-radius:12px;background:${color};color:#fff;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">${envKey.toUpperCase()}</span>`;
+        const label = document.createElement('p');
+        label.style.cssText = 'margin:0 0 6px 0;font-size:13px;';
+        label.innerHTML = `${badge} ${escapeHtml(scheme)}://<strong>${escapeHtml(host.toLowerCase())}</strong> → ${escapeHtml(data.target_ip)} — Status ${escapeHtml(data.status_code)}`;
+        resultsContent.innerHTML = '';
+        resultsContent.appendChild(label);
+        resultsContent.appendChild(createResponseIframe(data));
+    })
+    .catch(err => {
+        if (btn) { btn.disabled = false; btn.innerHTML = CS_BTN_LABELS[host] || host; }
+        resultsContent.innerHTML = `<p class="error">Request failed: ${escapeHtml(err.message)}</p>`;
+    });
 }
 
 
