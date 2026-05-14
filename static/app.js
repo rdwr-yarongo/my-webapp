@@ -277,6 +277,230 @@ function stopHaStream() {
         haEventSource = null;
     }
     removeResultsActionButton('ha-stop-btn');
+    resetHaDiagram();
+}
+
+// ─────────────────────────────────────────────────────────
+// HA LIVE TOPOLOGY DIAGRAM
+// ─────────────────────────────────────────────────────────
+let _haCounts = { a1: 0, a2: 0 };
+let _haTotal  = 0;
+let _haPhase  = 'normal'; // 'normal' | 'failover' | 'restored'
+
+function _detectHaAlteon(result) {
+    var info = (result.served_by || result.wanlink || '').toLowerCase();
+    if (info.indexOf('alteon 2') !== -1 || info.indexOf('alteon2') !== -1) return 'a2';
+    if (info.indexOf('alteon 1') !== -1 || info.indexOf('alteon1') !== -1) return 'a1';
+    // Fallback: check server_ip or target_ip
+    var sip = result.server_ip || result.target_ip || '';
+    if (sip.indexOf('.52') !== -1) return 'a2';
+    return 'a1';
+}
+
+function initHaDiagram() {
+    _haCounts = { a1: 0, a2: 0 };
+    _haTotal  = 0;
+    _haPhase  = 'normal';
+
+    // Reset nodes
+    ['ha-node-a1', 'ha-node-a2'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) { el.setAttribute('opacity', '0.45'); el.style.filter = ''; }
+    });
+    // Reset paths
+    ['ha-path-a1', 'ha-path-a2', 'ha-path-srv1', 'ha-path-srv2'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.setAttribute('stroke', '#cbd5e1');
+            el.setAttribute('stroke-width', '2');
+            el.setAttribute('opacity', '0.5');
+            el.setAttribute('marker-end', 'url(#ha-live-arr-idle)');
+            el.classList.remove('gslb-path-active');
+        }
+    });
+    // Reset counters
+    var ca1 = document.getElementById('ha-count-a1');
+    var ca2 = document.getElementById('ha-count-a2');
+    var pa1 = document.getElementById('ha-pct-a1');
+    var pa2 = document.getElementById('ha-pct-a2');
+    if (ca1) ca1.textContent = '0\xD7';
+    if (ca2) ca2.textContent = '0\xD7';
+    if (pa1) pa1.textContent = '\u2014';
+    if (pa2) pa2.textContent = '\u2014';
+    // Reset phase
+    var phaseBg = document.getElementById('ha-phase-bg');
+    var phaseText = document.getElementById('ha-phase-text');
+    if (phaseBg) phaseBg.setAttribute('fill', '#e2e8f0');
+    if (phaseText) { phaseText.textContent = 'Streaming \u2014 waiting\u2026'; phaseText.setAttribute('fill', '#64748b'); }
+    // Reset other labels
+    var attemptText = document.getElementById('ha-attempt-text');
+    if (attemptText) attemptText.textContent = '\u2014';
+    var srvStatus = document.getElementById('ha-srv-status');
+    if (srvStatus) srvStatus.textContent = '\u2014';
+    var a1Role = document.getElementById('ha-a1-role');
+    var a2Role = document.getElementById('ha-a2-role');
+    if (a1Role) a1Role.textContent = 'Active \u00b7 HA primary';
+    if (a2Role) a2Role.textContent = 'Standby \u00b7 HA secondary';
+    // Reset status + strip
+    var status = document.getElementById('ha-status-text');
+    if (status) { status.textContent = 'Streaming \u2014 waiting for first attempt\u2026'; status.style.color = '#64748b'; }
+    var strip = document.getElementById('ha-history-strip');
+    if (strip) strip.innerHTML = '';
+}
+
+function updateHaDiagram(result) {
+    var status = document.getElementById('ha-status-text');
+    var strip  = document.getElementById('ha-history-strip');
+
+    if (result.dns_error || result.http_error) {
+        var errMsg = result.dns_error || result.http_error;
+        if (status) { status.textContent = 'Attempt #' + result.attempt + ' \u2014 \u26A0 ' + errMsg; status.style.color = '#ef4444'; }
+        _haAppendDot(strip, '#ef4444', '#' + result.attempt + ': ' + errMsg);
+        return;
+    }
+
+    var alteon = _detectHaAlteon(result);
+    _haTotal++;
+    _haCounts[alteon] = (_haCounts[alteon] || 0) + 1;
+
+    // Detect phase transitions
+    var prevPhase = _haPhase;
+    if (alteon === 'a2' && prevPhase === 'normal') _haPhase = 'failover';
+    if (alteon === 'a1' && prevPhase === 'failover') _haPhase = 'restored';
+
+    // Deactivate all paths + nodes
+    ['ha-node-a1', 'ha-node-a2'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) { el.setAttribute('opacity', '0.45'); el.style.filter = ''; }
+    });
+    ['ha-path-a1', 'ha-path-a2', 'ha-path-srv1', 'ha-path-srv2'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.setAttribute('stroke', '#cbd5e1');
+            el.setAttribute('stroke-width', '2');
+            el.setAttribute('opacity', '0.5');
+            el.setAttribute('marker-end', 'url(#ha-live-arr-idle)');
+            el.classList.remove('gslb-path-active');
+        }
+    });
+
+    // Activate the correct Alteon path
+    var color = alteon === 'a1' ? '#3b82f6' : '#f59e0b';
+    var nodeId = alteon === 'a1' ? 'ha-node-a1' : 'ha-node-a2';
+    var pathIn = alteon === 'a1' ? 'ha-path-a1' : 'ha-path-a2';
+    var pathOut = alteon === 'a1' ? 'ha-path-srv1' : 'ha-path-srv2';
+    var arrIn = alteon === 'a1' ? 'ha-live-arr-a1' : 'ha-live-arr-a2';
+
+    var activeNode = document.getElementById(nodeId);
+    if (activeNode) {
+        activeNode.setAttribute('opacity', '1');
+        activeNode.style.filter = 'drop-shadow(0 0 8px ' + color + ')';
+    }
+
+    var activePathIn = document.getElementById(pathIn);
+    if (activePathIn) {
+        activePathIn.setAttribute('stroke', color);
+        activePathIn.setAttribute('stroke-width', '3');
+        activePathIn.setAttribute('opacity', '1');
+        activePathIn.setAttribute('marker-end', 'url(#' + arrIn + ')');
+        activePathIn.classList.add('gslb-path-active');
+    }
+
+    var activePathOut = document.getElementById(pathOut);
+    if (activePathOut) {
+        activePathOut.setAttribute('stroke', '#10b981');
+        activePathOut.setAttribute('stroke-width', '3');
+        activePathOut.setAttribute('opacity', '1');
+        activePathOut.setAttribute('marker-end', 'url(#ha-live-arr-srv)');
+        activePathOut.classList.add('gslb-path-active');
+    }
+
+    // WebApp server glow
+    var srvNode = document.getElementById('ha-node-srv');
+    if (srvNode) srvNode.style.filter = 'drop-shadow(0 0 6px #10b981)';
+
+    // Update counters
+    var ca1 = document.getElementById('ha-count-a1');
+    var ca2 = document.getElementById('ha-count-a2');
+    var pa1 = document.getElementById('ha-pct-a1');
+    var pa2 = document.getElementById('ha-pct-a2');
+    if (ca1) ca1.textContent = _haCounts.a1 + '\xD7';
+    if (ca2) ca2.textContent = _haCounts.a2 + '\xD7';
+    if (pa1) pa1.textContent = _haTotal > 0 ? Math.round(_haCounts.a1 / _haTotal * 100) + '%' : '\u2014';
+    if (pa2) pa2.textContent = _haTotal > 0 ? Math.round(_haCounts.a2 / _haTotal * 100) + '%' : '\u2014';
+
+    // Update phase indicator
+    var phaseBg = document.getElementById('ha-phase-bg');
+    var phaseText = document.getElementById('ha-phase-text');
+    if (_haPhase === 'normal') {
+        if (phaseBg) phaseBg.setAttribute('fill', '#dbeafe');
+        if (phaseText) { phaseText.textContent = '\u25CF Normal — Alteon 1 serving'; phaseText.setAttribute('fill', '#1d4ed8'); }
+    } else if (_haPhase === 'failover') {
+        if (phaseBg) phaseBg.setAttribute('fill', '#fef3c7');
+        if (phaseText) { phaseText.textContent = '\u26A0 Failover — Alteon 2 active'; phaseText.setAttribute('fill', '#b45309'); }
+    } else if (_haPhase === 'restored') {
+        if (phaseBg) phaseBg.setAttribute('fill', '#d1fae5');
+        if (phaseText) { phaseText.textContent = '\u2714 Restored — Alteon 1 back'; phaseText.setAttribute('fill', '#047857'); }
+    }
+
+    // Update role labels based on phase
+    var a1Role = document.getElementById('ha-a1-role');
+    var a2Role = document.getElementById('ha-a2-role');
+    if (_haPhase === 'failover') {
+        if (a1Role) a1Role.textContent = 'Ports DOWN \u00b7 failover triggered';
+        if (a2Role) a2Role.textContent = 'Active \u00b7 serving traffic';
+    } else if (_haPhase === 'restored') {
+        if (a1Role) a1Role.textContent = 'Active \u00b7 restored';
+        if (a2Role) a2Role.textContent = 'Standby \u00b7 HA secondary';
+    } else {
+        if (a1Role) a1Role.textContent = 'Active \u00b7 HA primary';
+        if (a2Role) a2Role.textContent = 'Standby \u00b7 HA secondary';
+    }
+
+    // Attempt + server info
+    var attemptText = document.getElementById('ha-attempt-text');
+    if (attemptText) attemptText.textContent = '#' + result.attempt;
+    var srvStatus = document.getElementById('ha-srv-status');
+    var servedBy = result.served_by || result.wanlink || '';
+    if (srvStatus) srvStatus.textContent = servedBy ? 'Via: ' + servedBy : '\u2014';
+
+    // Status line
+    if (status) {
+        var label = alteon === 'a1' ? 'Alteon 1' : 'Alteon 2';
+        status.textContent = 'Attempt #' + result.attempt + ' \u2192 ' + label + (servedBy ? ' \u00b7 ' + servedBy : '');
+        status.style.color = color;
+    }
+
+    // History dot
+    _haAppendDot(strip, color, '#' + result.attempt + ': ' + (alteon === 'a1' ? 'Alteon 1' : 'Alteon 2'));
+}
+
+function _haAppendDot(strip, color, title) {
+    if (!strip) return;
+    var dot = document.createElement('span');
+    dot.className = 'gslb-history-dot';
+    dot.style.background = color;
+    dot.title = title;
+    strip.appendChild(dot);
+    while (strip.children.length > 30) strip.removeChild(strip.firstChild);
+}
+
+function resetHaDiagram() {
+    ['ha-path-a1', 'ha-path-a2', 'ha-path-srv1', 'ha-path-srv2'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('gslb-path-active');
+    });
+    var srvNode = document.getElementById('ha-node-srv');
+    if (srvNode) srvNode.style.filter = '';
+    ['ha-node-a1', 'ha-node-a2'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.filter = '';
+    });
+    var status = document.getElementById('ha-status-text');
+    if (status && _haTotal > 0) {
+        status.textContent = 'Stopped after ' + _haTotal + ' attempt' + (_haTotal !== 1 ? 's' : '');
+        status.style.color = '#94a3b8';
+    }
 }
 
 // ─────────────────────────────────────────────────────────
@@ -350,15 +574,15 @@ function updateGslbDiagram(result) {
         const node = document.getElementById(m.nodeId);
         const path = document.getElementById(m.pathId);
         if (node) {
-            node.setAttribute('opacity', '0.35');
+            node.setAttribute('opacity', '0.45');
             node.classList.remove('gslb-node-active');
             node.style.filter = '';
         }
         if (path) {
             path.classList.remove('gslb-path-active');
-            path.setAttribute('stroke', '#334155');
+            path.setAttribute('stroke', '#cbd5e1');
             path.setAttribute('stroke-width', '2');
-            path.setAttribute('opacity', '0.4');
+            path.setAttribute('opacity', '0.5');
             path.setAttribute('marker-end', 'url(#gslb-arr-idle)');
         }
     });
@@ -384,7 +608,7 @@ function updateGslbDiagram(result) {
 
     // Also pulse the DNS→Client path on every attempt
     const dnsPath = document.getElementById('gslb-path-dns');
-    if (dnsPath) { dnsPath.setAttribute('stroke', '#94a3b8'); dnsPath.setAttribute('opacity', '0.8'); }
+    if (dnsPath) { dnsPath.setAttribute('stroke', '#64748b'); dnsPath.setAttribute('opacity', '0.8'); }
     const dnsNode = document.getElementById('gslb-node-dns');
     if (dnsNode) dnsNode.style.filter = 'drop-shadow(0 0 6px #3b82f6)';
 
@@ -686,10 +910,12 @@ function startHaScenario() {
 
         renderHaShell();
         ensureResultsActionButton('ha-stop-btn', 'Stop', stopHaStream);
+        initHaDiagram();
         haEventSource = new EventSource('/api/scenario/ha_failover/stream');
 
         haEventSource.onmessage = function(event) {
             const result = JSON.parse(event.data);
+            updateHaDiagram(result);
             const attemptsDiv = document.getElementById('ha-attempts');
             if (!attemptsDiv) return;
             const panel = buildTrafficPanel(result, { titlePrefix: 'HA Attempt' });
@@ -934,6 +1160,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function toggleTopoPanel(header) {
+    var body = document.getElementById('topo-collapsible');
+    var arrow = header.querySelector('.collapsible-arrow');
+    if (body.style.display === 'none') {
+        body.style.display = 'block';
+        arrow.classList.remove('bi-chevron-right');
+        arrow.classList.add('bi-chevron-down');
+    } else {
+        body.style.display = 'none';
+        arrow.classList.remove('bi-chevron-down');
+        arrow.classList.add('bi-chevron-right');
+    }
+}
 
 function showDiagramTab(btn, viewId) {
     document.querySelectorAll('.dview').forEach(function(d) { d.style.display = 'none'; });

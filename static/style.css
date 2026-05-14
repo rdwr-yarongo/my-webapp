@@ -363,6 +363,20 @@ p + svg {
     opacity: 0.95;
 }
 
+.collapsible-header {
+    cursor: pointer;
+    user-select: none;
+}
+.collapsible-header:hover {
+    color: #1565c0;
+}
+.collapsible-arrow {
+    font-size: 12px;
+    margin-left: 6px;
+    transition: transform 0.2s;
+    color: #9ca3af;
+}
+
 .headline-icon {
     margin-right: var(--spacing-8);
     color: var(--primary-color);
