@@ -1069,11 +1069,34 @@ h1 .headline-icon {
     transition: box-shadow 0.15s, border-color 0.15s;
     cursor: pointer;
     border-right: 3px solid #d0d8f0;
+    position: relative;
 }
 .quick-link-card:hover {
     box-shadow: 0 2px 12px rgba(80,100,200,0.13);
     border-color: #90b0f0;
     background: #eef2ff;
+}
+
+/* ── Health Monitor Dots ── */
+.health-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d1d5db;
+    border: 1.5px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+    transition: background 0.3s;
+}
+.health-dot.up {
+    background: #22c55e;
+    box-shadow: 0 0 6px rgba(34,197,94,0.45), 0 0 0 1px rgba(0,0,0,0.06);
+}
+.health-dot.down {
+    background: #ef4444;
+    box-shadow: 0 0 6px rgba(239,68,68,0.4), 0 0 0 1px rgba(0,0,0,0.06);
 }
 
 /* ── Diagram Tabs ── */

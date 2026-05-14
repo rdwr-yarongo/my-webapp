@@ -603,6 +603,29 @@ def ha_failover_stream():
     )
 
 
+@app.route('/api/health')
+def health_check():
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    targets = {
+        '10.100.0.51': 'https', '10.100.0.52': 'https', '10.100.0.100': 'https',
+        '10.100.0.10': 'http', '10.100.0.20': 'http', '10.100.0.200': 'https',
+        '10.100.0.101': 'https', '10.100.0.102': 'https'
+    }
+    def check(ip, scheme):
+        try:
+            requests.get(f'{scheme}://{ip}/', timeout=2, verify=False)
+            return ip, 'up'
+        except Exception:
+            return ip, 'down'
+    results = {}
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = {pool.submit(check, ip, scheme): ip for ip, scheme in targets.items()}
+        for f in as_completed(futures):
+            ip, status = f.result()
+            results[ip] = status
+    return jsonify(results)
+
+
 @app.route('/')
 def index():
     return render_template('index.html')

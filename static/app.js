@@ -766,3 +766,22 @@ function showDiagramTab(btn, viewId) {
     document.getElementById(viewId).style.display = 'block';
     btn.classList.add('dtab-active');
 }
+
+// ── Health Monitor ────────────────────────────────────────────────────────────
+function pollHealth() {
+    fetch('/api/health')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            document.querySelectorAll('.quick-link-card[data-ip]').forEach(function(card) {
+                var ip = card.getAttribute('data-ip');
+                var dot = card.querySelector('.health-dot');
+                if (!dot) return;
+                dot.classList.remove('up', 'down');
+                if (data[ip] === 'up') dot.classList.add('up');
+                else if (data[ip] === 'down') dot.classList.add('down');
+            });
+        })
+        .catch(function() {});
+}
+pollHealth();
+setInterval(pollHealth, 30000);
