@@ -831,6 +831,229 @@ function renderRedirectTrace(data) {
     `;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   REDIRECT LIVE DIAGRAM — step-by-step animation
+   ═══════════════════════════════════════════════════════════ */
+
+var _redirAnimTimer = null;
+
+function initRedirDiagram() {
+    /* Reset all paths to idle */
+    ['redir-path-http', 'redir-path-307', 'redir-path-https', 'redir-path-fwd'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.setAttribute('stroke', '#cbd5e1');
+            el.setAttribute('stroke-width', '2');
+            el.setAttribute('opacity', '0.5');
+            el.setAttribute('marker-end', 'url(#redir-live-arr-idle)');
+            el.classList.remove('gslb-path-active');
+        }
+    });
+    /* Reset step labels */
+    ['redir-label-1', 'redir-label-2', 'redir-label-3', 'redir-label-4'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) { el.setAttribute('fill', '#94a3b8'); el.setAttribute('opacity', '0.6'); }
+    });
+    /* Reset step dots */
+    ['redir-dot-1', 'redir-dot-2', 'redir-dot-3', 'redir-dot-4'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) { el.setAttribute('fill', '#e2e8f0'); el.setAttribute('stroke', '#94a3b8'); }
+    });
+    var stepFlow = document.getElementById('redir-step-flow');
+    if (stepFlow) stepFlow.setAttribute('opacity', '0.4');
+    /* Reset node dynamic elements */
+    var protoBg   = document.getElementById('redir-proto-bg');
+    var protoText = document.getElementById('redir-proto-text');
+    var lockIcon  = document.getElementById('redir-lock-icon');
+    var codeBg    = document.getElementById('redir-code-bg');
+    var codeText  = document.getElementById('redir-code-text');
+    var locText   = document.getElementById('redir-location-text');
+    var alteonIp  = document.getElementById('redir-alteon-ip');
+    var finalBg   = document.getElementById('redir-final-bg');
+    var finalText = document.getElementById('redir-final-text');
+    var serverIp  = document.getElementById('redir-server-ip');
+    var stepText  = document.getElementById('redir-step-text');
+    if (protoBg)   { protoBg.setAttribute('opacity', '0'); protoBg.setAttribute('fill', '#fee2e2'); }
+    if (protoText) { protoText.setAttribute('opacity', '0'); protoText.textContent = 'HTTP'; protoText.setAttribute('fill', '#dc2626'); }
+    if (lockIcon)  { lockIcon.textContent = '\uD83D\uDD13'; lockIcon.setAttribute('opacity', '0.3'); lockIcon.setAttribute('fill', '#94a3b8'); }
+    if (codeBg)    codeBg.setAttribute('opacity', '0');
+    if (codeText)  codeText.setAttribute('opacity', '0');
+    if (locText)   { locText.setAttribute('opacity', '0'); locText.textContent = 'Location: https://…'; }
+    if (alteonIp)  alteonIp.textContent = '—';
+    if (finalBg)   finalBg.setAttribute('opacity', '0');
+    if (finalText) finalText.setAttribute('opacity', '0');
+    if (serverIp)  serverIp.textContent = '—';
+    if (stepText)  stepText.textContent = '—';
+    /* Reset node glows */
+    var nodeAlteon = document.getElementById('redir-node-alteon');
+    var nodeServer = document.getElementById('redir-node-server');
+    if (nodeAlteon) nodeAlteon.querySelector('rect').style.filter = '';
+    if (nodeServer) nodeServer.querySelector('rect').style.filter = '';
+    /* Phase pill */
+    var phaseBg   = document.getElementById('redir-phase-bg');
+    var phaseText = document.getElementById('redir-phase-text');
+    if (phaseBg)   phaseBg.setAttribute('fill', '#e2e8f0');
+    if (phaseText) { phaseText.textContent = 'Waiting for demo launch…'; phaseText.setAttribute('fill', '#64748b'); }
+    /* Status text */
+    var statusText = document.getElementById('redir-status-text');
+    if (statusText) { statusText.textContent = 'Initializing redirect proof…'; statusText.style.color = '#64748b'; }
+}
+
+function animateRedirStep(step, data) {
+    var phaseBg   = document.getElementById('redir-phase-bg');
+    var phaseText = document.getElementById('redir-phase-text');
+    var statusText = document.getElementById('redir-status-text');
+
+    if (step === 1) {
+        /* ── Step 1: HTTP request sent ── */
+        var pathHttp  = document.getElementById('redir-path-http');
+        var label1    = document.getElementById('redir-label-1');
+        var dot1      = document.getElementById('redir-dot-1');
+        var protoBg   = document.getElementById('redir-proto-bg');
+        var protoText = document.getElementById('redir-proto-text');
+        var lockIcon  = document.getElementById('redir-lock-icon');
+        var stepText  = document.getElementById('redir-step-text');
+
+        if (pathHttp) {
+            pathHttp.setAttribute('stroke', '#f97316');
+            pathHttp.setAttribute('stroke-width', '3');
+            pathHttp.setAttribute('opacity', '1');
+            pathHttp.setAttribute('marker-end', 'url(#redir-live-arr-http)');
+            pathHttp.classList.add('gslb-path-active');
+        }
+        if (label1) { label1.setAttribute('fill', '#f97316'); label1.setAttribute('opacity', '1'); }
+        if (dot1)   { dot1.setAttribute('fill', '#fff7ed'); dot1.setAttribute('stroke', '#f97316'); }
+        if (protoBg)   { protoBg.setAttribute('fill', '#fee2e2'); protoBg.setAttribute('opacity', '1'); }
+        if (protoText) { protoText.textContent = 'HTTP'; protoText.setAttribute('fill', '#dc2626'); protoText.setAttribute('opacity', '1'); }
+        if (lockIcon)  { lockIcon.textContent = '\uD83D\uDD13'; lockIcon.setAttribute('opacity', '1'); lockIcon.setAttribute('fill', '#dc2626'); }
+        if (stepText)  stepText.textContent = 'Sending HTTP…';
+        if (phaseBg)   phaseBg.setAttribute('fill', '#fff7ed');
+        if (phaseText) { phaseText.textContent = '① Sending HTTP request…'; phaseText.setAttribute('fill', '#c2410c'); }
+        if (statusText) { statusText.textContent = 'HTTP GET http://scenario2.radware.lab/index.php'; statusText.style.color = '#f97316'; }
+
+    } else if (step === 2) {
+        /* ── Step 2: 307 redirect received ── */
+        var path307   = document.getElementById('redir-path-307');
+        var label2    = document.getElementById('redir-label-2');
+        var dot2      = document.getElementById('redir-dot-2');
+        var codeBg    = document.getElementById('redir-code-bg');
+        var codeText  = document.getElementById('redir-code-text');
+        var locText   = document.getElementById('redir-location-text');
+        var alteonIp  = document.getElementById('redir-alteon-ip');
+
+        /* Keep step 1 active but dim it slightly */
+        var pathHttp = document.getElementById('redir-path-http');
+        if (pathHttp) { pathHttp.classList.remove('gslb-path-active'); pathHttp.setAttribute('opacity', '0.7'); }
+
+        if (path307) {
+            path307.setAttribute('stroke', '#f59e0b');
+            path307.setAttribute('stroke-width', '3');
+            path307.setAttribute('opacity', '1');
+            path307.setAttribute('marker-end', 'url(#redir-live-arr-307)');
+            path307.classList.add('gslb-path-active');
+        }
+        if (label2) { label2.setAttribute('fill', '#f59e0b'); label2.setAttribute('opacity', '1'); }
+        if (dot2)   { dot2.setAttribute('fill', '#fffbeb'); dot2.setAttribute('stroke', '#f59e0b'); }
+        if (codeBg)   codeBg.setAttribute('opacity', '1');
+        if (codeText) { codeText.textContent = data ? data.redirect_status_code : '307'; codeText.setAttribute('opacity', '1'); }
+        if (locText)  { locText.textContent = 'Location: ' + (data && data.redirect_location ? data.redirect_location : 'https://…'); locText.setAttribute('opacity', '1'); }
+        if (alteonIp && data) alteonIp.textContent = 'VIP → ' + (data.target_ip || '');
+
+        /* Glow Alteon node */
+        var nodeAlteon = document.getElementById('redir-node-alteon');
+        if (nodeAlteon) nodeAlteon.querySelector('rect').style.filter = 'drop-shadow(0 0 8px #f59e0b)';
+
+        if (phaseBg)   phaseBg.setAttribute('fill', '#fef3c7');
+        if (phaseText) { phaseText.textContent = '\u26A0 ' + (data ? data.redirect_status_code : '307') + ' Redirect received'; phaseText.setAttribute('fill', '#b45309'); }
+        if (statusText) { statusText.textContent = (data ? data.redirect_status_code : '307') + ' Redirect → ' + (data && data.redirect_location ? data.redirect_location : 'https://…'); statusText.style.color = '#f59e0b'; }
+
+    } else if (step === 3) {
+        /* ── Step 3: HTTPS follow-up ── */
+        var pathHttps = document.getElementById('redir-path-https');
+        var label3    = document.getElementById('redir-label-3');
+        var dot3      = document.getElementById('redir-dot-3');
+        var protoBg   = document.getElementById('redir-proto-bg');
+        var protoText = document.getElementById('redir-proto-text');
+        var lockIcon  = document.getElementById('redir-lock-icon');
+        var stepText  = document.getElementById('redir-step-text');
+
+        /* Dim step 2 */
+        var path307 = document.getElementById('redir-path-307');
+        if (path307) { path307.classList.remove('gslb-path-active'); path307.setAttribute('opacity', '0.7'); }
+
+        if (pathHttps) {
+            pathHttps.setAttribute('stroke', '#10b981');
+            pathHttps.setAttribute('stroke-width', '3');
+            pathHttps.setAttribute('opacity', '1');
+            pathHttps.setAttribute('marker-end', 'url(#redir-live-arr-https)');
+            pathHttps.classList.add('gslb-path-active');
+        }
+        if (label3) { label3.setAttribute('fill', '#10b981'); label3.setAttribute('opacity', '1'); }
+        if (dot3)   { dot3.setAttribute('fill', '#ecfdf5'); dot3.setAttribute('stroke', '#10b981'); }
+        /* Upgrade protocol badge to HTTPS */
+        if (protoBg)   { protoBg.setAttribute('fill', '#d1fae5'); protoBg.setAttribute('opacity', '1'); }
+        if (protoText) { protoText.textContent = 'HTTPS 🔒'; protoText.setAttribute('fill', '#047857'); protoText.setAttribute('opacity', '1'); }
+        if (lockIcon)  { lockIcon.textContent = '\uD83D\uDD12'; lockIcon.setAttribute('opacity', '1'); lockIcon.setAttribute('fill', '#047857'); }
+        if (stepText)  stepText.textContent = 'Secure connection';
+        if (phaseBg)   phaseBg.setAttribute('fill', '#d1fae5');
+        if (phaseText) { phaseText.textContent = '③ Following redirect to HTTPS…'; phaseText.setAttribute('fill', '#047857'); }
+        if (statusText) { statusText.textContent = 'HTTPS GET https://scenario2.radware.lab/index.php'; statusText.style.color = '#10b981'; }
+
+    } else if (step === 4) {
+        /* ── Step 4: Backend forward + final response ── */
+        var pathFwd   = document.getElementById('redir-path-fwd');
+        var label4    = document.getElementById('redir-label-4');
+        var dot4      = document.getElementById('redir-dot-4');
+        var finalBg   = document.getElementById('redir-final-bg');
+        var finalText = document.getElementById('redir-final-text');
+        var serverIp  = document.getElementById('redir-server-ip');
+
+        /* Dim step 3 */
+        var pathHttps = document.getElementById('redir-path-https');
+        if (pathHttps) { pathHttps.classList.remove('gslb-path-active'); pathHttps.setAttribute('opacity', '0.7'); }
+
+        if (pathFwd) {
+            pathFwd.setAttribute('stroke', '#10b981');
+            pathFwd.setAttribute('stroke-width', '3');
+            pathFwd.setAttribute('opacity', '1');
+            pathFwd.setAttribute('marker-end', 'url(#redir-live-arr-https)');
+            pathFwd.classList.add('gslb-path-active');
+        }
+        if (label4) { label4.setAttribute('fill', '#10b981'); label4.setAttribute('opacity', '1'); }
+        if (dot4)   { dot4.setAttribute('fill', '#ecfdf5'); dot4.setAttribute('stroke', '#10b981'); }
+        if (finalBg)   finalBg.setAttribute('opacity', '1');
+        if (finalText) { finalText.textContent = data ? data.final_status_code + ' OK' : '200 OK'; finalText.setAttribute('opacity', '1'); }
+        if (serverIp && data)  serverIp.textContent = data.target_ip || '';
+
+        /* Glow server node */
+        var nodeServer = document.getElementById('redir-node-server');
+        if (nodeServer) nodeServer.querySelector('rect').style.filter = 'drop-shadow(0 0 8px #10b981)';
+
+        if (phaseBg)   phaseBg.setAttribute('fill', '#d1fae5');
+        if (phaseText) { phaseText.textContent = '\u2714 Secure page loaded successfully'; phaseText.setAttribute('fill', '#047857'); }
+        if (statusText) {
+            statusText.textContent = 'Complete — HTTP redirected to HTTPS via Alteon' + (data && data.target_ip ? ' (' + data.target_ip + ')' : '');
+            statusText.style.color = '#047857';
+        }
+
+    } else if (step === 'error') {
+        if (phaseBg)   phaseBg.setAttribute('fill', '#fee2e2');
+        if (phaseText) { phaseText.textContent = '\u26A0 Redirect proof failed'; phaseText.setAttribute('fill', '#dc2626'); }
+        if (statusText) { statusText.textContent = 'Error: ' + (data && data.error ? data.error : 'Unknown'); statusText.style.color = '#ef4444'; }
+    }
+}
+
+function resetRedirDiagram() {
+    ['redir-path-http', 'redir-path-307', 'redir-path-https', 'redir-path-fwd'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('gslb-path-active');
+    });
+    var nodeAlteon = document.getElementById('redir-node-alteon');
+    var nodeServer = document.getElementById('redir-node-server');
+    if (nodeAlteon) nodeAlteon.querySelector('rect').style.filter = '';
+    if (nodeServer) nodeServer.querySelector('rect').style.filter = '';
+}
+
 function launchEmbeddedRedirectDemo() {
     renderRedirectResultsShell();
 
@@ -841,6 +1064,10 @@ function launchEmbeddedRedirectDemo() {
     redirectScenarioState.launched = true;
     redirectScenarioState.proofLoaded = false;
 
+    /* ── Start redirect diagram animation ── */
+    initRedirDiagram();
+    animateRedirStep(1, null);
+
     setRedirectBrowserState('http://scenario2.radware.lab/index.php', 'Requesting HTTP page...', 'http');
     proof.innerHTML = '<p>Checking redirect proof and loading the secure destination...</p>';
     iframe.src = 'about:blank';
@@ -850,8 +1077,14 @@ function launchEmbeddedRedirectDemo() {
         .then(data => {
             renderRedirectProof(data);
             if (!data.success) {
+                animateRedirStep('error', data);
                 throw new Error(data.error || 'Unable to validate redirect flow');
             }
+
+            /* ── Steps 2→3→4 animate in sequence ── */
+            setTimeout(function() { animateRedirStep(2, data); }, 400);
+            setTimeout(function() { animateRedirStep(3, data); }, 1000);
+            setTimeout(function() { animateRedirStep(4, data); }, 1600);
 
             redirectScenarioState.proofLoaded = true;
             setRedirectBrowserState('https://scenario2.radware.lab/index.php', `Redirect ${data.redirect_status_code} observed. Secure page loaded.`, 'https');
