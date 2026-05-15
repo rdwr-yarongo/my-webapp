@@ -924,6 +924,26 @@
                     </ul>
                     <p>The <strong>Execute</strong> action performs multiple attempts to <strong>app1.radware.lab</strong>. Each attempt triggers a DNS decision and then sends HTTP traffic to the selected destination so you can observe GSLB behavior over time.</p>
                 </div>
+
+                <!-- ═══ Alteon WebUI — GSLB DNS Rules View ═══ -->
+                <div class="panel" id="alteon-webui-gslb-panel">
+                    <h3><i class="bi bi-display headline-icon"></i> How It Looks in Alteon WebUI</h3>
+                    <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
+                        See the actual GSLB DNS Redirection Rules as configured in the Alteon administration interface.
+                        Opens a side panel auto-navigated to <strong>Application Delivery &rarr; Global Traffic Redirection &rarr; DNS Redirection Rules &rarr; Rule 10</strong>.
+                    </p>
+                    <div class="btn-row" style="align-items:center;">
+                        <button class="btn btn-primary" onclick="toggleAlteonWebUI('alteon1','gslb-dns-rules')">
+                            <i class="bi bi-display"></i> Show Alteon 1 WebUI
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleAlteonWebUI('alteon2','gslb-dns-rules')">
+                            <i class="bi bi-display"></i> Show Alteon 2 WebUI
+                        </button>
+                        <button class="btn btn-secondary" onclick="window.open('https://10.100.0.51','_blank','noopener,noreferrer')">
+                            <i class="bi bi-box-arrow-up-right"></i> Open in New Tab
+                        </button>
+                    </div>
+                </div>
             </section>
             <section id="scenario-2" class="content-section">
                 <h1><i class="bi bi-diagram-2 headline-icon"></i>HA Failover</h1>
@@ -1091,10 +1111,10 @@
                         Opens a side panel with the live Alteon WebUI, auto-navigated to <strong>Network &rarr; High Availability</strong>.
                     </p>
                     <div class="btn-row" style="align-items:center;">
-                        <button class="btn btn-primary" onclick="toggleAlteonWebUI()">
+                        <button class="btn btn-primary" onclick="toggleAlteonWebUI('alteon1','ha')">
                             <i class="bi bi-display"></i> Show Alteon 1 WebUI
                         </button>
-                        <button class="btn btn-secondary" onclick="toggleAlteonWebUI('alteon2')">
+                        <button class="btn btn-secondary" onclick="toggleAlteonWebUI('alteon2','ha')">
                             <i class="bi bi-display"></i> Show Alteon 2 WebUI
                         </button>
                         <button class="btn btn-secondary" onclick="window.open('https://10.100.0.51','_blank','noopener,noreferrer')">

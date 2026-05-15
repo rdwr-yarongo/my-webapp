@@ -1448,8 +1448,14 @@ const alteonDeviceLabels = {
     alteon2: 'Alteon 2 (10.100.0.52)',
 };
 
-function toggleAlteonWebUI(device) {
+/* Saved navTarget so A1/A2 header buttons re-use the same page */
+var _alteonNavTarget = 'ha';
+
+function toggleAlteonWebUI(device, navTarget) {
     device = device || 'alteon1';
+    if (navTarget) _alteonNavTarget = navTarget;
+    var target = navTarget || _alteonNavTarget || 'ha';
+
     const drawer = document.getElementById('alteon-drawer');
     const backdrop = document.getElementById('alteon-drawer-backdrop');
     const frame = document.getElementById('alteon-webui-frame');
@@ -1468,10 +1474,11 @@ function toggleAlteonWebUI(device) {
     backdrop.classList.add('open');
     document.body.style.overflow = 'hidden';
 
-    /* Auto-navigate to Network → High Availability after GWT loads */
+    /* Auto-navigate after GWT loads */
     frame.onload = function () {
         function gwtClick(el) {
             if (!el) return;
+            el.scrollIntoView && el.scrollIntoView({ block: 'center' });
             var rect = el.getBoundingClientRect();
             var cx = rect.left + rect.width / 2;
             var cy = rect.top + rect.height / 2;
@@ -1480,16 +1487,40 @@ function toggleAlteonWebUI(device) {
             el.dispatchEvent(new MouseEvent('mouseup', opts));
             el.dispatchEvent(new MouseEvent('click', opts));
         }
+        function gwtDblClick(el) {
+            if (!el) return;
+            var rect = el.getBoundingClientRect();
+            var opts = { bubbles: true, cancelable: true, view: frame.contentWindow, detail: 2, clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2 };
+            el.dispatchEvent(new MouseEvent('dblclick', opts));
+        }
+        function retryClick(doc, id, attempts, cb) {
+            var el = doc.getElementById(id);
+            if (el) { gwtClick(el); if (cb) cb(); return; }
+            if (attempts > 0) setTimeout(function () { retryClick(doc, id, attempts - 1, cb); }, 800);
+        }
         setTimeout(function () {
             try {
                 var doc = frame.contentDocument || frame.contentWindow.document;
-                gwtClick(doc.getElementById('gwt-debug-TopicsStack_Configuration.Network'));
-                function clickHA(attempts) {
-                    var haNode = doc.getElementById('gwt-debug-TopicsNode_Network.tree.High_Availability8-content');
-                    if (haNode) { gwtClick(haNode); return; }
-                    if (attempts > 0) setTimeout(function () { clickHA(attempts - 1); }, 800);
+                if (target === 'gslb-dns-rules') {
+                    /* Application Delivery → Global Traffic Redirection → DNS Redirection Rules → Rule 10 */
+                    gwtClick(doc.getElementById('gwt-debug-TopicsStack_Configuration.Application_Delivery'));
+                    setTimeout(function () {
+                        retryClick(doc, 'gwt-debug-TopicsNode_Application_Delivery.tree.Global_Traffic_Redirection41-content', 5, function () {
+                            setTimeout(function () {
+                                retryClick(doc, 'gwt-debug-TopicsNode_Application_Delivery.tree.Global_Traffic_Redirection41.Rules-content', 5, function () {
+                                    setTimeout(function () {
+                                        var row = doc.getElementById('gwt-debug-gslbNewCfgRuleTable_RowID_1');
+                                        if (row) { gwtClick(row); setTimeout(function () { gwtDblClick(row); }, 500); }
+                                    }, 1500);
+                                });
+                            }, 1500);
+                        });
+                    }, 2000);
+                } else {
+                    /* Default: Network → High Availability */
+                    gwtClick(doc.getElementById('gwt-debug-TopicsStack_Configuration.Network'));
+                    retryClick(doc, 'gwt-debug-TopicsNode_Network.tree.High_Availability8-content', 5);
                 }
-                setTimeout(function () { clickHA(5); }, 2000);
             } catch (e) { /* cross-origin safety */ }
         }, 4000);
     };
