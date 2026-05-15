@@ -1516,6 +1516,23 @@ function toggleAlteonWebUI(device, navTarget) {
                             }, 1500);
                         });
                     }, 2000);
+                } else if (target === 'vs-scenario2-http') {
+                    /* Application Delivery → Virtual Services → Scenario2 → Application: HTTP */
+                    gwtClick(doc.getElementById('gwt-debug-TopicsStack_Configuration.Application_Delivery'));
+                    setTimeout(function () {
+                        retryClick(doc, 'gwt-debug-TopicsNode_Application_Delivery.tree.Node0-content', 5, function () {
+                            setTimeout(function () {
+                                /* Click Scenario2 row in Virtual Servers table */
+                                var s2Row = doc.getElementById('gwt-debug-slbNewCfgEnhVirtServerTable_RowID_6');
+                                if (s2Row) { gwtClick(s2Row); }
+                                setTimeout(function () {
+                                    /* Click + dblclick the HTTP virtual service row */
+                                    var httpRow = doc.getElementById('gwt-debug-slbNewCfgEnhVirtServicesTable_RowID_1');
+                                    if (httpRow) { gwtClick(httpRow); setTimeout(function () { gwtDblClick(httpRow); }, 500); }
+                                }, 2000);
+                            }, 2000);
+                        });
+                    }, 2000);
                 } else {
                     /* Default: Network → High Availability */
                     gwtClick(doc.getElementById('gwt-debug-TopicsStack_Configuration.Network'));
