@@ -1,20 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <!-- Server rack body -->
-  <rect x="8" y="4" width="48" height="56" rx="4" fill="#e2e8f0" stroke="#64748b" stroke-width="2"/>
-  <!-- Drive bay 1 -->
-  <rect x="14" y="10" width="36" height="8" rx="2" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
-  <circle cx="44" cy="14" r="2" fill="#10b981"/>
-  <line x1="18" y1="14" x2="34" y2="14" stroke="#cbd5e1" stroke-width="1.5"/>
-  <!-- Drive bay 2 -->
-  <rect x="14" y="22" width="36" height="8" rx="2" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
-  <circle cx="44" cy="26" r="2" fill="#10b981"/>
-  <line x1="18" y1="26" x2="34" y2="26" stroke="#cbd5e1" stroke-width="1.5"/>
-  <!-- Drive bay 3 -->
-  <rect x="14" y="34" width="36" height="8" rx="2" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
-  <circle cx="44" cy="38" r="2" fill="#10b981"/>
-  <line x1="18" y1="38" x2="34" y2="38" stroke="#cbd5e1" stroke-width="1.5"/>
-  <!-- Drive bay 4 -->
-  <rect x="14" y="46" width="36" height="8" rx="2" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
-  <circle cx="44" cy="50" r="2" fill="#10b981"/>
-  <line x1="18" y1="50" x2="34" y2="50" stroke="#cbd5e1" stroke-width="1.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 78 64" fill="none">
+  <!-- Server Tower 1 (left) -->
+  <rect x="2" y="2" width="22" height="60" rx="2" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+  <rect x="5" y="6" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="7" y1="8.5" x2="15" y2="8.5" stroke="#e74c3c" stroke-width="1"/>
+  <rect x="5" y="14" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="7" y1="16.5" x2="15" y2="16.5" stroke="#e74c3c" stroke-width="1"/>
+  <rect x="5" y="22" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="7" y1="24.5" x2="15" y2="24.5" stroke="#e74c3c" stroke-width="1"/>
+  <rect x="5" y="30" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="7" y1="32.5" x2="15" y2="32.5" stroke="#e74c3c" stroke-width="1"/>
+  <rect x="5" y="38" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="7" y1="40.5" x2="15" y2="40.5" stroke="#e74c3c" stroke-width="1"/>
+  <rect x="5" y="46" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="7" y1="48.5" x2="15" y2="48.5" stroke="#e74c3c" stroke-width="1"/>
+  <rect x="5" y="54" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="7" y1="56.5" x2="15" y2="56.5" stroke="#e74c3c" stroke-width="1"/>
+
+  <!-- Server Tower 2 (center) -->
+  <rect x="28" y="2" width="22" height="60" rx="2" fill="#f8fafc" stroke="#be185d" stroke-width="1.5"/>
+  <rect x="31" y="6" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="33" y1="8.5" x2="41" y2="8.5" stroke="#be185d" stroke-width="1"/>
+  <rect x="31" y="14" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="33" y1="16.5" x2="41" y2="16.5" stroke="#be185d" stroke-width="1"/>
+  <rect x="31" y="22" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="33" y1="24.5" x2="41" y2="24.5" stroke="#be185d" stroke-width="1"/>
+  <rect x="31" y="30" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="33" y1="32.5" x2="41" y2="32.5" stroke="#be185d" stroke-width="1"/>
+  <rect x="31" y="38" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="33" y1="40.5" x2="41" y2="40.5" stroke="#be185d" stroke-width="1"/>
+  <rect x="31" y="46" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="33" y1="48.5" x2="41" y2="48.5" stroke="#be185d" stroke-width="1"/>
+  <rect x="31" y="54" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="33" y1="56.5" x2="41" y2="56.5" stroke="#be185d" stroke-width="1"/>
+
+  <!-- Server Tower 3 (right) -->
+  <rect x="54" y="2" width="22" height="60" rx="2" fill="#f8fafc" stroke="#7c3aed" stroke-width="1.5"/>
+  <rect x="57" y="6" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="59" y1="8.5" x2="67" y2="8.5" stroke="#7c3aed" stroke-width="1"/>
+  <rect x="57" y="14" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="59" y1="16.5" x2="67" y2="16.5" stroke="#7c3aed" stroke-width="1"/>
+  <rect x="57" y="22" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="59" y1="24.5" x2="67" y2="24.5" stroke="#7c3aed" stroke-width="1"/>
+  <rect x="57" y="30" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="59" y1="32.5" x2="67" y2="32.5" stroke="#7c3aed" stroke-width="1"/>
+  <rect x="57" y="38" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="59" y1="40.5" x2="67" y2="40.5" stroke="#7c3aed" stroke-width="1"/>
+  <rect x="57" y="46" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="59" y1="48.5" x2="67" y2="48.5" stroke="#7c3aed" stroke-width="1"/>
+  <rect x="57" y="54" width="16" height="5" rx="1" fill="#fff" stroke="#94a3b8" stroke-width="0.8"/>
+  <line x1="59" y1="56.5" x2="67" y2="56.5" stroke="#7c3aed" stroke-width="1"/>
 </svg>
