@@ -805,6 +805,10 @@
                 <div class="panel">
                     <h3><i class="bi bi-caret-right-square headline-icon"></i>Run HA Failover</h3>
                     <p>Monitor live traffic for <strong>app2.radware.lab</strong>, trigger a failover from Alteon 1 to Alteon 2, and then restore the primary unit.</p>
+                    <p>Alteon 1 starts as the master ADC and Alteon 2 starts as the backup ADC in the HA pair.</p>
+                    <p>The failover action forces Alteon 1 to relinquish traffic by shutting down ports 1, 2, and 3 over the Alteon API.</p>
+                    <p>The restore action brings the same interfaces back up so the primary unit can return to service.</p>
+                    <p>In the live results pane, the customer can watch the embedded <strong>app2.radware.lab</strong> page continue to load while the proof fields show which system handled the request after failover.</p>
                     <div class="btn-row">
                         <button class="btn btn-primary" onclick="executeScenario('ha_failover')">Start Monitoring</button>
                         <button class="btn btn-danger" onclick="callHaAction('failover')">Trigger Failover</button>
