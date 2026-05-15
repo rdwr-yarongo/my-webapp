@@ -1082,6 +1082,44 @@
                     <p>The restore action brings the same interfaces back up so the primary unit can return to service.</p>
                     <p>In the live results pane, the customer can watch the embedded <strong>app2.radware.lab</strong> page continue to load while the proof fields show which system handled the request after failover.</p>
                 </div>
+
+                <!-- ═══ Alteon WebUI — HA Config View ═══ -->
+                <div class="panel" id="alteon-webui-panel">
+                    <h3><i class="bi bi-display headline-icon"></i> How It Looks in Alteon WebUI</h3>
+                    <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
+                        See the actual High Availability configuration as it appears in the Alteon administration interface.
+                        After the WebUI loads, navigate to <strong>Network &rarr; High Availability</strong> to view HA settings.
+                    </p>
+                    <div class="btn-row" style="align-items:center;">
+                        <button class="btn btn-primary" onclick="toggleAlteonWebUI()">
+                            <i class="bi bi-display"></i> Show Alteon 1 WebUI
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleAlteonWebUI('alteon2')">
+                            <i class="bi bi-display"></i> Show Alteon 2 WebUI
+                        </button>
+                        <button class="btn btn-secondary" onclick="window.open('https://10.100.0.51','_blank','noopener,noreferrer')">
+                            <i class="bi bi-box-arrow-up-right"></i> Open in New Tab
+                        </button>
+                    </div>
+                    <div id="alteon-webui-container" style="display:none;margin-top:12px;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                            <span style="font-size:11px;color:#64748b;">
+                                <i class="bi bi-info-circle"></i>
+                                Logged in as <strong>radware</strong> &mdash;
+                                Device: <strong id="alteon-webui-device-label">Alteon 1 (10.100.0.51)</strong>
+                            </span>
+                            <button class="btn btn-secondary" style="font-size:11px;padding:2px 10px;" onclick="document.getElementById('alteon-webui-frame').contentWindow.location.reload()">
+                                <i class="bi bi-arrow-clockwise"></i> Reload
+                            </button>
+                            <button class="btn btn-secondary" style="font-size:11px;padding:2px 10px;" onclick="hideAlteonWebUI()">
+                                <i class="bi bi-x-lg"></i> Close
+                            </button>
+                        </div>
+                        <iframe id="alteon-webui-frame" src=""
+                                style="width:100%;height:720px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;"
+                                title="Alteon WebUI" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+                    </div>
+                </div>
             </section>
             <section id="scenario-3" class="content-section">
                 <h1><i class="bi bi-arrow-left-right headline-icon"></i>Scenario 2</h1>

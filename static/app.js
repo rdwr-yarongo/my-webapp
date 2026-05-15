@@ -1442,6 +1442,33 @@ function callHaAction(actionName) {
     });
 }
 
+/* ── Alteon WebUI iframe toggle ─────────────────────────── */
+const alteonDeviceLabels = {
+    alteon1: 'Alteon 1 (10.100.0.51)',
+    alteon2: 'Alteon 2 (10.100.0.52)',
+};
+
+function toggleAlteonWebUI(device) {
+    device = device || 'alteon1';
+    const container = document.getElementById('alteon-webui-container');
+    const frame = document.getElementById('alteon-webui-frame');
+    const label = document.getElementById('alteon-webui-device-label');
+    const targetSrc = `/alteon-webui/${device}/webui/default.html`;
+
+    if (container.style.display !== 'none' && frame.src.includes(device)) {
+        container.style.display = 'none';
+        return;
+    }
+    label.textContent = alteonDeviceLabels[device] || device;
+    frame.src = targetSrc;
+    container.style.display = 'block';
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function hideAlteonWebUI() {
+    document.getElementById('alteon-webui-container').style.display = 'none';
+}
+
 function startHaScenario() {
     stopGslbStream();
     stopHaStream();

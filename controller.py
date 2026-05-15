@@ -906,6 +906,72 @@ def http2_gateway():
         return jsonify({'success': False, 'error': str(exc)}), 502
 
 
+# ═══════════════════════════════════════════════════════════════
+#  Alteon WebUI reverse proxy — strips X-Frame-Options so the
+#  GWT-based WebUI can be embedded in an iframe (same-origin).
+# ═══════════════════════════════════════════════════════════════
+
+ALTEON_WEBUI_AUTH = HTTPBasicAuth('radware', 'Radware1!')
+ALTEON_DEVICES = {
+    'alteon1': '10.100.0.51',
+    'alteon2': '10.100.0.52',
+}
+
+@app.route('/alteon-webui/<device>/', defaults={'subpath': ''}, methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route('/alteon-webui/<device>/<path:subpath>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def alteon_webui_proxy(device, subpath):
+    target_ip = ALTEON_DEVICES.get(device)
+    if not target_ip:
+        return Response('Unknown device', status=404)
+
+    target_url = f'https://{target_ip}/{subpath}'
+    if request.query_string:
+        target_url += f'?{request.query_string.decode()}'
+
+    fwd_headers = {
+        k: v for k, v in request.headers
+        if k.lower() not in ('host', 'authorization', 'content-length')
+    }
+    fwd_headers['Host'] = target_ip
+
+    try:
+        resp = requests.request(
+            method=request.method,
+            url=target_url,
+            auth=ALTEON_WEBUI_AUTH,
+            headers=fwd_headers,
+            data=request.get_data(),
+            verify=False,
+            timeout=15,
+            allow_redirects=False,
+            stream=True,
+        )
+    except Exception as exc:
+        return Response(f'Alteon proxy error: {exc}', status=502)
+
+    # Strip headers that block iframe embedding
+    excluded = {
+        'x-frame-options', 'content-security-policy',
+        'transfer-encoding', 'connection', 'keep-alive',
+    }
+    headers = {
+        k: v for k, v in resp.headers.items()
+        if k.lower() not in excluded
+    }
+
+    # Rewrite redirect Location to stay within the proxy
+    if resp.status_code in (301, 302, 307, 308):
+        loc = headers.get('Location', '')
+        if loc.startswith('/'):
+            headers['Location'] = f'/alteon-webui/{device}{loc}'
+
+    return Response(
+        resp.content,
+        status=resp.status_code,
+        headers=headers,
+    )
+
+
 if __name__ == '__main__':
     import ssl as _ssl_mod
     import threading as _threading
