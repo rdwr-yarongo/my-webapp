@@ -442,7 +442,7 @@ p + svg {
 /* ── Scroll-down hint overlay ── */
 .scroll-hint-overlay {
     position: absolute;
-    bottom: 0;
+    bottom: 50px;
     left: 0;
     right: 0;
     height: 90px;
