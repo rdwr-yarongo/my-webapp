@@ -198,7 +198,7 @@ p + svg {
     pointer-events: none;
     z-index: 10;
     filter: drop-shadow(0 0 6px rgba(59,130,246,0.6));
-    animation: pointerGlide 12s infinite ease-in-out;
+    animation: pointerGlide 12s 1 ease-in-out forwards;
     transform: scaleX(-1);
 }
 @keyframes pointerGlide {
