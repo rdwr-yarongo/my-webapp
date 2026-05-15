@@ -502,7 +502,14 @@
                 <h1><i class="bi bi-play-btn headline-icon"></i>Scenario 1</h1>
                 <div class="panel">
                     <h3><i class="bi bi-caret-right-square headline-icon"></i>Run Scenario 1</h3>
-                    <p>Start the GSLB live execution attempts for app1.radware.lab.</p>
+                    <p>In this section we will demonstrate global site load balancing.</p>
+                    <p>Please note: the Main site has two links, and the DR site has one link:</p>
+                    <ul style="margin:8px 0 8px 20px;">
+                        <li>Site A ISP link 1 is represented by VIP <strong>10.100.4.54</strong></li>
+                        <li>Site A ISP link 2 is represented by VIP <strong>10.100.5.54</strong></li>
+                        <li>Site B ISP link is represented by VIP <strong>10.100.7.103</strong></li>
+                    </ul>
+                    <p>The Execute action performs multiple attempts to app1.radware.lab. Each attempt triggers a DNS decision and then sends HTTP traffic to the selected destination so you can observe GSLB behavior over time.</p>
                     <button class="btn btn-primary" onclick="executeScenario('gslb_rr')">Execute Scenario 1</button>
                 </div>
 
