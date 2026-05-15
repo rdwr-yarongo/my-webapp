@@ -173,6 +173,8 @@ p + svg {
     padding: 12px 10px;
     flex: 1;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Section labels */
