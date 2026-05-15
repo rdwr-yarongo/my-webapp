@@ -1183,6 +1183,93 @@ h1 .headline-icon {
     overflow: hidden;
 }
 
+/* ── Sticky Health Top Bar ── */
+#health-top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    padding: 8px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+.htb-label {
+    font-weight: 700;
+    font-size: 11px;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.htb-items {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+.htb-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+.htb-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d1d5db;
+    border: 1.5px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+    transition: background 0.3s;
+    flex-shrink: 0;
+}
+.htb-dot.up {
+    background: #22c55e;
+    box-shadow: 0 0 6px rgba(34,197,94,0.45), 0 0 0 1px rgba(0,0,0,0.06);
+}
+.htb-dot.down {
+    background: #ef4444;
+    box-shadow: 0 0 6px rgba(239,68,68,0.4), 0 0 0 1px rgba(0,0,0,0.06);
+}
+.htb-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+}
+.htb-ha-badge {
+    display: none;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+.htb-ha-badge.master {
+    display: inline-block;
+    color: #15803d;
+    background: #f0fdf4;
+    border: 1.5px solid #86efac;
+}
+.htb-ha-badge.standby {
+    display: inline-block;
+    color: #1d4ed8;
+    background: #eff6ff;
+    border: 1.5px solid #93c5fd;
+}
+.htb-ha-badge.init,
+.htb-ha-badge.holdoff {
+    display: inline-block;
+    color: #6b7280;
+    background: #f3f4f6;
+    border: 1.5px solid #d1d5db;
+}
+
 /* ═══════════════════════════════════════════════════
    GSLB LIVE DIAGRAM
 ═══════════════════════════════════════════════════ */

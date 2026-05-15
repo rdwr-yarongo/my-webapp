@@ -1734,13 +1734,43 @@ function pollHealth() {
     fetch('/api/health')
         .then(function(r) { return r.json(); })
         .then(function(data) {
-            document.querySelectorAll('.quick-link-card[data-ip]').forEach(function(card) {
-                var ip = card.getAttribute('data-ip');
-                var dot = card.querySelector('.health-dot');
-                if (!dot) return;
-                dot.classList.remove('up', 'down');
-                if (data[ip] === 'up') dot.classList.add('up');
-                else if (data[ip] === 'down') dot.classList.add('down');
+            Object.keys(data).forEach(function(ip) {
+                var val = data[ip];
+                var status = (typeof val === 'object') ? val.status : val;
+                var haState = (typeof val === 'object') ? (val.ha_state || null) : null;
+
+                // Update quick-link-card dots (existing)
+                document.querySelectorAll('.quick-link-card[data-ip="' + ip + '"] .health-dot').forEach(function(dot) {
+                    dot.classList.remove('up', 'down');
+                    if (status === 'up') dot.classList.add('up');
+                    else if (status === 'down') dot.classList.add('down');
+                });
+
+                // Update top bar dot
+                var barItem = document.querySelector('.htb-item[data-htb-ip="' + ip + '"]');
+                if (barItem) {
+                    var barDot = barItem.querySelector('.htb-dot');
+                    if (barDot) {
+                        barDot.classList.remove('up', 'down');
+                        if (status === 'up') barDot.classList.add('up');
+                        else if (status === 'down') barDot.classList.add('down');
+                    }
+                }
+
+                // Update HA badge
+                if (haState) {
+                    var badgeId = ip === '10.100.0.51' ? 'ha-badge-51' : (ip === '10.100.0.52' ? 'ha-badge-52' : null);
+                    if (badgeId) {
+                        var badge = document.getElementById(badgeId);
+                        if (badge) {
+                            var hsLower = haState.toLowerCase();
+                            badge.className = 'htb-ha-badge';
+                            if (hsLower === 'master') { badge.classList.add('master'); badge.textContent = 'MASTER'; }
+                            else if (hsLower === 'backup') { badge.classList.add('standby'); badge.textContent = 'STANDBY'; }
+                            else { badge.classList.add(hsLower); badge.textContent = haState.toUpperCase(); }
+                        }
+                    }
+                }
             });
         })
         .catch(function() {});

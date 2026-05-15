@@ -611,18 +611,45 @@ def health_check():
         '10.100.0.10': 'http', '10.100.0.20': 'http', '10.100.0.200': 'https',
         '10.100.0.101': 'https', '10.100.0.102': 'https'
     }
+    ha_targets = {'10.100.0.51', '10.100.0.52'}
+
     def check(ip, scheme):
         try:
             requests.get(f'{scheme}://{ip}/', timeout=2, verify=False)
             return ip, 'up'
         except Exception:
             return ip, 'down'
+
+    def check_ha(ip):
+        try:
+            r = requests.get(f'https://{ip}/config/haSwitchInfoState',
+                             auth=ALTEON_AUTH, timeout=3, verify=False)
+            if r.status_code == 200:
+                body = r.json()
+                state_val = body.get('haSwitchInfoState', '')
+                ha_map = {'1': 'Init', '2': 'Master', '3': 'Backup', '4': 'Holdoff'}
+                return ip, ha_map.get(str(state_val), str(state_val))
+            return ip, None
+        except Exception:
+            return ip, None
+
     results = {}
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        futures = {pool.submit(check, ip, scheme): ip for ip, scheme in targets.items()}
-        for f in as_completed(futures):
+    with ThreadPoolExecutor(max_workers=10) as pool:
+        health_futures = {pool.submit(check, ip, scheme): ip for ip, scheme in targets.items()}
+        ha_futures = {pool.submit(check_ha, ip): ip for ip in ha_targets}
+        for f in as_completed(health_futures):
             ip, status = f.result()
             results[ip] = status
+        ha_states = {}
+        for f in as_completed(ha_futures):
+            ip, state = f.result()
+            if state:
+                ha_states[ip] = state
+    for ip in ha_targets:
+        status = results.get(ip, 'down')
+        results[ip] = {'status': status}
+        if ip in ha_states:
+            results[ip]['ha_state'] = ha_states[ip]
     return jsonify(results)
 
 
