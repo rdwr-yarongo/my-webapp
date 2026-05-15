@@ -1669,6 +1669,26 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- ═══ Alteon WebUI — Content-Switching Config View ═══ -->
+                <div class="panel" id="alteon-webui-cs-panel">
+                    <h3><i class="bi bi-display headline-icon"></i> How It Looks in Alteon WebUI</h3>
+                    <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
+                        See the content-switching virtual service as configured in the Alteon administration interface.
+                        Opens a side panel auto-navigated to <strong>Application Delivery &rarr; Virtual Services &rarr; Scenario3 &rarr; Content Based Rules</strong>.
+                    </p>
+                    <div class="btn-row" style="align-items:center;">
+                        <button class="btn btn-primary" onclick="toggleAlteonWebUI('alteon1','vs-scenario3-cbr')">
+                            <i class="bi bi-display"></i> Show Alteon 1 WebUI
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleAlteonWebUI('alteon2','vs-scenario3-cbr')">
+                            <i class="bi bi-display"></i> Show Alteon 2 WebUI
+                        </button>
+                        <button class="btn btn-secondary" onclick="window.open('https://10.100.0.51','_blank','noopener,noreferrer')">
+                            <i class="bi bi-box-arrow-up-right"></i> Open in New Tab
+                        </button>
+                    </div>
+                </div>
             </section>
             <section id="scenario-http2-gateway" class="content-section">
                 <h1><i class="bi bi-lightning-charge headline-icon"></i>Scenario 4 &mdash; HTTP/2 Gateway</h1>

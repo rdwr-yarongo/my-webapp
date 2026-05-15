@@ -1555,6 +1555,28 @@ function toggleAlteonWebUI(device, navTarget) {
                             }, 2000);
                         });
                     }, 2000);
+                } else if (target === 'vs-scenario3-cbr') {
+                    /* Application Delivery → Virtual Services → Scenario3 → Content Based Rules */
+                    gwtClick(doc.getElementById('gwt-debug-TopicsStack_Configuration.Application_Delivery'));
+                    setTimeout(function () {
+                        retryClick(doc, 'gwt-debug-TopicsNode_Application_Delivery.tree.Node0-content', 5, function () {
+                            setTimeout(function () {
+                                /* Click Scenario3 row (RowID_7) */
+                                var s3Row = doc.getElementById('gwt-debug-slbNewCfgEnhVirtServerTable_RowID_7');
+                                if (s3Row) { gwtClick(s3Row); }
+                                setTimeout(function () {
+                                    /* Click + dblclick the SSL virtual service row (RowID_0) */
+                                    var sslRow = doc.getElementById('gwt-debug-slbNewCfgEnhVirtServicesTable_RowID_0');
+                                    if (sslRow) { gwtClick(sslRow); setTimeout(function () { gwtDblClick(sslRow); }, 500); }
+                                    /* Click the Content Based Rules tab */
+                                    setTimeout(function () {
+                                        var tab = doc.getElementById('gwt-debug-ApplicationDelivery.VirtualServicesmockup.Column_17_Tab');
+                                        if (tab) { gwtClick(tab); }
+                                    }, 2000);
+                                }, 2000);
+                            }, 2000);
+                        });
+                    }, 2000);
                 } else {
                     /* Default: Network → High Availability */
                     gwtClick(doc.getElementById('gwt-debug-TopicsStack_Configuration.Network'));
