@@ -192,27 +192,31 @@ p + svg {
 .nav-pointer-hint {
     position: absolute;
     left: 160px;
-    top: 115px;
+    top: 155px;
     font-size: 22px;
     color: #3b82f6;
     pointer-events: none;
     z-index: 10;
     filter: drop-shadow(0 0 6px rgba(59,130,246,0.6));
     animation: pointerGlide 12s infinite ease-in-out;
+    transform: scaleX(-1);
 }
 @keyframes pointerGlide {
-    0%   { opacity: 0; transform: translate(0, 0) scale(0.7); }
-    5%   { opacity: 1; transform: translate(0, 0) scale(1); filter: drop-shadow(0 0 10px rgba(59,130,246,0.8)); }
-    15%  { opacity: 1; transform: translate(0, 0) scale(1.05); }
-    20%  { opacity: 1; transform: translate(0, 5px) scale(1); }
-    35%  { opacity: 1; transform: translate(0, 50px) scale(1); }
-    42%  { opacity: 1; transform: translate(0, 50px) scale(1.05); filter: drop-shadow(0 0 12px rgba(59,130,246,0.9)); }
-    50%  { opacity: 1; transform: translate(0, 55px) scale(1); }
-    65%  { opacity: 1; transform: translate(0, 100px) scale(1); }
-    72%  { opacity: 1; transform: translate(0, 100px) scale(1.05); filter: drop-shadow(0 0 12px rgba(59,130,246,0.9)); }
-    78%  { opacity: 0.6; transform: translate(0, 105px) scale(0.9); }
-    82%  { opacity: 0; transform: translate(0, 110px) scale(0.7); }
-    100% { opacity: 0; transform: translate(0, 110px) scale(0.7); }
+    0%   { opacity: 0; transform: scaleX(-1) translate(0, 0) scale(0.7); }
+    5%   { opacity: 1; transform: scaleX(-1) translate(0, 0) scale(1); filter: drop-shadow(0 0 10px rgba(59,130,246,0.8)); }
+    15%  { opacity: 1; transform: scaleX(-1) translate(0, 0) scale(1.05); }
+    20%  { opacity: 1; transform: scaleX(-1) translate(0, 5px) scale(1); }
+    30%  { opacity: 1; transform: scaleX(-1) translate(0, 55px) scale(1); }
+    35%  { opacity: 1; transform: scaleX(-1) translate(0, 55px) scale(1.05); filter: drop-shadow(0 0 12px rgba(59,130,246,0.9)); }
+    40%  { opacity: 1; transform: scaleX(-1) translate(0, 60px) scale(1); }
+    50%  { opacity: 1; transform: scaleX(-1) translate(0, 110px) scale(1); }
+    55%  { opacity: 1; transform: scaleX(-1) translate(0, 110px) scale(1.05); filter: drop-shadow(0 0 12px rgba(59,130,246,0.9)); }
+    60%  { opacity: 1; transform: scaleX(-1) translate(0, 115px) scale(1); }
+    70%  { opacity: 1; transform: scaleX(-1) translate(0, 165px) scale(1); }
+    75%  { opacity: 1; transform: scaleX(-1) translate(0, 165px) scale(1.05); filter: drop-shadow(0 0 12px rgba(59,130,246,0.9)); }
+    80%  { opacity: 0.6; transform: scaleX(-1) translate(0, 170px) scale(0.9); }
+    85%  { opacity: 0; transform: scaleX(-1) translate(0, 175px) scale(0.7); }
+    100% { opacity: 0; transform: scaleX(-1) translate(0, 175px) scale(0.7); }
 }
 
 /* Section labels */
