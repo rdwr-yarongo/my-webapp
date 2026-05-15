@@ -1442,7 +1442,7 @@ function callHaAction(actionName) {
     });
 }
 
-/* ── Alteon WebUI iframe toggle ─────────────────────────── */
+/* ── Alteon WebUI Side Drawer ───────────────────────────── */
 const alteonDeviceLabels = {
     alteon1: 'Alteon 1 (10.100.0.51)',
     alteon2: 'Alteon 2 (10.100.0.52)',
@@ -1450,19 +1450,23 @@ const alteonDeviceLabels = {
 
 function toggleAlteonWebUI(device) {
     device = device || 'alteon1';
-    const container = document.getElementById('alteon-webui-container');
+    const drawer = document.getElementById('alteon-drawer');
+    const backdrop = document.getElementById('alteon-drawer-backdrop');
     const frame = document.getElementById('alteon-webui-frame');
     const label = document.getElementById('alteon-webui-device-label');
     const targetSrc = `/alteon-webui/${device}/webui/default.html`;
 
-    if (container.style.display !== 'none' && frame.src.includes(device)) {
-        container.style.display = 'none';
+    /* If drawer is open on the same device, close it */
+    if (drawer.classList.contains('open') && frame.src.includes(device)) {
+        hideAlteonWebUI();
         return;
     }
+
     label.textContent = alteonDeviceLabels[device] || device;
     frame.src = targetSrc;
-    container.style.display = 'block';
-    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    drawer.classList.add('open');
+    backdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
 
     /* Auto-navigate to Network → High Availability after GWT loads */
     frame.onload = function () {
@@ -1492,7 +1496,9 @@ function toggleAlteonWebUI(device) {
 }
 
 function hideAlteonWebUI() {
-    document.getElementById('alteon-webui-container').style.display = 'none';
+    document.getElementById('alteon-drawer').classList.remove('open');
+    document.getElementById('alteon-drawer-backdrop').classList.remove('open');
+    document.body.style.overflow = '';
 }
 
 function startHaScenario() {
