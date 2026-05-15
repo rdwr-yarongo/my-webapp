@@ -302,12 +302,12 @@
                         <line x1="555" y1="130" x2="728" y2="149" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
                         <line x1="245" y1="226" x2="160" y2="298" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
                         <line x1="278" y1="226" x2="353" y2="298" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="4,4"/>
-                        <line x1="755" y1="226" x2="840" y2="298" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="740" y1="224" x2="785" y2="298" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
                         <line x1="125" y1="378" x2="125" y2="418" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
                         <line x1="353" y1="378" x2="353" y2="418" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
-                        <line x1="865" y1="378" x2="865" y2="418" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="785" y1="378" x2="785" y2="418" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
                         <line x1="245" y1="446" x2="245" y2="470" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
-                        <line x1="840" y1="446" x2="840" y2="470" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
+                        <line x1="785" y1="446" x2="785" y2="470" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="5,3"/>
                         <!-- === ROW 1: Test Client, Internet Cloud, DNS Server === -->
                         <!-- Test Client -->
                         <rect x="30" y="52" width="180" height="72" rx="10" fill="#fff0f0" stroke="#ef9a9a" stroke-width="1.5" filter="url(#cardShadow)"/>
@@ -359,8 +359,8 @@
                         <text x="130" y="266" text-anchor="middle" fill="#4527a0" font-size="11" font-weight="700" letter-spacing="0.3">Site A ISP1 &#x2014; 10.100.4.0/24</text>
                         <rect x="258" y="248" width="214" height="26" rx="6" fill="url(#ispGrad)" filter="url(#cardShadow)"/>
                         <text x="365" y="266" text-anchor="middle" fill="#4527a0" font-size="11" font-weight="700" letter-spacing="0.3">Site A ISP2 &#x2014; 10.100.5.0/24</text>
-                        <rect x="740" y="248" width="220" height="26" rx="6" fill="url(#ispGrad)" filter="url(#cardShadow)"/>
-                        <text x="850" y="266" text-anchor="middle" fill="#4527a0" font-size="11" font-weight="700" letter-spacing="0.3">Site B ISP &#x2014; 10.100.7.0/24</text>
+                        <rect x="675" y="248" width="220" height="26" rx="6" fill="url(#ispGrad)" filter="url(#cardShadow)"/>
+                        <text x="785" y="266" text-anchor="middle" fill="#4527a0" font-size="11" font-weight="700" letter-spacing="0.3">Site B ISP &#x2014; 10.100.7.0/24</text>
                         <!-- === ROW 3: Alteon Boxes === -->
                         <!-- Alteon 1 -->
                         <rect x="30" y="298" width="190" height="80" rx="10" fill="#e3f2fd" stroke="#64b5f6" stroke-width="2" filter="url(#alteonShadow)"/>
@@ -377,11 +377,11 @@
                         <text x="386" y="349" text-anchor="middle" fill="#888888" font-size="12">10.100.0.52</text>
                         <text x="386" y="367" text-anchor="middle" fill="#f57c00" font-size="9" font-weight="600">STANDBY</text>
                         <!-- Alteon 3 -->
-                        <rect x="758" y="298" width="202" height="80" rx="10" fill="#e3f2fd" stroke="#64b5f6" stroke-width="2" filter="url(#alteonShadow)"/>
-                        <rect x="766" y="306" width="58" height="58" rx="6" fill="#ffffff" stroke="#e3f2fd" stroke-width="0.5"/>
-                        <image href="{{ url_for('static', filename='adc.svg') }}" x="766" y="306" width="58" height="58"/>
-                        <text x="892" y="329" text-anchor="middle" fill="#1565c0" font-size="15" font-weight="700">Alteon 3</text>
-                        <text x="892" y="349" text-anchor="middle" fill="#888888" font-size="12">10.100.0.100</text>
+                        <rect x="684" y="298" width="202" height="80" rx="10" fill="#e3f2fd" stroke="#64b5f6" stroke-width="2" filter="url(#alteonShadow)"/>
+                        <rect x="692" y="306" width="58" height="58" rx="6" fill="#ffffff" stroke="#e3f2fd" stroke-width="0.5"/>
+                        <image href="{{ url_for('static', filename='adc.svg') }}" x="692" y="306" width="58" height="58"/>
+                        <text x="818" y="329" text-anchor="middle" fill="#1565c0" font-size="15" font-weight="700">Alteon 3</text>
+                        <text x="818" y="349" text-anchor="middle" fill="#888888" font-size="12">10.100.0.100</text>
                         <!-- === ROW 4: LAN Bars === -->
                         <rect x="30" y="418" width="430" height="28" rx="6" fill="url(#lanGrad)" filter="url(#cardShadow)"/>
                         <text x="245" y="437" text-anchor="middle" fill="#37474f" font-size="12" font-weight="700" letter-spacing="0.3">Main LAN &#x2014; 10.100.3.0/24</text>
@@ -395,11 +395,11 @@
                         <text x="278" y="501" text-anchor="middle" fill="#00695c" font-size="14" font-weight="700">WebApp Servers</text>
                         <text x="278" y="521" text-anchor="middle" fill="#888888" font-size="12">10.100.0.10&#x2013;15</text>
                         <!-- Site B WebApp -->
-                        <rect x="730" y="470" width="220" height="80" rx="10" fill="#e0f2f1" stroke="#4db6ac" stroke-width="1.5" filter="url(#cardShadow)"/>
-                        <rect x="738" y="478" width="58" height="58" rx="6" fill="#ffffff" stroke="#e0f2f1" stroke-width="0.5"/>
-                        <image href="{{ url_for('static', filename='servers.png') }}" x="738" y="478" width="58" height="58"/>
-                        <text x="873" y="501" text-anchor="middle" fill="#00695c" font-size="14" font-weight="700">WebApp Servers</text>
-                        <text x="873" y="521" text-anchor="middle" fill="#888888" font-size="12">10.100.0.20&#x2013;25</text>
+                        <rect x="675" y="470" width="220" height="80" rx="10" fill="#e0f2f1" stroke="#4db6ac" stroke-width="1.5" filter="url(#cardShadow)"/>
+                        <rect x="683" y="478" width="58" height="58" rx="6" fill="#ffffff" stroke="#e0f2f1" stroke-width="0.5"/>
+                        <image href="{{ url_for('static', filename='servers.png') }}" x="683" y="478" width="58" height="58"/>
+                        <text x="818" y="501" text-anchor="middle" fill="#00695c" font-size="14" font-weight="700">WebApp Servers</text>
+                        <text x="818" y="521" text-anchor="middle" fill="#888888" font-size="12">10.100.0.20&#x2013;25</text>
                     </svg></div>
 <div id="dview-gslb" class="dview" style="display:none"><svg viewBox="0 0 1000 460" width="100%" style="max-height:620px;font-family:'Segoe UI',sans-serif;" role="img" aria-label="GSLB flow diagram">
                         <!-- Background -->
