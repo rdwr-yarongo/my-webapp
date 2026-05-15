@@ -1185,12 +1185,14 @@ h1 .headline-icon {
 
 /* ── Sticky Health Top Bar ── */
 #health-top-bar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
     background: #fff;
-    border-bottom: 1px solid #e5e7eb;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -1px 4px rgba(0,0,0,0.06);
     padding: 8px 24px;
     display: flex;
     align-items: center;
