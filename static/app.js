@@ -1532,7 +1532,7 @@ function loadOffloadingDemo() {
             const iframe = document.createElement('iframe');
             iframe.sandbox = 'allow-same-origin allow-scripts';
             iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
-            iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', '');
+            iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', 'HTTP/1.1');
             resultsContent.innerHTML = '';
             resultsContent.appendChild(iframe);
         })
@@ -1563,7 +1563,7 @@ function loadBypassDemo() {
             const iframe = document.createElement('iframe');
             iframe.sandbox = 'allow-same-origin allow-scripts';
             iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
-            iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', '');
+            iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', 'HTTP/1.1');
             resultsContent.innerHTML = '';
             resultsContent.appendChild(iframe);
         })
@@ -1620,7 +1620,7 @@ function applyCustomHeader() {
         const iframe = document.createElement('iframe');
         iframe.sandbox = 'allow-same-origin allow-scripts';
         iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:4px;background:#fff;';
-        iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', '');
+        iframe.srcdoc = buildIframeDocument(data.body_html || '', window.location.origin + '/', 'HTTP/1.1');
         resultsContent.innerHTML = '';
         resultsContent.appendChild(label);
         resultsContent.appendChild(iframe);
