@@ -263,6 +263,8 @@ function stopGslbStream() {
     }
     removeResultsActionButton('gslb-stop-btn');
     resetGslbDiagram();
+    resetGslbDnsFlow();
+    resetHttpFlow();
     const indicator = document.getElementById('gslb-live-indicator');
     if (indicator) {
         indicator.style.background = '#dc3545';
@@ -658,10 +660,320 @@ function resetGslbDiagram() {
 }
 // ─────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────
+// GSLB DNS DELEGATION FLOW DIAGRAM
+// ─────────────────────────────────────────────────────────
+const GD_NS_NODES  = ['gd-node-alt1', 'gd-node-alt2', 'gd-node-alt3'];
+const GD_NS_PATHS  = ['gd-path-ns1',  'gd-path-ns2',  'gd-path-ns3'];
+const GD_NS_COLORS = ['#3b82f6', '#06b6d4', '#8b5cf6'];
+const GD_NS_LABELS = ['Alteon 1 (Site A)', 'Alteon 2 (Site A)', 'Alteon 3 (DR)'];
+const GD_NS_COUNT  = ['gd-ns1-count', 'gd-ns2-count', 'gd-ns3-count'];
+const GD_NS_PCT    = ['gd-ns1-pct',   'gd-ns2-pct',   'gd-ns3-pct'];
+const GD_VIP_MAP   = {
+    '10.100.4.54':  { nodeId: 'gd-node-v1', countId: 'gd-v1-count', pctId: 'gd-v1-pct', color: '#3b82f6', suffix: 'v1' },
+    '10.100.5.54':  { nodeId: 'gd-node-v2', countId: 'gd-v2-count', pctId: 'gd-v2-pct', color: '#06b6d4', suffix: 'v2' },
+    '10.100.7.103': { nodeId: 'gd-node-vb', countId: 'gd-vb-count', pctId: 'gd-vb-pct', color: '#a78bfa', suffix: 'vb' }
+};
+const GD_GSLB_PATHS = [
+    'gd-path-a1v1','gd-path-a1v2','gd-path-a1vb',
+    'gd-path-a2v1','gd-path-a2v2','gd-path-a2vb',
+    'gd-path-a3v1','gd-path-a3v2','gd-path-a3vb'
+];
+
+let _gdNsCounts  = [0, 0, 0];
+let _gdVipCounts = {};
+let _gdTotal     = 0;
+let _gdNsIndex   = 0;
+
+function initGslbDnsFlow() {
+    _gdNsCounts  = [0, 0, 0];
+    _gdVipCounts = { '10.100.4.54': 0, '10.100.5.54': 0, '10.100.7.103': 0 };
+    _gdTotal     = 0;
+    _gdNsIndex   = 0;
+
+    // Reset NS nodes
+    GD_NS_NODES.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.setAttribute('opacity', '0.45'); el.style.filter = ''; }
+    });
+    // Reset NS paths
+    GD_NS_PATHS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.setAttribute('stroke', '#cbd5e1'); el.setAttribute('opacity', '0.3'); el.setAttribute('marker-end', 'url(#gd-arr-idle)'); el.classList.remove('gslb-path-active'); }
+    });
+    // Reset GSLB paths
+    GD_GSLB_PATHS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.setAttribute('stroke', '#cbd5e1'); el.setAttribute('stroke-width', '1'); el.setAttribute('opacity', '0.12'); el.classList.remove('gslb-path-active'); }
+    });
+    // Reset VIP nodes
+    Object.values(GD_VIP_MAP).forEach(v => {
+        const el = document.getElementById(v.nodeId);
+        if (el) { el.setAttribute('opacity', '0.45'); el.style.filter = ''; }
+    });
+    // Reset query path
+    const qp = document.getElementById('gd-path-q');
+    if (qp) { qp.setAttribute('stroke', '#cbd5e1'); qp.setAttribute('opacity', '0.5'); qp.setAttribute('marker-end', 'url(#gd-arr-idle)'); }
+
+    // Reset counters
+    GD_NS_COUNT.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '0\xD7'; });
+    GD_NS_PCT.forEach(id   => { const el = document.getElementById(id); if (el) el.textContent = '\u2014'; });
+    Object.values(GD_VIP_MAP).forEach(v => {
+        const c = document.getElementById(v.countId); if (c) c.textContent = '0\xD7';
+        const p = document.getElementById(v.pctId);   if (p) p.textContent = '\u2014';
+    });
+
+    // Reset text elements
+    const phaseText = document.getElementById('gd-phase-text');
+    const phaseBg   = document.getElementById('gd-phase-bg');
+    if (phaseText) phaseText.textContent = 'Streaming \u2014 waiting for first attempt\u2026';
+    if (phaseBg)   phaseBg.setAttribute('fill', '#e2e8f0');
+    const clientAttempt = document.getElementById('gd-client-attempt');
+    if (clientAttempt) clientAttempt.textContent = '\u2014';
+    const dnsStatus = document.getElementById('gd-dns-status');
+    if (dnsStatus) dnsStatus.textContent = '\u2014';
+    const statusText = document.getElementById('gd-status-text');
+    if (statusText) { statusText.textContent = 'Streaming \u2014 waiting for first attempt\u2026'; statusText.style.color = '#64748b'; }
+    const strip = document.getElementById('gd-history-strip');
+    if (strip) strip.innerHTML = '';
+}
+
+function updateGslbDnsFlow(result) {
+    if (result.dns_error || result.http_error) return;
+
+    const ip = (result.target_ip || '').trim();
+    const vip = GD_VIP_MAP[ip];
+    if (!vip) return;
+
+    const ns = _gdNsIndex;
+    _gdNsIndex = (_gdNsIndex + 1) % 3;
+    _gdTotal++;
+    _gdNsCounts[ns]++;
+    _gdVipCounts[ip] = (_gdVipCounts[ip] || 0) + 1;
+
+    // --- Deactivate all ---
+    GD_NS_NODES.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.setAttribute('opacity', '0.45'); el.style.filter = ''; }
+    });
+    GD_NS_PATHS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.setAttribute('stroke', '#cbd5e1'); el.setAttribute('opacity', '0.3'); el.setAttribute('marker-end', 'url(#gd-arr-idle)'); el.classList.remove('gslb-path-active'); }
+    });
+    GD_GSLB_PATHS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.setAttribute('stroke', '#cbd5e1'); el.setAttribute('stroke-width', '1'); el.setAttribute('opacity', '0.12'); el.classList.remove('gslb-path-active'); }
+    });
+    Object.values(GD_VIP_MAP).forEach(v => {
+        const el = document.getElementById(v.nodeId);
+        if (el) { el.setAttribute('opacity', '0.45'); el.style.filter = ''; }
+    });
+
+    // --- 1. Query path ---
+    const qp = document.getElementById('gd-path-q');
+    if (qp) { qp.setAttribute('stroke', '#3b82f6'); qp.setAttribute('opacity', '1'); qp.setAttribute('marker-end', 'url(#gd-arr-query)'); }
+
+    // --- 2. NS delegation path ---
+    const nsPath = document.getElementById(GD_NS_PATHS[ns]);
+    if (nsPath) { nsPath.setAttribute('stroke', '#f59e0b'); nsPath.setAttribute('opacity', '1'); nsPath.setAttribute('marker-end', 'url(#gd-arr-ns)'); nsPath.classList.add('gslb-path-active'); }
+
+    // --- 3. NS node glow ---
+    const nsNode = document.getElementById(GD_NS_NODES[ns]);
+    if (nsNode) { nsNode.setAttribute('opacity', '1'); nsNode.style.filter = `drop-shadow(0 0 8px ${GD_NS_COLORS[ns]})`; }
+
+    // --- 4. GSLB answer path (NS → VIP) ---
+    const gslbPathId = `gd-path-a${ns + 1}${vip.suffix}`;
+    const gslbPath = document.getElementById(gslbPathId);
+    if (gslbPath) { gslbPath.setAttribute('stroke', '#10b981'); gslbPath.setAttribute('stroke-width', '2.5'); gslbPath.setAttribute('opacity', '1'); gslbPath.setAttribute('marker-end', 'url(#gd-arr-gslb)'); gslbPath.classList.add('gslb-path-active'); }
+
+    // --- 5. VIP node glow ---
+    const vipNode = document.getElementById(vip.nodeId);
+    if (vipNode) { vipNode.setAttribute('opacity', '1'); vipNode.style.filter = `drop-shadow(0 0 8px ${vip.color})`; }
+
+    // --- 6. NS counters ---
+    GD_NS_COUNT.forEach((id, i) => { const el = document.getElementById(id); if (el) el.textContent = `${_gdNsCounts[i]}\xD7`; });
+    GD_NS_PCT.forEach((id, i)   => { const el = document.getElementById(id); if (el) el.textContent = _gdTotal > 0 ? `${Math.round(_gdNsCounts[i] / _gdTotal * 100)}%` : '\u2014'; });
+
+    // --- 7. VIP counters ---
+    Object.entries(GD_VIP_MAP).forEach(([vipIp, v]) => {
+        const n = _gdVipCounts[vipIp] || 0;
+        const c = document.getElementById(v.countId); if (c) c.textContent = `${n}\xD7`;
+        const p = document.getElementById(v.pctId);   if (p) p.textContent = _gdTotal > 0 ? `${Math.round(n / _gdTotal * 100)}%` : '\u2014';
+    });
+
+    // --- 8. Phase pill ---
+    const phaseText = document.getElementById('gd-phase-text');
+    const phaseBg   = document.getElementById('gd-phase-bg');
+    if (phaseText) phaseText.textContent = `#${_gdTotal} \u2192 ${GD_NS_LABELS[ns]} \u2192 ${ip}`;
+    if (phaseBg)   phaseBg.setAttribute('fill', '#dbeafe');
+
+    // --- 9. Client attempt ---
+    const clientAttempt = document.getElementById('gd-client-attempt');
+    if (clientAttempt) clientAttempt.textContent = `Attempt #${_gdTotal}`;
+
+    // --- 10. DNS status ---
+    const dnsStatus = document.getElementById('gd-dns-status');
+    if (dnsStatus) dnsStatus.textContent = `NS \u2192 ${GD_NS_LABELS[ns]}`;
+
+    // --- 11. Status text ---
+    const statusText = document.getElementById('gd-status-text');
+    if (statusText) { statusText.textContent = `#${_gdTotal} via ${GD_NS_LABELS[ns]} \u2192 VIP ${ip}`; statusText.style.color = vip.color; }
+
+    // --- 12. History dot ---
+    const strip = document.getElementById('gd-history-strip');
+    if (strip) {
+        const dot = document.createElement('span');
+        dot.className = 'gslb-history-dot';
+        dot.style.background = vip.color;
+        dot.title = `#${_gdTotal}: ${ip} via ${GD_NS_LABELS[ns]}`;
+        strip.appendChild(dot);
+        while (strip.children.length > 20) strip.removeChild(strip.firstChild);
+    }
+}
+
+function resetGslbDnsFlow() {
+    GD_NS_PATHS.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('gslb-path-active'); });
+    GD_GSLB_PATHS.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('gslb-path-active'); });
+    GD_NS_NODES.forEach(id => { const el = document.getElementById(id); if (el) el.style.filter = ''; });
+    Object.values(GD_VIP_MAP).forEach(v => { const el = document.getElementById(v.nodeId); if (el) el.style.filter = ''; });
+    const statusText = document.getElementById('gd-status-text');
+    if (statusText && _gdTotal > 0) { statusText.textContent = `Stopped after ${_gdTotal} attempt${_gdTotal !== 1 ? 's' : ''}`; statusText.style.color = '#94a3b8'; }
+    const phaseText = document.getElementById('gd-phase-text');
+    if (phaseText && _gdTotal > 0) phaseText.textContent = `Stopped \u2014 ${_gdTotal} attempts`;
+}
+
+// ═══════════════ HTTP Traffic Flow ═══════════════
+const HF_VIP_MAP = {
+    '10.100.4.54':  { nodeId:'hf-node-v1', countId:'hf-v1-count', pctId:'hf-v1-pct', wanlinkId:'hf-v1-wanlink', color:'#3b82f6', clientPath:'hf-path-cv1', poolPath:'hf-path-v1sa', pool:'sa' },
+    '10.100.5.54':  { nodeId:'hf-node-v2', countId:'hf-v2-count', pctId:'hf-v2-pct', wanlinkId:'hf-v2-wanlink', color:'#06b6d4', clientPath:'hf-path-cv2', poolPath:'hf-path-v2sa', pool:'sa' },
+    '10.100.7.103': { nodeId:'hf-node-vb', countId:'hf-vb-count', pctId:'hf-vb-pct', wanlinkId:'hf-vb-wanlink', color:'#a78bfa', clientPath:'hf-path-cvb', poolPath:'hf-path-vbdr', pool:'dr' }
+};
+const HF_POOL_MAP = {
+    'sa': { nodeId:'hf-node-sa', countId:'hf-sa-count', pctId:'hf-sa-pct', selectedId:'hf-sa-selected', srvIpId:'hf-sa-srv-ip', color:'#10b981' },
+    'dr': { nodeId:'hf-node-dr', countId:'hf-dr-count', pctId:'hf-dr-pct', selectedId:'hf-dr-selected', srvIpId:'hf-dr-srv-ip', color:'#f59e0b' }
+};
+const HF_CLIENT_PATHS = ['hf-path-cv1','hf-path-cv2','hf-path-cvb'];
+const HF_POOL_PATHS   = ['hf-path-v1sa','hf-path-v2sa','hf-path-vbdr'];
+let _hfVipCounts = {}, _hfPoolCounts = {}, _hfTotal = 0;
+
+function _hfResetPath(id, w, op) {
+    const el = document.getElementById(id); if (!el) return;
+    el.setAttribute('stroke','#cbd5e1'); el.setAttribute('stroke-width', w);
+    el.setAttribute('opacity', op); el.setAttribute('marker-end','url(#hf-arr-idle)');
+    el.classList.remove('gslb-path-active');
+}
+function _hfActivatePath(id, color, w, mid) {
+    const el = document.getElementById(id); if (!el) return;
+    el.setAttribute('stroke', color); el.setAttribute('stroke-width', w);
+    el.setAttribute('opacity','1'); el.setAttribute('marker-end','url(#' + mid + ')');
+    el.classList.add('gslb-path-active');
+}
+function _hfResetNode(id) { const el = document.getElementById(id); if (!el) return; el.setAttribute('opacity','0.45'); el.style.filter = ''; }
+function _hfGlowNode(id, color) { const el = document.getElementById(id); if (!el) return; el.setAttribute('opacity','1'); el.style.filter = 'drop-shadow(0 0 8px ' + color + ')'; }
+
+function initHttpFlow() {
+    _hfVipCounts = { '10.100.4.54':0, '10.100.5.54':0, '10.100.7.103':0 };
+    _hfPoolCounts = { sa:0, dr:0 };
+    _hfTotal = 0;
+    HF_CLIENT_PATHS.forEach(id => _hfResetPath(id, 2, 0.3));
+    HF_POOL_PATHS.forEach(id => _hfResetPath(id, 1.5, 0.15));
+    Object.values(HF_VIP_MAP).forEach(v => { _hfResetNode(v.nodeId); const c = document.getElementById(v.countId); if (c) c.textContent = '0\u00D7'; const p = document.getElementById(v.pctId); if (p) p.textContent = '\u2014'; const w = document.getElementById(v.wanlinkId); if (w) w.textContent = '\u2014'; });
+    Object.values(HF_POOL_MAP).forEach(p => { _hfResetNode(p.nodeId); const c = document.getElementById(p.countId); if (c) c.textContent = '0\u00D7'; const pc = document.getElementById(p.pctId); if (pc) pc.textContent = '\u2014'; const s = document.getElementById(p.selectedId); if (s) s.textContent = '\u2014'; const ip = document.getElementById(p.srvIpId); if (ip) ip.textContent = 'waiting\u2026'; });
+    const badge = document.getElementById('hf-http-badge'); if (badge) { badge.textContent = '\u2014'; badge.setAttribute('fill','#94a3b8'); }
+    const badgeBg = document.getElementById('hf-http-badge-bg'); if (badgeBg) { badgeBg.setAttribute('fill','#e2e8f0'); badgeBg.setAttribute('opacity','0.5'); }
+    const phase = document.getElementById('hf-phase-text'); if (phase) phase.textContent = 'Waiting for execution\u2026';
+    const phaseBg = document.getElementById('hf-phase-bg'); if (phaseBg) phaseBg.setAttribute('fill','#e2e8f0');
+    const clientLabel = document.getElementById('hf-client-label'); if (clientLabel) clientLabel.textContent = '\u2014';
+    const status = document.getElementById('hf-status-text'); if (status) { status.textContent = 'Click "Execute Scenario 1" to start the HTTP traffic animation.'; status.style.color = '#64748b'; }
+    const strip = document.getElementById('hf-history-strip'); if (strip) strip.innerHTML = '';
+}
+
+function updateHttpFlow(result) {
+    if (!result) return;
+    const ip = result.target_ip;
+    const vip = HF_VIP_MAP[ip];
+    if (!vip) return;
+    _hfTotal++;
+    _hfVipCounts[ip] = (_hfVipCounts[ip] || 0) + 1;
+    const poolKey = vip.pool;
+    _hfPoolCounts[poolKey] = (_hfPoolCounts[poolKey] || 0) + 1;
+    const pool = HF_POOL_MAP[poolKey];
+
+    // Reset all
+    HF_CLIENT_PATHS.forEach(id => _hfResetPath(id, 2, 0.3));
+    HF_POOL_PATHS.forEach(id => _hfResetPath(id, 1.5, 0.15));
+    Object.values(HF_VIP_MAP).forEach(v => _hfResetNode(v.nodeId));
+    Object.values(HF_POOL_MAP).forEach(p => _hfResetNode(p.nodeId));
+
+    // Activate paths
+    _hfActivatePath(vip.clientPath, '#f59e0b', 2.5, 'hf-arr-req');
+    _hfGlowNode(vip.nodeId, vip.color);
+    _hfActivatePath(vip.poolPath, '#10b981', 2.5, 'hf-arr-resp');
+    _hfGlowNode(pool.nodeId, pool.color);
+
+    // Selected server
+    const srvName = result.server_name || 'unknown';
+    const srvIp = result.server_ip || '';
+    const selEl = document.getElementById(pool.selectedId); if (selEl) selEl.textContent = srvName;
+    const ipEl = document.getElementById(pool.srvIpId); if (ipEl) ipEl.textContent = srvIp;
+
+    // VIP counters
+    Object.entries(HF_VIP_MAP).forEach(([vIp, v]) => {
+        const n = _hfVipCounts[vIp] || 0;
+        const c = document.getElementById(v.countId); if (c) c.textContent = n + '\u00D7';
+        const p = document.getElementById(v.pctId); if (p) p.textContent = _hfTotal > 0 ? Math.round(n / _hfTotal * 100) + '%' : '\u2014';
+    });
+    // Pool counters
+    Object.entries(HF_POOL_MAP).forEach(([pk, p]) => {
+        const n = _hfPoolCounts[pk] || 0;
+        const c = document.getElementById(p.countId); if (c) c.textContent = n + '\u00D7';
+        const pc = document.getElementById(p.pctId); if (pc) pc.textContent = _hfTotal > 0 ? Math.round(n / _hfTotal * 100) + '%' : '\u2014';
+    });
+    // WAN link
+    if (result.wanlink) { const wl = document.getElementById(vip.wanlinkId); if (wl) wl.textContent = 'WAN: ' + result.wanlink; }
+    // HTTP badge
+    const badge = document.getElementById('hf-http-badge');
+    const badgeBg = document.getElementById('hf-http-badge-bg');
+    const sc = result.status_code || 0;
+    if (badge) { badge.textContent = sc + (sc === 200 ? ' OK' : ''); badge.setAttribute('fill', sc === 200 ? '#10b981' : '#ef4444'); }
+    if (badgeBg) { badgeBg.setAttribute('fill', sc === 200 ? '#ecfdf5' : '#fef2f2'); badgeBg.setAttribute('opacity','1'); }
+    // Phase pill
+    const phase = document.getElementById('hf-phase-text'); if (phase) phase.textContent = '#' + _hfTotal + ' \u2192 ' + ip + ' \u2192 ' + srvName + ' (' + srvIp + ') \u2014 ' + sc;
+    const phaseBg = document.getElementById('hf-phase-bg'); if (phaseBg) phaseBg.setAttribute('fill','#fef3c7');
+    // Client label
+    const clientLabel = document.getElementById('hf-client-label'); if (clientLabel) clientLabel.textContent = 'Req #' + _hfTotal + ' \u2192 ' + ip;
+    // Status
+    const st = document.getElementById('hf-status-text'); if (st) { st.textContent = '#' + _hfTotal + ' HTTP \u2192 ' + ip + ' \u2192 ' + srvName + ' (' + srvIp + ')'; st.style.color = vip.color; }
+    // History dot
+    const strip = document.getElementById('hf-history-strip');
+    if (strip) {
+        const dot = document.createElement('span');
+        dot.className = 'gslb-history-dot';
+        dot.style.background = pool.color;
+        dot.title = '#' + _hfTotal + ': ' + ip + ' \u2192 ' + srvName + ' (' + srvIp + ')';
+        strip.appendChild(dot);
+        while (strip.children.length > 20) strip.removeChild(strip.firstChild);
+    }
+}
+
+function resetHttpFlow() {
+    HF_CLIENT_PATHS.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('gslb-path-active'); });
+    HF_POOL_PATHS.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('gslb-path-active'); });
+    Object.values(HF_VIP_MAP).forEach(v => { const el = document.getElementById(v.nodeId); if (el) el.style.filter = ''; });
+    Object.values(HF_POOL_MAP).forEach(p => { const el = document.getElementById(p.nodeId); if (el) el.style.filter = ''; });
+    const st = document.getElementById('hf-status-text');
+    if (st && _hfTotal > 0) { st.textContent = 'Stopped after ' + _hfTotal + ' request' + (_hfTotal !== 1 ? 's' : ''); st.style.color = '#94a3b8'; }
+    const phase = document.getElementById('hf-phase-text');
+    if (phase && _hfTotal > 0) phase.textContent = 'Stopped \u2014 ' + _hfTotal + ' requests';
+}
+// ─────────────────────────────────────────────────────────
+
 function startGslbStream() {
     stopHaStream();
     stopGslbStream();
     initGslbDiagram();
+    initGslbDnsFlow();
+    initHttpFlow();
     const resultsContent = document.getElementById('results-content');
     resultsContent.innerHTML = `
         <div class="panel">
@@ -682,6 +994,8 @@ function startGslbStream() {
         const panel = buildTrafficPanel(result, { titlePrefix: 'Attempt' });
         attemptsDiv.insertBefore(panel, attemptsDiv.firstChild);
         updateGslbDiagram(result);
+        updateGslbDnsFlow(result);
+        updateHttpFlow(result);
     };
 
     gslbEventSource.onerror = function() {
