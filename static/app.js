@@ -1533,6 +1533,28 @@ function toggleAlteonWebUI(device, navTarget) {
                             }, 2000);
                         });
                     }, 2000);
+                } else if (target === 'vs-scenario2-https-contentmod') {
+                    /* Application Delivery → Virtual Services → Scenario2 → HTTPS → HTTP Content Modification */
+                    gwtClick(doc.getElementById('gwt-debug-TopicsStack_Configuration.Application_Delivery'));
+                    setTimeout(function () {
+                        retryClick(doc, 'gwt-debug-TopicsNode_Application_Delivery.tree.Node0-content', 5, function () {
+                            setTimeout(function () {
+                                /* Click Scenario2 row */
+                                var s2Row = doc.getElementById('gwt-debug-slbNewCfgEnhVirtServerTable_RowID_6');
+                                if (s2Row) { gwtClick(s2Row); }
+                                setTimeout(function () {
+                                    /* Click + dblclick the HTTPS virtual service row (RowID_0) */
+                                    var httpsRow = doc.getElementById('gwt-debug-slbNewCfgEnhVirtServicesTable_RowID_0');
+                                    if (httpsRow) { gwtClick(httpsRow); setTimeout(function () { gwtDblClick(httpsRow); }, 500); }
+                                    /* Click the HTTP Content Modification tab */
+                                    setTimeout(function () {
+                                        var tab = doc.getElementById('gwt-debug-ApplicationDelivery.VirtualServicesmockup.Column_5_Tab');
+                                        if (tab) { gwtClick(tab); }
+                                    }, 2000);
+                                }, 2000);
+                            }, 2000);
+                        });
+                    }, 2000);
                 } else {
                     /* Default: Network → High Availability */
                     gwtClick(doc.getElementById('gwt-debug-TopicsStack_Configuration.Network'));
