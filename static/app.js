@@ -1512,6 +1512,163 @@ function executeScenario(scenarioId) {
 }
 
 
+// ── Offloading Flow Diagram ────────────────────────────────────────────────────
+
+let _offReqCount = 0;
+
+function initOffFlow() {
+    _offReqCount = 0;
+    // Reset paths
+    var cv = document.getElementById('off-path-cv');
+    if (cv) { cv.setAttribute('stroke','#cbd5e1'); cv.setAttribute('stroke-width','2'); cv.setAttribute('opacity','0.3'); cv.setAttribute('marker-end','url(#off-arr-idle)'); cv.classList.remove('gslb-path-active'); }
+    var vb = document.getElementById('off-path-vb');
+    if (vb) { vb.setAttribute('stroke','#cbd5e1'); vb.setAttribute('stroke-width','2'); vb.setAttribute('opacity','0.3'); vb.setAttribute('marker-end','url(#off-arr-idle)'); vb.classList.remove('gslb-path-active'); }
+    var bp = document.getElementById('off-path-bypass');
+    if (bp) { bp.setAttribute('stroke','#cbd5e1'); bp.setAttribute('stroke-width','2'); bp.setAttribute('opacity','0.15'); bp.setAttribute('marker-end','url(#off-arr-idle)'); bp.classList.remove('gslb-path-active'); }
+    // Reset nodes
+    ['off-node-vip','off-node-backend'].forEach(function(id) { var el = document.getElementById(id); if (!el) return; el.setAttribute('opacity','0.45'); el.style.filter = ''; });
+    // Reset labels
+    var hl = document.getElementById('off-host-label'); if (hl) { hl.textContent = 'Host: ?'; hl.setAttribute('fill','#94a3b8'); }
+    var cl = document.getElementById('off-client-label'); if (cl) cl.textContent = '\u2014';
+    var vs = document.getElementById('off-vip-status'); if (vs) vs.textContent = '\u2014';
+    var bl = document.getElementById('off-backend-label'); if (bl) bl.textContent = '\u2014';
+    var byl = document.getElementById('off-bypass-label'); if (byl) { byl.setAttribute('fill','#94a3b8'); byl.setAttribute('opacity','0.5'); }
+    // Reset protocol badges
+    var plBg = document.getElementById('off-proto-left-bg'); if (plBg) { plBg.setAttribute('fill','#e2e8f0'); plBg.setAttribute('opacity','0.5'); }
+    var pl = document.getElementById('off-proto-left'); if (pl) { pl.textContent = 'HTTPS :443'; pl.setAttribute('fill','#94a3b8'); }
+    var prBg = document.getElementById('off-proto-right-bg'); if (prBg) { prBg.setAttribute('fill','#e2e8f0'); prBg.setAttribute('opacity','0.5'); }
+    var pr = document.getElementById('off-proto-right'); if (pr) { pr.textContent = 'HTTP :80'; pr.setAttribute('fill','#94a3b8'); }
+    // Reset modification icons
+    ['off-mod-ssl-icon','off-mod-body-icon','off-mod-xff-icon','off-mod-hdr-icon'].forEach(function(id) { var el = document.getElementById(id); if (el) { el.textContent = '\u25CB'; el.setAttribute('fill','#94a3b8'); } });
+    ['off-mod-ssl','off-mod-body','off-mod-xff','off-mod-hdr'].forEach(function(id) { var el = document.getElementById(id); if (el) { el.setAttribute('fill','#94a3b8'); el.style.textDecoration = ''; } });
+    // Reset badge & counter
+    var badge = document.getElementById('off-http-badge'); if (badge) { badge.textContent = '\u2014'; badge.setAttribute('fill','#94a3b8'); }
+    var badgeBg = document.getElementById('off-http-badge-bg'); if (badgeBg) { badgeBg.setAttribute('fill','#e2e8f0'); badgeBg.setAttribute('opacity','0.5'); }
+    var rc = document.getElementById('off-req-count'); if (rc) rc.textContent = '0';
+    var phase = document.getElementById('off-phase-text'); if (phase) phase.textContent = 'Click a button to send a request\u2026';
+    var phaseBg = document.getElementById('off-phase-bg'); if (phaseBg) phaseBg.setAttribute('fill','#e2e8f0');
+    var st = document.getElementById('off-status-text'); if (st) { st.textContent = 'Click a button below to animate the offloading flow.'; st.style.color = '#64748b'; }
+    var strip = document.getElementById('off-history-strip'); if (strip) strip.innerHTML = '';
+}
+
+function updateOffFlow(data) {
+    if (!data) return;
+    _offReqCount++;
+    var mode = data.mode || 'alteon'; // 'alteon' or 'bypass'
+    var sc = data.status_code || 0;
+    var host = data.target_host || '';
+    var customHdr = data.custom_header_name || '';
+    var customVal = data.custom_header_value || '';
+    var isAlteon = (mode === 'alteon');
+    var pathColor = isAlteon ? '#3b82f6' : '#ef4444';
+
+    // Reset all paths
+    var cv = document.getElementById('off-path-cv');
+    if (cv) { cv.setAttribute('stroke','#cbd5e1'); cv.setAttribute('stroke-width','2'); cv.setAttribute('opacity','0.3'); cv.setAttribute('marker-end','url(#off-arr-idle)'); cv.classList.remove('gslb-path-active'); }
+    var vb = document.getElementById('off-path-vb');
+    if (vb) { vb.setAttribute('stroke','#cbd5e1'); vb.setAttribute('stroke-width','2'); vb.setAttribute('opacity','0.3'); vb.setAttribute('marker-end','url(#off-arr-idle)'); vb.classList.remove('gslb-path-active'); }
+    var bp = document.getElementById('off-path-bypass');
+    if (bp) { bp.setAttribute('stroke','#cbd5e1'); bp.setAttribute('stroke-width','2'); bp.setAttribute('opacity','0.15'); bp.setAttribute('marker-end','url(#off-arr-idle)'); bp.classList.remove('gslb-path-active'); }
+    ['off-node-vip','off-node-backend'].forEach(function(id) { var el = document.getElementById(id); if (!el) return; el.setAttribute('opacity','0.45'); el.style.filter = ''; });
+
+    if (isAlteon) {
+        // Activate top path: Client → VIP → Backend
+        if (cv) { cv.setAttribute('stroke','#3b82f6'); cv.setAttribute('stroke-width','2.5'); cv.setAttribute('opacity','1'); cv.setAttribute('marker-end','url(#off-arr-alteon)'); cv.classList.add('gslb-path-active'); }
+        if (vb) { vb.setAttribute('stroke','#16a34a'); vb.setAttribute('stroke-width','2.5'); vb.setAttribute('opacity','1'); vb.setAttribute('marker-end','url(#off-arr-http)'); vb.classList.add('gslb-path-active'); }
+        // Glow VIP + Backend
+        var vipEl = document.getElementById('off-node-vip');
+        if (vipEl) { vipEl.setAttribute('opacity','1'); vipEl.style.filter = 'drop-shadow(0 0 8px #3b82f6)'; }
+        var beEl = document.getElementById('off-node-backend');
+        if (beEl) { beEl.setAttribute('opacity','1'); beEl.style.filter = 'drop-shadow(0 0 8px #f59e0b)'; }
+        // Protocol badges
+        var plBg = document.getElementById('off-proto-left-bg'); if (plBg) { plBg.setAttribute('fill','#dbeafe'); plBg.setAttribute('opacity','1'); }
+        var pl = document.getElementById('off-proto-left'); if (pl) { pl.textContent = 'HTTPS :443'; pl.setAttribute('fill','#1d4ed8'); }
+        var prBg = document.getElementById('off-proto-right-bg'); if (prBg) { prBg.setAttribute('fill','#dcfce7'); prBg.setAttribute('opacity','1'); }
+        var pr = document.getElementById('off-proto-right'); if (pr) { pr.textContent = 'HTTP :80'; pr.setAttribute('fill','#166534'); }
+        // Modification checkmarks — all green
+        ['off-mod-ssl-icon','off-mod-body-icon','off-mod-xff-icon'].forEach(function(id) { var el = document.getElementById(id); if (el) { el.textContent = '\u2714'; el.setAttribute('fill','#16a34a'); } });
+        ['off-mod-ssl','off-mod-body','off-mod-xff'].forEach(function(id) { var el = document.getElementById(id); if (el) { el.setAttribute('fill','#1e293b'); el.style.textDecoration = ''; } });
+        // Custom header: green check if set, else gray circle
+        var hdrIcon = document.getElementById('off-mod-hdr-icon');
+        var hdrText = document.getElementById('off-mod-hdr');
+        if (customHdr) {
+            if (hdrIcon) { hdrIcon.textContent = '\u2714'; hdrIcon.setAttribute('fill','#16a34a'); }
+            if (hdrText) { hdrText.textContent = '+ ' + customHdr + ': ' + customVal; hdrText.setAttribute('fill','#1e293b'); hdrText.style.textDecoration = ''; }
+        } else {
+            if (hdrIcon) { hdrIcon.textContent = '\u25CB'; hdrIcon.setAttribute('fill','#94a3b8'); }
+            if (hdrText) { hdrText.textContent = '+ Custom header (via API)'; hdrText.setAttribute('fill','#94a3b8'); hdrText.style.textDecoration = ''; }
+        }
+        // VIP status
+        var vs = document.getElementById('off-vip-status'); if (vs) vs.textContent = 'HTTPS \u2192 HTTP (offloaded)';
+        // Host label
+        var hl = document.getElementById('off-host-label'); if (hl) { hl.textContent = 'Host: ' + host; hl.setAttribute('fill','#3b82f6'); }
+        // Client label
+        var cl = document.getElementById('off-client-label'); if (cl) cl.textContent = 'https://' + host;
+        // Backend label
+        var bl = document.getElementById('off-backend-label'); if (bl) bl.textContent = 'HTTP :80 \u2190 Alteon';
+        // Bypass label dim
+        var byl = document.getElementById('off-bypass-label'); if (byl) { byl.setAttribute('fill','#94a3b8'); byl.setAttribute('opacity','0.3'); }
+        // Phase pill
+        var phase = document.getElementById('off-phase-text');
+        if (phase) phase.textContent = '#' + _offReqCount + ' HTTPS \u2192 Alteon \u2192 HTTP :80 \u2192 Backend \u2014 ' + sc;
+        var phaseBg = document.getElementById('off-phase-bg'); if (phaseBg) phaseBg.setAttribute('fill','#dbeafe');
+        // Status text
+        var st = document.getElementById('off-status-text');
+        if (st) { st.textContent = '#' + _offReqCount + ' Via Alteon \u2014 SSL offloaded + content modified \u2014 ' + sc; st.style.color = '#3b82f6'; }
+    } else {
+        // BYPASS mode: activate bottom path
+        if (bp) { bp.setAttribute('stroke','#ef4444'); bp.setAttribute('stroke-width','2.5'); bp.setAttribute('opacity','1'); bp.setAttribute('marker-end','url(#off-arr-bypass)'); bp.classList.add('gslb-path-active'); }
+        // Glow backend only, VIP stays dim
+        var beEl2 = document.getElementById('off-node-backend');
+        if (beEl2) { beEl2.setAttribute('opacity','1'); beEl2.style.filter = 'drop-shadow(0 0 8px #ef4444)'; }
+        // Protocol badges dim
+        var plBg2 = document.getElementById('off-proto-left-bg'); if (plBg2) { plBg2.setAttribute('fill','#e2e8f0'); plBg2.setAttribute('opacity','0.3'); }
+        var pl2 = document.getElementById('off-proto-left'); if (pl2) pl2.setAttribute('fill','#94a3b8');
+        var prBg2 = document.getElementById('off-proto-right-bg'); if (prBg2) { prBg2.setAttribute('fill','#e2e8f0'); prBg2.setAttribute('opacity','0.3'); }
+        var pr2 = document.getElementById('off-proto-right'); if (pr2) pr2.setAttribute('fill','#94a3b8');
+        // Modification icons — all crossed out
+        ['off-mod-ssl-icon','off-mod-body-icon','off-mod-xff-icon','off-mod-hdr-icon'].forEach(function(id) { var el = document.getElementById(id); if (el) { el.textContent = '\u2717'; el.setAttribute('fill','#ef4444'); } });
+        ['off-mod-ssl','off-mod-body','off-mod-xff','off-mod-hdr'].forEach(function(id) { var el = document.getElementById(id); if (el) { el.setAttribute('fill','#94a3b8'); el.style.textDecoration = 'line-through'; } });
+        // VIP status
+        var vs2 = document.getElementById('off-vip-status'); if (vs2) vs2.textContent = 'BYPASSED';
+        // Host label
+        var hl2 = document.getElementById('off-host-label'); if (hl2) { hl2.textContent = 'Host: ?'; hl2.setAttribute('fill','#94a3b8'); }
+        // Client label
+        var cl2 = document.getElementById('off-client-label'); if (cl2) cl2.textContent = 'https://' + host;
+        // Backend label
+        var bl2 = document.getElementById('off-backend-label'); if (bl2) bl2.textContent = 'HTTPS direct \u2014 no mods';
+        // Bypass label bright
+        var byl2 = document.getElementById('off-bypass-label'); if (byl2) { byl2.setAttribute('fill','#ef4444'); byl2.setAttribute('opacity','1'); }
+        // Phase pill
+        var phase2 = document.getElementById('off-phase-text');
+        if (phase2) phase2.textContent = '#' + _offReqCount + ' BYPASS \u2192 ' + host + ' \u2014 no modifications \u2014 ' + sc;
+        var phaseBg2 = document.getElementById('off-phase-bg'); if (phaseBg2) phaseBg2.setAttribute('fill','#fee2e2');
+        // Status text
+        var st2 = document.getElementById('off-status-text');
+        if (st2) { st2.textContent = '#' + _offReqCount + ' Bypass \u2014 direct to server, no offloading \u2014 ' + sc; st2.style.color = '#ef4444'; }
+    }
+
+    // HTTP badge (shared)
+    var badge = document.getElementById('off-http-badge');
+    var badgeBg = document.getElementById('off-http-badge-bg');
+    if (badge) { badge.textContent = sc + (sc === 200 ? ' OK' : ''); badge.setAttribute('fill', sc === 200 ? '#10b981' : '#ef4444'); }
+    if (badgeBg) { badgeBg.setAttribute('fill', sc === 200 ? '#ecfdf5' : '#fef2f2'); badgeBg.setAttribute('opacity','1'); }
+
+    // Request counter
+    var rc = document.getElementById('off-req-count'); if (rc) rc.textContent = _offReqCount;
+
+    // History dot
+    var strip = document.getElementById('off-history-strip');
+    if (strip) {
+        var dot = document.createElement('span');
+        dot.className = 'gslb-history-dot';
+        dot.style.background = isAlteon ? '#3b82f6' : '#ef4444';
+        dot.title = '#' + _offReqCount + ': ' + (isAlteon ? 'Via Alteon' : 'Bypass') + ' \u2014 ' + sc;
+        strip.appendChild(dot);
+        while (strip.children.length > 20) strip.removeChild(strip.firstChild);
+    }
+}
+
 // ── Offloading Demo ───────────────────────────────────────────────────────────
 
 function loadOffloadingDemo() {
@@ -1529,6 +1686,7 @@ function loadOffloadingDemo() {
                 return;
             }
             if (!resultsContent) return;
+            updateOffFlow({ mode: 'alteon', status_code: data.status_code, target_host: data.target_host || 'scenario2.radware.lab' });
             const iframe = document.createElement('iframe');
             iframe.sandbox = 'allow-same-origin allow-scripts';
             iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
@@ -1560,6 +1718,7 @@ function loadBypassDemo() {
                 return;
             }
             if (!resultsContent) return;
+            updateOffFlow({ mode: 'bypass', status_code: data.status_code, target_host: data.target_host || 'site-a-servers.radware.lab' });
             const iframe = document.createElement('iframe');
             iframe.sandbox = 'allow-same-origin allow-scripts';
             iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
@@ -1610,6 +1769,7 @@ function applyCustomHeader() {
             return;
         }
         if (!resultsContent) return;
+        updateOffFlow({ mode: 'alteon', status_code: data.page_status_code, target_host: 'scenario2.radware.lab', custom_header_name: data.header_name, custom_header_value: data.header_value });
         const applyNote = data.apply_ok
             ? `<span style="color:#16a34a;font-weight:600;">&#x2713; Config applied</span>`
             : `<span style="color:#f59e0b;font-weight:600;">&#x26a0; Apply status uncertain</span>`;

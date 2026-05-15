@@ -1322,6 +1322,127 @@
             </section>
             <section id="scenario-offloading" class="content-section">
                 <h1><i class="bi bi-layers headline-icon"></i>Scenario 2 &#x2014; Content Offloading</h1>
+
+                <!-- ══ Content Offloading Live Flow Diagram ══ -->
+                <div class="panel" id="off-flow-panel">
+                    <h3>&#x1F6E1;&#xFE0F; Live Content-Offloading Flow</h3>
+                    <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
+                        Click <strong>Load Page via Alteon</strong> or <strong>Bypass Alteon</strong> below &#x2014; the diagram animates the path and shows which modifications Alteon applies.
+                    </p>
+                    <svg id="off-flow-svg" viewBox="0 0 960 370" width="100%"
+                         style="font-family:'Segoe UI',Tahoma,sans-serif;border-radius:10px;display:block;"
+                         role="img" aria-label="Content-offloading flow diagram">
+                        <defs>
+                            <marker id="off-arr-idle" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L7,3 z" fill="#94a3b8"/>
+                            </marker>
+                            <marker id="off-arr-alteon" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L7,3 z" fill="#3b82f6"/>
+                            </marker>
+                            <marker id="off-arr-http" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L7,3 z" fill="#16a34a"/>
+                            </marker>
+                            <marker id="off-arr-bypass" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L7,3 z" fill="#ef4444"/>
+                            </marker>
+                        </defs>
+                        <!-- Background -->
+                        <rect x="0" y="0" width="960" height="370" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+                        <!-- Legend -->
+                        <circle cx="20" cy="16" r="5" fill="#3b82f6"/>
+                        <text x="30" y="20" fill="#64748b" font-size="10">HTTPS (via Alteon)</text>
+                        <circle cx="145" cy="16" r="5" fill="#16a34a"/>
+                        <text x="155" y="20" fill="#64748b" font-size="10">HTTP :80 (backend)</text>
+                        <circle cx="265" cy="16" r="5" fill="#ef4444"/>
+                        <text x="275" y="20" fill="#64748b" font-size="10">Bypass (direct)</text>
+                        <!-- Phase pill -->
+                        <rect id="off-phase-bg" x="420" y="6" width="530" height="22" rx="11" fill="#e2e8f0"/>
+                        <text id="off-phase-text" x="685" y="21" text-anchor="middle" fill="#64748b" font-size="11" font-weight="600">Click a button to send a request&#x2026;</text>
+
+                        <!-- Step labels -->
+                        <text x="270" y="52" fill="#94a3b8" font-size="9" font-weight="600" text-anchor="middle">&#x2460; HTTPS :443</text>
+                        <text x="680" y="52" fill="#94a3b8" font-size="9" font-weight="600" text-anchor="middle">&#x2461; HTTP :80</text>
+
+                        <!-- === TOP PATH: Client → Alteon VIP → Backend === -->
+                        <line id="off-path-cv" x1="175" y1="140" x2="335" y2="140" stroke="#cbd5e1" stroke-width="2" opacity="0.3" marker-end="url(#off-arr-idle)"/>
+                        <text id="off-host-label" x="255" y="125" text-anchor="middle" fill="#94a3b8" font-size="9" font-style="italic">Host: ?</text>
+
+                        <line id="off-path-vb" x1="620" y1="140" x2="720" y2="140" stroke="#cbd5e1" stroke-width="2" opacity="0.3" marker-end="url(#off-arr-idle)"/>
+
+                        <!-- Protocol badges on top path -->
+                        <rect id="off-proto-left-bg" x="210" y="150" width="90" height="22" rx="6" fill="#e2e8f0" opacity="0.5"/>
+                        <text id="off-proto-left" x="255" y="165" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="700">HTTPS :443</text>
+
+                        <rect id="off-proto-right-bg" x="640" y="150" width="80" height="22" rx="6" fill="#e2e8f0" opacity="0.5"/>
+                        <text id="off-proto-right" x="680" y="165" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="700">HTTP :80</text>
+
+                        <!-- === BYPASS PATH: Client → Backend (curved below) === -->
+                        <path id="off-path-bypass" d="M 175 160 Q 175 320, 480 330 Q 720 340, 720 160"
+                              fill="none" stroke="#cbd5e1" stroke-width="2" opacity="0.15"
+                              marker-end="url(#off-arr-idle)"/>
+                        <text id="off-bypass-label" x="440" y="318" text-anchor="middle" fill="#94a3b8" font-size="9" font-style="italic" opacity="0.5">HTTPS direct &#x2014; no modifications</text>
+
+                        <!-- === CLIENT NODE === -->
+                        <g id="off-node-client">
+                            <rect x="8" y="95" width="167" height="90" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+                            <text x="91" y="128" text-anchor="middle" fill="#1e293b" font-size="11" font-weight="700">Lab Controller</text>
+                            <text x="91" y="146" text-anchor="middle" fill="#64748b" font-size="9">curl HTTPS GET</text>
+                            <text id="off-client-label" x="91" y="175" text-anchor="middle" fill="#94a3b8" font-size="8">&#x2014;</text>
+                        </g>
+
+                        <!-- === ALTEON VIP NODE (tall, with modification checklist) === -->
+                        <g id="off-node-vip" opacity="0.45">
+                            <rect x="335" y="60" width="285" height="220" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+                            <text x="478" y="85" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="700">ALTEON OFFLOADING VIP</text>
+                            <text x="478" y="105" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">scenario2.radware.lab</text>
+                            <line x1="355" y1="115" x2="600" y2="115" stroke="#93c5fd" stroke-width="1" opacity="0.5"/>
+
+                            <text x="478" y="135" text-anchor="middle" fill="#64748b" font-size="9" font-weight="600">Modifications Applied:</text>
+
+                            <!-- Mod 1: SSL Termination -->
+                            <text id="off-mod-ssl-icon" x="360" y="158" fill="#94a3b8" font-size="11">&#x25CB;</text>
+                            <text id="off-mod-ssl" x="378" y="158" fill="#94a3b8" font-size="10">SSL Termination: HTTPS &#x2192; HTTP</text>
+
+                            <!-- Mod 2: Body Rewrite -->
+                            <text id="off-mod-body-icon" x="360" y="180" fill="#94a3b8" font-size="11">&#x25CB;</text>
+                            <text id="off-mod-body" x="378" y="180" fill="#94a3b8" font-size="10">Body: &#x201C;Served by Apache&#x201D; &#x2192; &#x201C;Served by Alteon&#x201D;</text>
+
+                            <!-- Mod 3: X-Forwarded-For -->
+                            <text id="off-mod-xff-icon" x="360" y="202" fill="#94a3b8" font-size="11">&#x25CB;</text>
+                            <text id="off-mod-xff" x="378" y="202" fill="#94a3b8" font-size="10">+ X-Forwarded-For header</text>
+
+                            <!-- Mod 4: Custom Header -->
+                            <text id="off-mod-hdr-icon" x="360" y="224" fill="#94a3b8" font-size="11">&#x25CB;</text>
+                            <text id="off-mod-hdr" x="378" y="224" fill="#94a3b8" font-size="10">+ Custom header (via API)</text>
+
+                            <text id="off-vip-status" x="478" y="262" text-anchor="middle" fill="#94a3b8" font-size="8">&#x2014;</text>
+                        </g>
+
+                        <!-- === BACKEND SERVER NODE === -->
+                        <g id="off-node-backend" opacity="0.45">
+                            <rect x="720" y="95" width="230" height="90" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"/>
+                            <text x="835" y="123" text-anchor="middle" fill="#92400e" font-size="9" font-weight="700">BACKEND SERVER</text>
+                            <text x="835" y="143" text-anchor="middle" fill="#1e293b" font-size="11" font-weight="700">Apache / PHP</text>
+                            <text id="off-backend-label" x="835" y="175" text-anchor="middle" fill="#94a3b8" font-size="8">&#x2014;</text>
+                        </g>
+
+                        <!-- HTTP Status Badge -->
+                        <rect id="off-http-badge-bg" x="10" y="200" width="100" height="28" rx="6" fill="#e2e8f0" opacity="0.5"/>
+                        <text id="off-http-badge" x="60" y="219" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="700">&#x2014;</text>
+
+                        <!-- Request Counter -->
+                        <rect x="10" y="238" width="60" height="22" rx="5" fill="#e2e8f0"/>
+                        <text x="18" y="253" fill="#64748b" font-size="9">Reqs:</text>
+                        <text id="off-req-count" x="55" y="253" text-anchor="middle" fill="#1e293b" font-size="10" font-weight="700">0</text>
+                    </svg>
+                    <div style="display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap;">
+                        <span id="off-status-text" style="font-size:12px;color:#64748b;font-style:italic;flex-shrink:0;">
+                            Click a button below to animate the offloading flow.
+                        </span>
+                        <div id="off-history-strip" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;"></div>
+                    </div>
+                </div>
+
                 <div class="panel">
                     <h3><i class="bi bi-info-circle headline-icon"></i>What is Content Offloading?</h3>
                     <p>Alteon can modify HTTP traffic in transit: <strong>removing sensitive headers from responses</strong>, <strong>stripping strings from the body</strong>, and <strong>injecting new content</strong> &#x2014; all without touching the backend server.</p>
