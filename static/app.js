@@ -1643,6 +1643,110 @@ const CS_BTN_LABELS = {
 
 const CS_ENV_COLORS = { dev: '#7c3aed', stg: '#b45309', prod: '#16a34a' };
 
+// ═══════════════ Content-Switching Flow Diagram ═══════════════
+const CS_ENV_MAP = {
+    'dev':  { nodeId:'cs-node-dev',  countId:'cs-dev-count',  pctId:'cs-dev-pct',  pathId:'cs-path-dev',  color:'#7c3aed', arrId:'cs-arr-dev'  },
+    'stg':  { nodeId:'cs-node-stg',  countId:'cs-stg-count',  pctId:'cs-stg-pct',  pathId:'cs-path-stg',  color:'#b45309', arrId:'cs-arr-stg'  },
+    'prod': { nodeId:'cs-node-prod', countId:'cs-prod-count', pctId:'cs-prod-pct', pathId:'cs-path-prod', color:'#16a34a', arrId:'cs-arr-prod' }
+};
+const CS_ALL_PATHS = ['cs-path-dev','cs-path-stg','cs-path-prod'];
+let _csCounts = { dev:0, stg:0, prod:0 }, _csTotal = 0;
+
+function initCsFlow() {
+    _csCounts = { dev:0, stg:0, prod:0 }; _csTotal = 0;
+    // Reset client path
+    var cv = document.getElementById('cs-path-cv');
+    if (cv) { cv.setAttribute('stroke','#cbd5e1'); cv.setAttribute('stroke-width','2'); cv.setAttribute('opacity','0.3'); cv.setAttribute('marker-end','url(#cs-arr-idle)'); cv.classList.remove('gslb-path-active'); }
+    // Reset backend paths
+    CS_ALL_PATHS.forEach(function(id) { var el = document.getElementById(id); if (!el) return; el.setAttribute('stroke','#cbd5e1'); el.setAttribute('stroke-width','1.5'); el.setAttribute('opacity','0.15'); el.setAttribute('marker-end','url(#cs-arr-idle)'); el.classList.remove('gslb-path-active'); });
+    // Reset nodes
+    ['cs-node-vip','cs-node-dev','cs-node-stg','cs-node-prod'].forEach(function(id) { var el = document.getElementById(id); if (!el) return; el.setAttribute('opacity','0.45'); el.style.filter = ''; });
+    // Reset counters
+    Object.values(CS_ENV_MAP).forEach(function(e) { var c = document.getElementById(e.countId); if (c) c.textContent = '0'; var p = document.getElementById(e.pctId); if (p) p.textContent = '\u2014'; });
+    // Reset labels
+    var hl = document.getElementById('cs-host-label'); if (hl) hl.textContent = 'Host: ?';
+    var cl = document.getElementById('cs-client-label'); if (cl) cl.textContent = '\u2014';
+    var vs = document.getElementById('cs-vip-status'); if (vs) vs.textContent = '\u2014';
+    var badge = document.getElementById('cs-http-badge'); if (badge) { badge.textContent = '\u2014'; badge.setAttribute('fill','#94a3b8'); }
+    var badgeBg = document.getElementById('cs-http-badge-bg'); if (badgeBg) { badgeBg.setAttribute('fill','#e2e8f0'); badgeBg.setAttribute('opacity','0.5'); }
+    var phase = document.getElementById('cs-phase-text'); if (phase) phase.textContent = 'Click a button to send a request\u2026';
+    var phaseBg = document.getElementById('cs-phase-bg'); if (phaseBg) phaseBg.setAttribute('fill','#e2e8f0');
+    var st = document.getElementById('cs-status-text'); if (st) { st.textContent = 'Click a button below to animate the content-switching flow.'; st.style.color = '#64748b'; }
+    var strip = document.getElementById('cs-history-strip'); if (strip) strip.innerHTML = '';
+}
+
+function updateCsFlow(data) {
+    if (!data || !data.env) return;
+    var envKey = data.env;
+    var env = CS_ENV_MAP[envKey];
+    if (!env) return;
+    _csTotal++;
+    _csCounts[envKey] = (_csCounts[envKey] || 0) + 1;
+    var host = data.host || '';
+    var scheme = data.scheme || 'http';
+    var sc = data.status_code || 0;
+    var targetIp = data.target_ip || '';
+
+    // Reset all paths & nodes
+    var cv = document.getElementById('cs-path-cv');
+    if (cv) { cv.setAttribute('stroke','#cbd5e1'); cv.setAttribute('stroke-width','2'); cv.setAttribute('opacity','0.3'); cv.setAttribute('marker-end','url(#cs-arr-idle)'); cv.classList.remove('gslb-path-active'); }
+    CS_ALL_PATHS.forEach(function(id) { var el = document.getElementById(id); if (!el) return; el.setAttribute('stroke','#cbd5e1'); el.setAttribute('stroke-width','1.5'); el.setAttribute('opacity','0.15'); el.setAttribute('marker-end','url(#cs-arr-idle)'); el.classList.remove('gslb-path-active'); });
+    ['cs-node-vip','cs-node-dev','cs-node-stg','cs-node-prod'].forEach(function(id) { var el = document.getElementById(id); if (!el) return; el.setAttribute('opacity','0.45'); el.style.filter = ''; });
+
+    // Activate Controller → VIP
+    if (cv) { cv.setAttribute('stroke','#f59e0b'); cv.setAttribute('stroke-width','2.5'); cv.setAttribute('opacity','1'); cv.setAttribute('marker-end','url(#cs-arr-req)'); cv.classList.add('gslb-path-active'); }
+    var vipEl = document.getElementById('cs-node-vip');
+    if (vipEl) { vipEl.setAttribute('opacity','1'); vipEl.style.filter = 'drop-shadow(0 0 8px #3b82f6)'; }
+
+    // Activate VIP → Backend
+    var pathEl = document.getElementById(env.pathId);
+    if (pathEl) { pathEl.setAttribute('stroke', env.color); pathEl.setAttribute('stroke-width','2.5'); pathEl.setAttribute('opacity','1'); pathEl.setAttribute('marker-end','url(#' + env.arrId + ')'); pathEl.classList.add('gslb-path-active'); }
+    var nodeEl = document.getElementById(env.nodeId);
+    if (nodeEl) { nodeEl.setAttribute('opacity','1'); nodeEl.style.filter = 'drop-shadow(0 0 8px ' + env.color + ')'; }
+
+    // Host header label
+    var hl = document.getElementById('cs-host-label'); if (hl) { hl.textContent = 'Host: ' + host.toLowerCase(); hl.setAttribute('fill', env.color); }
+
+    // Counters
+    Object.entries(CS_ENV_MAP).forEach(function(pair) {
+        var k = pair[0], e = pair[1];
+        var n = _csCounts[k] || 0;
+        var c = document.getElementById(e.countId); if (c) c.textContent = n;
+        var p = document.getElementById(e.pctId); if (p) p.textContent = _csTotal > 0 ? Math.round(n / _csTotal * 100) + '%' : '\u2014';
+    });
+
+    // VIP status
+    var vs = document.getElementById('cs-vip-status'); if (vs) vs.textContent = scheme.toUpperCase() + ' \u2192 ' + envKey.toUpperCase();
+
+    // Client label
+    var cl = document.getElementById('cs-client-label'); if (cl) cl.textContent = scheme + '://' + host.toLowerCase();
+
+    // HTTP badge
+    var badge = document.getElementById('cs-http-badge');
+    var badgeBg = document.getElementById('cs-http-badge-bg');
+    if (badge) { badge.textContent = sc + (sc === 200 ? ' OK' : ''); badge.setAttribute('fill', sc === 200 ? '#10b981' : '#ef4444'); }
+    if (badgeBg) { badgeBg.setAttribute('fill', sc === 200 ? '#ecfdf5' : '#fef2f2'); badgeBg.setAttribute('opacity','1'); }
+
+    // Phase pill
+    var phase = document.getElementById('cs-phase-text'); if (phase) phase.textContent = '#' + _csTotal + ' ' + scheme.toUpperCase() + ' \u2192 ' + host.toLowerCase() + ' \u2192 ' + envKey.toUpperCase() + ' \u2014 ' + sc;
+    var phaseBg = document.getElementById('cs-phase-bg'); if (phaseBg) phaseBg.setAttribute('fill','#fef3c7');
+
+    // Status text
+    var st = document.getElementById('cs-status-text');
+    if (st) { st.textContent = '#' + _csTotal + ' ' + scheme + '://' + host.toLowerCase() + ' \u2192 ' + envKey.toUpperCase() + ' (' + targetIp + ') \u2014 ' + sc; st.style.color = env.color; }
+
+    // History dot
+    var strip = document.getElementById('cs-history-strip');
+    if (strip) {
+        var dot = document.createElement('span');
+        dot.className = 'gslb-history-dot';
+        dot.style.background = env.color;
+        dot.title = '#' + _csTotal + ': ' + host.toLowerCase() + ' \u2192 ' + envKey.toUpperCase();
+        strip.appendChild(dot);
+        while (strip.children.length > 20) strip.removeChild(strip.firstChild);
+    }
+}
+
 function loadContentSwitch(host, btnId, scheme) {
     scheme = scheme || 'http';
     const resultsContent = document.getElementById('results-content');
@@ -1663,6 +1767,7 @@ function loadContentSwitch(host, btnId, scheme) {
             resultsContent.innerHTML = `<p class="error">Error: ${escapeHtml(data.error)}</p>`;
             return;
         }
+        updateCsFlow(data);
         const envKey = (data.env || 'prod');
         const color = CS_ENV_COLORS[envKey] || '#1a56db';
         const badge = `<span style="display:inline-block;padding:2px 10px;border-radius:12px;background:${color};color:#fff;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">${envKey.toUpperCase()}</span>`;
