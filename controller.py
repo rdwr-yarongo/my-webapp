@@ -409,33 +409,50 @@ def fetch_redirect_page():
 
 @app.route('/api/scenario/offloading/data')
 def offloading_data():
-    """Fetch scenario2.radware.lab via HTTPS and return body + response headers for offloading demo."""
+    """Fetch scenario2.radware.lab via HTTPS using curl and return body + response headers."""
     try:
         target_ip, _ = resolve_target_ip(REDIRECT_TARGET_HOST)
-        response = requests.get(
-            f'https://{target_ip}/index.php',
-            headers=build_request_headers(REDIRECT_TARGET_HOST),
-            timeout=5,
-            allow_redirects=True,
-            verify=False
+        result = subprocess.run(
+            [
+                'curl', '-sk', '-L',
+                '-D', '/dev/stderr',
+                '-o', '/dev/stdout',
+                '-w', '\n__CURL_META__%{http_code}',
+                '-H', f'Host: {REDIRECT_TARGET_HOST}',
+                '-H', 'Cache-Control: no-cache',
+                '-H', 'Pragma: no-cache',
+                f'https://{target_ip}/index.php'
+            ],
+            capture_output=True, text=True, timeout=10
         )
+        output = result.stdout
+        meta_marker = '__CURL_META__'
+        if meta_marker in output:
+            body_part, meta_part = output.rsplit(meta_marker, 1)
+            status_code = int(meta_part.strip())
+        else:
+            body_part = output
+            status_code = 0
         body_html = rewrite_relative_resource_urls(
-            response.text,
-            target_ip,
-            REDIRECT_TARGET_HOST,
-            scheme='https'
+            body_part, target_ip, REDIRECT_TARGET_HOST, scheme='https'
         )
-        # Collect response headers (skip hop-by-hop)
+        # Parse response headers from stderr (last header block after redirects)
         skip = {'transfer-encoding', 'connection', 'keep-alive', 'te', 'trailers', 'upgrade'}
-        headers_list = [
-            {'name': k, 'value': v}
-            for k, v in response.headers.items()
-            if k.lower() not in skip
-        ]
+        headers_list = []
+        raw_headers = result.stderr
+        blocks = raw_headers.split('HTTP/')
+        if len(blocks) > 1:
+            last_block = blocks[-1]
+            for line in last_block.splitlines()[1:]:
+                if ':' in line:
+                    name, _, value = line.partition(':')
+                    name, value = name.strip(), value.strip()
+                    if name and name.lower() not in skip:
+                        headers_list.append({'name': name, 'value': value})
         return jsonify({
             'success': True,
             'target_host': REDIRECT_TARGET_HOST,
-            'status_code': response.status_code,
+            'status_code': status_code,
             'body_html': body_html,
             'response_headers': headers_list
         })
@@ -445,26 +462,36 @@ def offloading_data():
 
 @app.route('/api/scenario/offloading/bypass')
 def offloading_bypass():
-    """Fetch site-a-servers.radware.lab directly (bypassing Alteon) and return body HTML."""
+    """Fetch site-a-servers.radware.lab directly (bypassing Alteon) using curl."""
     try:
         target_ip, _ = resolve_target_ip(BYPASS_TARGET_HOST)
-        response = requests.get(
-            f'https://{target_ip}/index.php',
-            headers=build_request_headers(BYPASS_TARGET_HOST),
-            timeout=5,
-            allow_redirects=True,
-            verify=False
+        result = subprocess.run(
+            [
+                'curl', '-sk', '-L',
+                '-o', '/dev/stdout',
+                '-w', '\n__CURL_META__%{http_code}',
+                '-H', f'Host: {BYPASS_TARGET_HOST}',
+                '-H', 'Cache-Control: no-cache',
+                '-H', 'Pragma: no-cache',
+                f'https://{target_ip}/index.php'
+            ],
+            capture_output=True, text=True, timeout=10
         )
+        output = result.stdout
+        meta_marker = '__CURL_META__'
+        if meta_marker in output:
+            body_part, meta_part = output.rsplit(meta_marker, 1)
+            status_code = int(meta_part.strip())
+        else:
+            body_part = output
+            status_code = 0
         body_html = rewrite_relative_resource_urls(
-            response.text,
-            target_ip,
-            BYPASS_TARGET_HOST,
-            scheme='https'
+            body_part, target_ip, BYPASS_TARGET_HOST, scheme='https'
         )
         return jsonify({
             'success': True,
             'target_host': BYPASS_TARGET_HOST,
-            'status_code': response.status_code,
+            'status_code': status_code,
             'body_html': body_html
         })
     except Exception as exc:
@@ -746,22 +773,32 @@ def offloading_set_header():
         )
         apply_ok = '"ok"' in apply_resp.text
 
-        # Step 3: Fetch the page through Alteon and return body
+        # Step 3: Fetch the page through Alteon using curl and return body
         import time as _time
         _time.sleep(1)  # brief pause for apply to take effect
         target_ip, _ = resolve_target_ip(REDIRECT_TARGET_HOST)
-        page_resp = requests.get(
-            f'https://{target_ip}/index.php',
-            headers=build_request_headers(REDIRECT_TARGET_HOST),
-            timeout=8,
-            allow_redirects=True,
-            verify=False
+        page_result = subprocess.run(
+            [
+                'curl', '-sk', '-L',
+                '-o', '/dev/stdout',
+                '-w', '\n__CURL_META__%{http_code}',
+                '-H', f'Host: {REDIRECT_TARGET_HOST}',
+                '-H', 'Cache-Control: no-cache',
+                '-H', 'Pragma: no-cache',
+                f'https://{target_ip}/index.php'
+            ],
+            capture_output=True, text=True, timeout=10
         )
+        page_output = page_result.stdout
+        meta_marker = '__CURL_META__'
+        if meta_marker in page_output:
+            page_body, page_meta = page_output.rsplit(meta_marker, 1)
+            page_status = int(page_meta.strip())
+        else:
+            page_body = page_output
+            page_status = 0
         body_html = rewrite_relative_resource_urls(
-            page_resp.text,
-            target_ip,
-            REDIRECT_TARGET_HOST,
-            scheme='https'
+            page_body, target_ip, REDIRECT_TARGET_HOST, scheme='https'
         )
 
         return jsonify({
@@ -771,7 +808,7 @@ def offloading_set_header():
             'alteon_status_code': put_resp.status_code,
             'apply_ok': apply_ok,
             'apply_raw': apply_resp.text[:200],
-            'page_status_code': page_resp.status_code,
+            'page_status_code': page_status,
             'body_html': body_html
         })
 
