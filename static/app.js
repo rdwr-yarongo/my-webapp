@@ -18,24 +18,24 @@ function clearNavActive() {
 
 // ── Scroll hint: fade + arrow + text ──
 function updateScrollHint() {
-    const mc = document.querySelector('.main-content');
+    const section = document.querySelector('.content-section.active');
     const hint = document.getElementById('scroll-hint');
-    if (!mc || !hint) return;
-    const hasMore = mc.scrollHeight - mc.scrollTop - mc.clientHeight > 80;
-    const atTop = mc.scrollTop < 50;
+    if (!section || !hint) return;
+    const hasMore = section.scrollHeight - section.scrollTop - section.clientHeight > 80;
+    const atTop = section.scrollTop < 50;
     if (hasMore && atTop) {
         hint.classList.remove('hidden');
     } else {
         hint.classList.add('hidden');
     }
 }
-(function() {
-    const mc = document.querySelector('.main-content');
-    if (mc) {
-        mc.addEventListener('scroll', updateScrollHint, { passive: true });
-        setTimeout(updateScrollHint, 500);
-    }
-})();
+function bindScrollHint() {
+    document.querySelectorAll('.content-section').forEach(function(sec) {
+        sec.addEventListener('scroll', updateScrollHint, { passive: true });
+    });
+    setTimeout(updateScrollHint, 500);
+}
+bindScrollHint();
 
 function toggleFlatGroup(id) {
     const g = document.getElementById(id);
@@ -56,11 +56,9 @@ function switchSection(section) {
     document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
     document.getElementById(section).classList.add('active');
     // Reset scroll and show scroll hint if section has scrollable content
-    const mc = document.querySelector('.main-content');
-    if (mc) {
-        mc.scrollTop = 0;
-        setTimeout(updateScrollHint, 100);
-    }
+    var sec = document.getElementById(section);
+    if (sec) sec.scrollTop = 0;
+    setTimeout(updateScrollHint, 100);
     const sidebar = document.getElementById('results-sidebar');
     if (sidebar) sidebar.style.display = (section === 'home') ? 'none' : '';
     const resultsContent = document.getElementById('results-content');
