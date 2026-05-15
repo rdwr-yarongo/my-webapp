@@ -1534,6 +1534,112 @@
                     </ul>
                 </div>
 
+                <!-- ══ HTTP/2 Gateway Live Flow Diagram ══ -->
+                <div class="panel" id="h2-flow-panel">
+                    <h3>&#x26A1; Live HTTP/2 Gateway Flow</h3>
+                    <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
+                        Click the button below — the diagram animates the request path through the Alteon HTTP/2 termination gateway.
+                    </p>
+                    <svg id="h2-flow-svg" viewBox="0 0 960 280" width="100%"
+                         style="font-family:'Segoe UI',Tahoma,sans-serif;border-radius:10px;display:block;"
+                         role="img" aria-label="HTTP/2 gateway flow diagram">
+                        <defs>
+                            <marker id="h2-arr-idle" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L7,3 z" fill="#94a3b8"/>
+                            </marker>
+                            <marker id="h2-arr-h2" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L7,3 z" fill="#16a34a"/>
+                            </marker>
+                            <marker id="h2-arr-h1" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L7,3 z" fill="#f59e0b"/>
+                            </marker>
+                        </defs>
+                        <!-- Background -->
+                        <rect x="0" y="0" width="960" height="280" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+                        <!-- Legend -->
+                        <circle cx="20" cy="16" r="5" fill="#16a34a"/>
+                        <text x="30" y="20" fill="#64748b" font-size="10">HTTP/2 (TLS)</text>
+                        <circle cx="115" cy="16" r="5" fill="#f59e0b"/>
+                        <text x="125" y="20" fill="#64748b" font-size="10">HTTP/1.1</text>
+                        <!-- Phase pill -->
+                        <rect id="h2-phase-bg" x="400" y="6" width="550" height="22" rx="11" fill="#e2e8f0"/>
+                        <text id="h2-phase-text" x="675" y="21" text-anchor="middle" fill="#64748b" font-size="11" font-weight="600">Click the button to send an HTTP/2 request…</text>
+
+                        <!-- Step labels -->
+                        <text x="310" y="52" fill="#94a3b8" font-size="9" font-weight="600" text-anchor="middle">① HTTP/2 + TLS</text>
+                        <text x="660" y="52" fill="#94a3b8" font-size="9" font-weight="600" text-anchor="middle">② HTTP/1.1 (translated)</text>
+
+                        <!-- Path: Client → VIP -->
+                        <line id="h2-path-cv" x1="175" y1="150" x2="345" y2="150" stroke="#cbd5e1" stroke-width="2" opacity="0.3" marker-end="url(#h2-arr-idle)"/>
+                        <text id="h2-host-label" x="260" y="135" text-anchor="middle" fill="#94a3b8" font-size="9" font-style="italic">Host: ?</text>
+
+                        <!-- Path: VIP → Backend -->
+                        <line id="h2-path-vb" x1="615" y1="150" x2="715" y2="150" stroke="#cbd5e1" stroke-width="2" opacity="0.3" marker-end="url(#h2-arr-idle)"/>
+
+                        <!-- Protocol badge: HTTP/2 side -->
+                        <rect x="210" y="168" width="100" height="24" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+                        <text id="h2-proto-client" x="260" y="185" text-anchor="middle" fill="#16a34a" font-size="10" font-weight="700">HTTP/2</text>
+
+                        <!-- Protocol badge: HTTP/1.1 side -->
+                        <rect x="620" y="168" width="100" height="24" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1"/>
+                        <text id="h2-proto-backend" x="670" y="185" text-anchor="middle" fill="#b45309" font-size="10" font-weight="700">HTTP/1.1</text>
+
+                        <!-- Lab Controller -->
+                        <g id="h2-node-client">
+                            <rect x="8" y="105" width="167" height="90" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+                            <text x="91" y="138" text-anchor="middle" fill="#1e293b" font-size="11" font-weight="700">Lab Controller</text>
+                            <text x="91" y="156" text-anchor="middle" fill="#64748b" font-size="9">HTTPS GET (HTTP/2)</text>
+                            <text id="h2-client-label" x="91" y="185" text-anchor="middle" fill="#94a3b8" font-size="8">—</text>
+                        </g>
+
+                        <!-- Alteon VIP (wide, protocol translation) -->
+                        <g id="h2-node-vip" opacity="0.45">
+                            <rect x="345" y="70" width="270" height="160" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+                            <text x="480" y="98" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="700">ALTEON HTTP/2 GATEWAY</text>
+                            <text x="480" y="120" text-anchor="middle" fill="#1e293b" font-size="14" font-weight="700">scenario4.radware.lab</text>
+                            <line x1="370" y1="133" x2="590" y2="133" stroke="#93c5fd" stroke-width="1" opacity="0.5"/>
+                            <text x="480" y="153" text-anchor="middle" fill="#64748b" font-size="9">Protocol Translation</text>
+                            <text x="410" y="173" text-anchor="middle" fill="#16a34a" font-size="10" font-weight="600">HTTP/2</text>
+                            <text x="480" y="173" text-anchor="middle" fill="#94a3b8" font-size="11">→</text>
+                            <text x="545" y="173" text-anchor="middle" fill="#b45309" font-size="10" font-weight="600">HTTP/1.1</text>
+                            <text id="h2-vip-status" x="480" y="196" text-anchor="middle" fill="#94a3b8" font-size="8">TLS termination + multiplexing</text>
+                            <text id="h2-vip-ip" x="480" y="218" text-anchor="middle" fill="#94a3b8" font-size="8">—</text>
+                        </g>
+
+                        <!-- Backend Server -->
+                        <g id="h2-node-backend" opacity="0.45">
+                            <rect x="715" y="105" width="235" height="90" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"/>
+                            <text x="832" y="133" text-anchor="middle" fill="#92400e" font-size="9" font-weight="700">BACKEND SERVER</text>
+                            <text x="832" y="153" text-anchor="middle" fill="#1e293b" font-size="11" font-weight="700">HTTP/1.1 (Plain)</text>
+                            <text id="h2-backend-ip" x="832" y="185" text-anchor="middle" fill="#94a3b8" font-size="8">—</text>
+                        </g>
+
+                        <!-- HTTP Status Badge -->
+                        <rect id="h2-http-badge-bg" x="10" y="210" width="100" height="28" rx="6" fill="#e2e8f0" opacity="0.5"/>
+                        <text id="h2-http-badge" x="60" y="229" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="700">—</text>
+
+                        <!-- Request Counter -->
+                        <rect x="10" y="248" width="60" height="22" rx="5" fill="#e2e8f0"/>
+                        <text x="18" y="263" fill="#64748b" font-size="9">Reqs:</text>
+                        <text id="h2-req-count" x="55" y="263" text-anchor="middle" fill="#1e293b" font-size="10" font-weight="700">0</text>
+                    </svg>
+                    <div style="display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap;">
+                        <span id="h2-status-text" style="font-size:12px;color:#64748b;font-style:italic;flex-shrink:0;">
+                            Click the button below to animate the HTTP/2 gateway flow.
+                        </span>
+                        <div id="h2-history-strip" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;"></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3><i class="bi bi-send headline-icon"></i>Send Request via Alteon</h3>
+                    <div class="scenario-buttons">
+                        <button class="btn btn-primary" id="h2-send-btn" onclick="loadHttp2Gateway()">
+                            <i class="bi bi-lightning-charge"></i> Send HTTPS Request → scenario4.radware.lab
+                        </button>
+                    </div>
+                </div>
+
             </section>
             <section id="settings" class="content-section">
                 <h1><i class="bi bi-gear headline-icon"></i>Settings</h1>

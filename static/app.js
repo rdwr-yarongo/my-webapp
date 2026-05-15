@@ -1784,6 +1784,129 @@ function loadContentSwitch(host, btnId, scheme) {
     });
 }
 
+// ═══════════════ HTTP/2 Gateway Flow Diagram ═══════════════
+let _h2ReqCount = 0;
+
+function initH2Flow() {
+    _h2ReqCount = 0;
+    var cv = document.getElementById('h2-path-cv');
+    if (cv) { cv.setAttribute('stroke','#cbd5e1'); cv.setAttribute('stroke-width','2'); cv.setAttribute('opacity','0.3'); cv.setAttribute('marker-end','url(#h2-arr-idle)'); cv.classList.remove('gslb-path-active'); }
+    var vb = document.getElementById('h2-path-vb');
+    if (vb) { vb.setAttribute('stroke','#cbd5e1'); vb.setAttribute('stroke-width','2'); vb.setAttribute('opacity','0.3'); vb.setAttribute('marker-end','url(#h2-arr-idle)'); vb.classList.remove('gslb-path-active'); }
+    ['h2-node-vip','h2-node-backend'].forEach(function(id) { var el = document.getElementById(id); if (!el) return; el.setAttribute('opacity','0.45'); el.style.filter = ''; });
+    var hl = document.getElementById('h2-host-label'); if (hl) { hl.textContent = 'Host: ?'; hl.setAttribute('fill','#94a3b8'); }
+    var cl = document.getElementById('h2-client-label'); if (cl) cl.textContent = '\u2014';
+    var vs = document.getElementById('h2-vip-status'); if (vs) vs.textContent = 'TLS termination + multiplexing';
+    var vi = document.getElementById('h2-vip-ip'); if (vi) vi.textContent = '\u2014';
+    var bi = document.getElementById('h2-backend-ip'); if (bi) bi.textContent = '\u2014';
+    var badge = document.getElementById('h2-http-badge'); if (badge) { badge.textContent = '\u2014'; badge.setAttribute('fill','#94a3b8'); }
+    var badgeBg = document.getElementById('h2-http-badge-bg'); if (badgeBg) { badgeBg.setAttribute('fill','#e2e8f0'); badgeBg.setAttribute('opacity','0.5'); }
+    var phase = document.getElementById('h2-phase-text'); if (phase) phase.textContent = 'Click the button to send an HTTP/2 request\u2026';
+    var phaseBg = document.getElementById('h2-phase-bg'); if (phaseBg) phaseBg.setAttribute('fill','#e2e8f0');
+    var rc = document.getElementById('h2-req-count'); if (rc) rc.textContent = '0';
+    var st = document.getElementById('h2-status-text'); if (st) { st.textContent = 'Click the button below to animate the HTTP/2 gateway flow.'; st.style.color = '#64748b'; }
+    var strip = document.getElementById('h2-history-strip'); if (strip) strip.innerHTML = '';
+}
+
+function updateH2Flow(data) {
+    if (!data) return;
+    _h2ReqCount++;
+    var sc = data.status_code || 0;
+    var proto = data.protocol_version || 'HTTP/1.1';
+    var host = data.target_host || 'scenario4.radware.lab';
+    // The VIP is an HTTP/2 gateway; Python requests uses HTTP/1.1 so proto may report 1.1
+    // The client-side badge always shows HTTP/2 (what a real browser negotiates)
+    var clientProto = 'HTTP/2';
+
+    // Reset paths
+    var cv = document.getElementById('h2-path-cv');
+    if (cv) { cv.setAttribute('stroke','#cbd5e1'); cv.setAttribute('stroke-width','2'); cv.setAttribute('opacity','0.3'); cv.setAttribute('marker-end','url(#h2-arr-idle)'); cv.classList.remove('gslb-path-active'); }
+    var vb = document.getElementById('h2-path-vb');
+    if (vb) { vb.setAttribute('stroke','#cbd5e1'); vb.setAttribute('stroke-width','2'); vb.setAttribute('opacity','0.3'); vb.setAttribute('marker-end','url(#h2-arr-idle)'); vb.classList.remove('gslb-path-active'); }
+    ['h2-node-vip','h2-node-backend'].forEach(function(id) { var el = document.getElementById(id); if (!el) return; el.setAttribute('opacity','0.45'); el.style.filter = ''; });
+
+    // Activate Client → VIP (green, HTTP/2)
+    if (cv) { cv.setAttribute('stroke','#16a34a'); cv.setAttribute('stroke-width','2.5'); cv.setAttribute('opacity','1'); cv.setAttribute('marker-end','url(#h2-arr-h2)'); cv.classList.add('gslb-path-active'); }
+
+    // Activate VIP → Backend (orange, HTTP/1.1)
+    if (vb) { vb.setAttribute('stroke','#f59e0b'); vb.setAttribute('stroke-width','2.5'); vb.setAttribute('opacity','1'); vb.setAttribute('marker-end','url(#h2-arr-h1)'); vb.classList.add('gslb-path-active'); }
+
+    // Glow VIP + Backend
+    var vipEl = document.getElementById('h2-node-vip');
+    if (vipEl) { vipEl.setAttribute('opacity','1'); vipEl.style.filter = 'drop-shadow(0 0 8px #3b82f6)'; }
+    var beEl = document.getElementById('h2-node-backend');
+    if (beEl) { beEl.setAttribute('opacity','1'); beEl.style.filter = 'drop-shadow(0 0 8px #f59e0b)'; }
+
+    // Host label
+    var hl = document.getElementById('h2-host-label'); if (hl) { hl.textContent = 'Host: ' + host; hl.setAttribute('fill','#16a34a'); }
+    var cl = document.getElementById('h2-client-label'); if (cl) cl.textContent = 'https://' + host;
+
+    // VIP status
+    var vs = document.getElementById('h2-vip-status');
+    if (vs) vs.textContent = clientProto + ' \u2192 HTTP/1.1 translated';
+
+    // Protocol badges
+    var pc = document.getElementById('h2-proto-client'); if (pc) pc.textContent = clientProto;
+
+    // Counter
+    var rc = document.getElementById('h2-req-count'); if (rc) rc.textContent = _h2ReqCount;
+
+    // HTTP badge
+    var badge = document.getElementById('h2-http-badge');
+    var badgeBg = document.getElementById('h2-http-badge-bg');
+    if (badge) { badge.textContent = sc + (sc === 200 ? ' OK' : ''); badge.setAttribute('fill', sc === 200 ? '#10b981' : '#ef4444'); }
+    if (badgeBg) { badgeBg.setAttribute('fill', sc === 200 ? '#ecfdf5' : '#fef2f2'); badgeBg.setAttribute('opacity','1'); }
+
+    // Phase pill
+    var phase = document.getElementById('h2-phase-text');
+    if (phase) phase.textContent = '#' + _h2ReqCount + ' HTTPS \u2192 ' + host + ' \u2014 ' + clientProto + ' \u2192 HTTP/1.1 \u2014 ' + sc;
+    var phaseBg = document.getElementById('h2-phase-bg'); if (phaseBg) phaseBg.setAttribute('fill','#dcfce7');
+
+    // Status text
+    var st = document.getElementById('h2-status-text');
+    if (st) { st.textContent = '#' + _h2ReqCount + ' https://' + host + ' — ' + clientProto + ' gateway \u2192 HTTP/1.1 backend \u2014 ' + sc; st.style.color = '#16a34a'; }
+
+    // History dot
+    var strip = document.getElementById('h2-history-strip');
+    if (strip) {
+        var dot = document.createElement('span');
+        dot.className = 'gslb-history-dot';
+        dot.style.background = sc === 200 ? '#16a34a' : '#ef4444';
+        dot.title = '#' + _h2ReqCount + ': ' + clientProto + ' \u2192 HTTP/1.1 \u2014 ' + sc;
+        strip.appendChild(dot);
+        while (strip.children.length > 20) strip.removeChild(strip.firstChild);
+    }
+}
+
+function loadHttp2Gateway() {
+    var resultsContent = document.getElementById('results-content');
+    if (!resultsContent) return;
+    var btn = document.getElementById('h2-send-btn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading\u2026'; }
+    resultsContent.innerHTML = '<p>Loading\u2026</p>';
+
+    fetch('/api/scenario/http2_gateway')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-lightning-charge"></i> Send HTTPS Request \u2192 scenario4.radware.lab'; }
+        if (!data.success) {
+            resultsContent.innerHTML = '<p class="error">Error: ' + escapeHtml(data.error) + '</p>';
+            return;
+        }
+        updateH2Flow(data);
+        var proto = data.protocol_version || 'HTTP/1.1';
+        var label = document.createElement('p');
+        label.style.cssText = 'margin:0 0 6px 0;font-size:13px;';
+        label.innerHTML = '<span style="display:inline-block;padding:2px 10px;border-radius:12px;background:#16a34a;color:#fff;font-size:12px;font-weight:700;">HTTP/2 \u2192 HTTP/1.1</span> https://<strong>' + escapeHtml(data.target_host) + '</strong> \u2014 Status ' + escapeHtml(String(data.status_code));
+        resultsContent.innerHTML = '';
+        resultsContent.appendChild(label);
+        resultsContent.appendChild(createResponseIframe(data));
+    })
+    .catch(function(err) {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-lightning-charge"></i> Send HTTPS Request \u2192 scenario4.radware.lab'; }
+        resultsContent.innerHTML = '<p class="error">Request failed: ' + escapeHtml(err.message) + '</p>';
+    });
+}
 
 
 // Initialize
