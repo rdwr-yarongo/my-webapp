@@ -825,27 +825,44 @@ def content_switch():
 
 @app.route('/api/scenario/http2_gateway')
 def http2_gateway():
-    """Fetch scenario4.radware.lab via HTTPS (HTTP/2 gateway VIP) and return body HTML."""
+    """Fetch scenario4.radware.lab via HTTPS/HTTP2 using curl (which supports HTTP/2 natively)."""
     try:
         target_ip, _ = resolve_target_ip(HTTP2_TARGET_HOST)
-        response = requests.get(
-            f'https://{target_ip}/index.php',
-            headers=build_request_headers(HTTP2_TARGET_HOST),
-            timeout=5,
-            allow_redirects=True,
-            verify=False
+        result = subprocess.run(
+            [
+                'curl', '-sk', '--http2',
+                '-o', '/dev/stdout',
+                '-w', '\n__CURL_META__%{http_version} %{http_code} %{remote_ip}',
+                '-H', f'Host: {HTTP2_TARGET_HOST}',
+                '-H', 'Cache-Control: no-cache',
+                '-H', 'Pragma: no-cache',
+                f'https://{target_ip}/index.php'
+            ],
+            capture_output=True, text=True, timeout=10
         )
+        output = result.stdout
+        meta_marker = '__CURL_META__'
+        if meta_marker in output:
+            body_part, meta_part = output.rsplit(meta_marker, 1)
+            parts = meta_part.strip().split()
+            http_ver = parts[0] if len(parts) > 0 else '1.1'
+            status_code = int(parts[1]) if len(parts) > 1 else 0
+            remote_ip = parts[2] if len(parts) > 2 else target_ip
+            protocol_version = 'HTTP/2' if http_ver == '2' else f'HTTP/{http_ver}'
+        else:
+            body_part = output
+            status_code = 0
+            protocol_version = 'unknown'
+            remote_ip = target_ip
         body_html = rewrite_relative_resource_urls(
-            response.text,
-            target_ip,
-            HTTP2_TARGET_HOST,
-            scheme='https'
+            body_part, target_ip, HTTP2_TARGET_HOST, scheme='https'
         )
         return jsonify({
             'success': True,
             'target_host': HTTP2_TARGET_HOST,
-            'status_code': response.status_code,
-            'protocol_version': format_http_version(response),
+            'target_ip': remote_ip,
+            'status_code': status_code,
+            'protocol_version': protocol_version,
             'body_html': body_html
         })
     except Exception as exc:

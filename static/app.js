@@ -1814,9 +1814,7 @@ function updateH2Flow(data) {
     var sc = data.status_code || 0;
     var proto = data.protocol_version || 'HTTP/1.1';
     var host = data.target_host || 'scenario4.radware.lab';
-    // The VIP is an HTTP/2 gateway; Python requests uses HTTP/1.1 so proto may report 1.1
-    // The client-side badge always shows HTTP/2 (what a real browser negotiates)
-    var clientProto = 'HTTP/2';
+    var clientProto = proto; // curl now reports actual HTTP/2
 
     // Reset paths
     var cv = document.getElementById('h2-path-cv');
