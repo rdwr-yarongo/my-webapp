@@ -1463,6 +1463,32 @@ function toggleAlteonWebUI(device) {
     frame.src = targetSrc;
     container.style.display = 'block';
     container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    /* Auto-navigate to Network → High Availability after GWT loads */
+    frame.onload = function () {
+        function gwtClick(el) {
+            if (!el) return;
+            var rect = el.getBoundingClientRect();
+            var cx = rect.left + rect.width / 2;
+            var cy = rect.top + rect.height / 2;
+            var opts = { bubbles: true, cancelable: true, view: frame.contentWindow, clientX: cx, clientY: cy };
+            el.dispatchEvent(new MouseEvent('mousedown', opts));
+            el.dispatchEvent(new MouseEvent('mouseup', opts));
+            el.dispatchEvent(new MouseEvent('click', opts));
+        }
+        setTimeout(function () {
+            try {
+                var doc = frame.contentDocument || frame.contentWindow.document;
+                gwtClick(doc.getElementById('gwt-debug-TopicsStack_Configuration.Network'));
+                function clickHA(attempts) {
+                    var haNode = doc.getElementById('gwt-debug-TopicsNode_Network.tree.High_Availability8-content');
+                    if (haNode) { gwtClick(haNode); return; }
+                    if (attempts > 0) setTimeout(function () { clickHA(attempts - 1); }, 800);
+                }
+                setTimeout(function () { clickHA(5); }, 2000);
+            } catch (e) { /* cross-origin safety */ }
+        }, 4000);
+    };
 }
 
 function hideAlteonWebUI() {
