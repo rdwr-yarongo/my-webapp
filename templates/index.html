@@ -107,6 +107,13 @@
                         <div class="nav-flat-desc">Configuration</div>
                     </div>
                 </a>
+                <a href="#" data-section="about" class="nav-flat-item">
+                    <div class="nav-flat-icon"><i class="bi bi-info-circle"></i></div>
+                    <div class="nav-flat-text">
+                        <div class="nav-flat-name">About</div>
+                        <div class="nav-flat-desc">What's New</div>
+                    </div>
+                </a>
                 <div style="margin-top:auto;padding:16px 8px 48px;text-align:center;">
                     <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#888e97;text-transform:uppercase;text-shadow:0 1px 0 rgba(255,255,255,0.9);">ASE</div>
                     <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#888e97;text-transform:uppercase;text-shadow:0 1px 0 rgba(255,255,255,0.9);margin-top:2px;">Demolab@radware.com</div>
@@ -1730,6 +1737,85 @@
                         <button class="btn btn-primary" onclick="performDnsLookup()">Lookup</button>
                     </div>
                     <div id="dns-result"></div>
+                </div>
+            </section>
+
+            <!-- ══ About / What's New ══ -->
+            <section id="about" class="content-section">
+                <h1><i class="bi bi-info-circle headline-icon"></i>About This Lab</h1>
+
+                <div class="panel">
+                    <h3><i class="bi bi-megaphone headline-icon"></i>What's New</h3>
+                    <div class="about-feature-list">
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon" style="background:#16a34a;"><i class="bi bi-arrow-up-circle"></i></div>
+                            <div class="about-feature-text">
+                                <strong>Alteon Upgrade</strong>
+                                <span>All Alteon devices upgraded to version <span class="about-version-badge">35.0.0.0</span></span>
+                            </div>
+                        </div>
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon" style="background:#2563eb;"><i class="bi bi-cloud-check"></i></div>
+                            <div class="about-feature-text">
+                                <strong>CyberController Upgrade</strong>
+                                <span>CyberController upgraded to version <span class="about-version-badge badge-blue">10.12.0</span></span>
+                            </div>
+                        </div>
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon" style="background:#7c3aed;"><i class="bi bi-diagram-3"></i></div>
+                            <div class="about-feature-text">
+                                <strong>Interactive Diagrams</strong>
+                                <span>Live topology diagrams for each scenario with click-to-expand full-screen lightbox</span>
+                            </div>
+                        </div>
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon" style="background:#059669;"><i class="bi bi-check2-circle"></i></div>
+                            <div class="about-feature-text">
+                                <strong>Fast Backend Verification</strong>
+                                <span>Instant verification of backend web application availability and response</span>
+                            </div>
+                        </div>
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon" style="background:#d97706;"><i class="bi bi-gear"></i></div>
+                            <div class="about-feature-text">
+                                <strong>Fast Alteon Navigation</strong>
+                                <span>One-click configuration navigation directly to Alteon WebUI sections</span>
+                            </div>
+                        </div>
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon" style="background:#dc2626;"><i class="bi bi-braces"></i></div>
+                            <div class="about-feature-text">
+                                <strong>User-Defined Header Insertion</strong>
+                                <span>Custom HTTP header insertion on the Offloading scenario</span>
+                            </div>
+                        </div>
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon" style="background:#0891b2;"><i class="bi bi-lightning-charge"></i></div>
+                            <div class="about-feature-text">
+                                <strong>HTTP/2 Gateway</strong>
+                                <span>Live HTTP/2 &rarr; HTTP/1.1 protocol translation and inspection</span>
+                            </div>
+                        </div>
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon" style="background:#e11d48;"><i class="bi bi-heart-pulse"></i></div>
+                            <div class="about-feature-text">
+                                <strong>Real-Time Health Monitoring</strong>
+                                <span>Live component health checks for Alteon, CyberController, DNS, and web servers</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel about-contact-card">
+                    <div class="about-contact-inner">
+                        <div class="about-contact-icon"><i class="bi bi-building"></i></div>
+                        <div class="about-contact-body">
+                            <div class="about-contact-title">ASE Demo Lab</div>
+                            <div class="about-contact-desc">Built by the Radware ASE team for demonstrating Alteon ADC capabilities including GSLB, HA failover, HTTP redirect, SSL offloading, content-switching, and HTTP/2 gateway.</div>
+                            <div class="about-contact-email"><i class="bi bi-envelope"></i> demolab@radware.com</div>
+                        </div>
+                    </div>
+                    <div class="about-lab-version">Lab v2.0 &mdash; May 2026</div>
                 </div>
             </section>
         </main>
