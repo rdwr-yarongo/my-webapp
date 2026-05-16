@@ -66,10 +66,10 @@ function switchSection(section) {
         setTimeout(function() { sec.classList.remove('scroll-pulse'); }, 2000);
     }
     const sidebar = document.getElementById('results-sidebar');
-    if (sidebar) sidebar.style.display = (section === 'home' || section === 'scenario-http2-gateway') ? 'none' : '';
+    if (sidebar) sidebar.style.display = (section === 'home') ? 'none' : '';
     const resultsContent = document.getElementById('results-content');
     if (resultsContent && section === 'scenario-http2-gateway') {
-        resultsContent.innerHTML = '<p>No results yet. Execute a scenario to see results here.</p>';
+        resultsContent.innerHTML = '<p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Browser connects directly to <code>https://scenario4.radware.lab/index.php</code> over HTTP/2.</p><iframe src="https://scenario4.radware.lab/index.php" style="width:100%;height:820px;border:1px solid #555;border-radius:4px;background:#fff;" title="scenario4.radware.lab/index.php"></iframe>';
     } else if (resultsContent && section !== 'scenario-http2-gateway') {
         if (resultsContent.querySelector('iframe[src*="scenario4"]')) {
             resultsContent.innerHTML = '<p>No results yet. Execute a scenario to see results here.</p>';
