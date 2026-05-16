@@ -1498,6 +1498,117 @@ h1 .headline-icon {
     background: rgba(220, 38, 38, 0.7);
 }
 
+/* ═══════════════════════════════════════════════════
+   DIAGRAM LIGHTBOX (full-screen expand overlay)
+═══════════════════════════════════════════════════ */
+.diagram-lightbox-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 950;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+.diagram-lightbox-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+.diagram-lightbox {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    width: 92vw;
+    max-height: 92vh;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+    z-index: 960;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.diagram-lightbox.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+.diagram-lightbox-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+.diagram-lightbox-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: 0.02em;
+}
+.diagram-lightbox-close {
+    background: none;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+}
+.diagram-lightbox-close:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #fca5a5;
+}
+.diagram-lightbox-body {
+    flex: 1;
+    overflow: auto;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-lightbox-body svg {
+    width: 100%;
+    height: auto;
+    max-height: calc(92vh - 80px);
+}
+
+/* Expand button on diagrams */
+.diagram-expand-btn {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 30px; height: 30px;
+    background: rgba(255,255,255,0.85);
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.diagram-expand-btn:hover {
+    background: #3b82f6;
+    color: #fff;
+    border-color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(59,130,246,0.35);
+}
+.dview { position: relative; }
+.panel { position: relative; }
+
 .drawer iframe {
     flex: 1;
     width: 100%;

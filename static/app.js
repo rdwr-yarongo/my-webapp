@@ -2291,6 +2291,37 @@ function showDiagramTab(btn, viewId) {
     btn.classList.add('dtab-active');
 }
 
+// ── Diagram Lightbox (full-screen expand) ─────────────────────────────────────
+function openDiagramLightbox(svgId, title) {
+    var src = document.getElementById(svgId);
+    if (!src) return;
+    var svg = src.tagName === 'svg' ? src : src.querySelector('svg');
+    if (!svg) return;
+    var clone = svg.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.style.width = '100%';
+    clone.style.maxHeight = 'calc(92vh - 80px)';
+    clone.style.height = 'auto';
+    var body = document.getElementById('diagram-lightbox-body');
+    body.innerHTML = '';
+    body.appendChild(clone);
+    document.getElementById('diagram-lightbox-title').textContent = title || '';
+    document.getElementById('diagram-lightbox-backdrop').classList.add('open');
+    document.getElementById('diagram-lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeDiagramLightbox() {
+    document.getElementById('diagram-lightbox-backdrop').classList.remove('open');
+    document.getElementById('diagram-lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(function() {
+        document.getElementById('diagram-lightbox-body').innerHTML = '';
+    }, 300);
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeDiagramLightbox();
+});
+
 // ── Health Monitor ────────────────────────────────────────────────────────────
 function pollHealth() {
     fetch('/api/health')

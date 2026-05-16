@@ -233,7 +233,7 @@
                     <div class="diagram-tabs">
     <button class='dtab dtab-active' onclick='showDiagramTab(this,"dview-lab")'><i class='bi bi-map'></i> Lab Topology</button>
 </div>
-<div id="dview-lab" class="dview"><svg viewBox="0 0 1000 590" width="100%" style="max-height:620px;font-family:'Segoe UI',sans-serif;" role="img" aria-label="Lab topology diagram">
+<div id="dview-lab" class="dview"><button class="diagram-expand-btn" onclick="openDiagramLightbox('dview-lab','Lab Topology')" title="Expand"><i class="bi bi-arrows-fullscreen"></i></button><svg viewBox="0 0 1000 590" width="100%" style="max-height:620px;font-family:'Segoe UI',sans-serif;" role="img" aria-label="Lab topology diagram">
                         <defs>
                           <!-- Drop shadow for cards -->
                           <filter id="cardShadow" x="-4%" y="-4%" width="112%" height="116%">
@@ -405,7 +405,7 @@
                         <text x="818" y="501" text-anchor="middle" fill="#00695c" font-size="14" font-weight="700">WebApp Servers</text>
                         <text x="818" y="521" text-anchor="middle" fill="#888888" font-size="12">10.100.0.20&#x2013;25</text>
                     </svg></div>
-<div id="dview-gslb" class="dview" style="display:none"><svg viewBox="0 0 1000 460" width="100%" style="max-height:620px;font-family:'Segoe UI',sans-serif;" role="img" aria-label="GSLB flow diagram">
+<div id="dview-gslb" class="dview" style="display:none"><button class="diagram-expand-btn" onclick="openDiagramLightbox('dview-gslb','GSLB DNS Delegation')" title="Expand"><i class="bi bi-arrows-fullscreen"></i></button><svg viewBox="0 0 1000 460" width="100%" style="max-height:620px;font-family:'Segoe UI',sans-serif;" role="img" aria-label="GSLB flow diagram">
                         <!-- Background -->
                         <rect x="0" y="0" width="1000" height="460" fill="#ffffff" rx="10"/>
                         <!-- Legend -->
@@ -492,7 +492,7 @@
                         <text x="904" y="402" text-anchor="middle" fill="#00695c" font-size="14" font-weight="700">WebApp Servers</text>
                         <text x="904" y="422" text-anchor="middle" fill="#888888" font-size="13">10.100.0.20&#x2013;25</text>
                     </svg></div>
-<div id="dview-ha" class="dview" style="display:none"><svg viewBox="0 10 1000 360" width="100%" style="max-height:620px;" role="img" aria-label="High availability failover flow diagram">
+<div id="dview-ha" class="dview" style="display:none"><button class="diagram-expand-btn" onclick="openDiagramLightbox('dview-ha','HA Failover')" title="Expand"><i class="bi bi-arrows-fullscreen"></i></button><svg viewBox="0 10 1000 360" width="100%" style="max-height:620px;" role="img" aria-label="High availability failover flow diagram">
                         <defs>
                             <marker id="ha-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
                                 <path d="M0,0 L0,6 L9,3 z" fill="#888888"/>
@@ -534,7 +534,7 @@
 
                         <text x="70" y="355" fill="#ffffff" font-size="14">Gray dashed: original active path | Green: traffic observed after failover to backup Alteon</text>
                     </svg></div>
-<div id="dview-redirect" class="dview" style="display:none"><svg viewBox="0 20 1000 300" width="100%" style="max-height:620px;" role="img" aria-label="HTTP to HTTPS redirection flow diagram">
+<div id="dview-redirect" class="dview" style="display:none"><button class="diagram-expand-btn" onclick="openDiagramLightbox('dview-redirect','HTTP → HTTPS Redirect')" title="Expand"><i class="bi bi-arrows-fullscreen"></i></button><svg viewBox="0 20 1000 300" width="100%" style="max-height:620px;" role="img" aria-label="HTTP to HTTPS redirection flow diagram">
                         <defs>
                             <marker id="redir-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
                                 <path d="M0,0 L0,6 L9,3 z" fill="#888888"/>
@@ -595,6 +595,7 @@
 
                 <!-- ═══ GSLB DNS Delegation Flow Diagram ═══ -->
                 <div class="panel" id="gslb-dns-flow-panel">
+                    <button class="diagram-expand-btn" onclick="openDiagramLightbox('gslb-dns-flow-svg','Live GSLB DNS Delegation Flow')" title="Expand"><i class="bi bi-arrows-fullscreen"></i></button>
                     <h3><i class="bi bi-signpost-split headline-icon"></i>Live GSLB DNS Delegation Flow</h3>
                     <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
                         Shows the full DNS delegation path: Controller → DNS Server → NS delegation to Alteon DNS Responders → GSLB round-robin decision → VIP answer.
@@ -739,6 +740,7 @@
 
                 <!-- ══ HTTP Traffic Flow Panel ══ -->
                 <div class="panel" id="http-traffic-flow-panel">
+                    <button class="diagram-expand-btn" onclick="openDiagramLightbox('http-flow-svg','Live HTTP Traffic Flow')" title="Expand"><i class="bi bi-arrows-fullscreen"></i></button>
                     <h3>&#x1F310; Live HTTP Traffic Flow</h3>
                     <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
                         Controller uses the DNS answer to send HTTP directly to the VIP — the Alteon SLB selects a real server from the pool.
@@ -896,6 +898,7 @@
                      HA LIVE INTERACTIVE TOPOLOGY DIAGRAM
                 ═══════════════════════════════════════════════════════ -->
                 <div class="panel" id="ha-live-diagram-panel">
+                    <button class="diagram-expand-btn" onclick="openDiagramLightbox('ha-topology-svg','Live HA Topology')" title="Expand"><i class="bi bi-arrows-fullscreen"></i></button>
                     <h3><i class="bi bi-diagram-2 headline-icon"></i>Live HA Topology</h3>
                     <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
                         Animates in real-time as each HA attempt resolves — the active Alteon path lights up and the phase indicator updates automatically.
@@ -1062,6 +1065,7 @@
                 </div>
                 <!-- ═══ Live Redirect Topology Diagram ═══ -->
                 <div class="panel" id="redir-live-diagram-panel">
+                    <button class="diagram-expand-btn" onclick="openDiagramLightbox('redir-topology-svg','Live Redirect Topology')" title="Expand"><i class="bi bi-arrows-fullscreen"></i></button>
                     <h3><i class="bi bi-diagram-2 headline-icon"></i>Live Redirect Topology</h3>
                     <svg id="redir-topology-svg" viewBox="0 0 900 330" width="100%"
                          style="font-family:'Segoe UI',Tahoma,sans-serif;border-radius:10px;display:block;"
@@ -1232,6 +1236,7 @@
 
                 <!-- ══ Content Offloading Live Flow Diagram ══ -->
                 <div class="panel" id="off-flow-panel">
+                    <button class="diagram-expand-btn" onclick="openDiagramLightbox('off-flow-svg','Live Content-Offloading Flow')" title="Expand"><i class="bi bi-arrows-fullscreen"></i></button>
                     <h3>&#x1F6E1;&#xFE0F; Live Content-Offloading Flow</h3>
                     <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
                         Click <strong>Load Page via Alteon</strong> or <strong>Bypass Alteon</strong> below &#x2014; the diagram animates the path and shows which modifications Alteon applies.
@@ -1431,6 +1436,7 @@
 
                 <!-- ══ Content-Switching Live Flow Diagram ══ -->
                 <div class="panel" id="cs-flow-panel">
+                    <button class="diagram-expand-btn" onclick="openDiagramLightbox('cs-flow-svg','Live Content-Switching Flow')" title="Expand"><i class="bi bi-arrows-fullscreen"></i></button>
                     <h3>&#x1F500; Live Content-Switching Flow</h3>
                     <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
                         Click any button below — the diagram animates the path taken by the request through the Alteon VIP to the matching backend.
@@ -1759,6 +1765,15 @@
         <iframe id="alteon-webui-frame" src="" title="Alteon WebUI"
                 sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
     </aside>
+    <!-- ═══ Diagram Lightbox Overlay ═══ -->
+    <div id="diagram-lightbox-backdrop" class="diagram-lightbox-backdrop" onclick="closeDiagramLightbox()"></div>
+    <div id="diagram-lightbox" class="diagram-lightbox">
+        <div class="diagram-lightbox-header">
+            <span class="diagram-lightbox-title" id="diagram-lightbox-title"></span>
+            <button class="diagram-lightbox-close" onclick="closeDiagramLightbox()" title="Close"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="diagram-lightbox-body" id="diagram-lightbox-body"></div>
+    </div>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
