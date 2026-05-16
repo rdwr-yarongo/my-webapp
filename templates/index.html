@@ -579,10 +579,7 @@
             <section id="scenario-1" class="content-section">
                 <h1><i class="bi bi-play-btn headline-icon"></i>Scenario 1</h1>
                 <div class="panel">
-                    <div class="panel-header-row">
-                        <h3><i class="bi bi-caret-right-square headline-icon"></i>Run Scenario 1</h3>
-                        <button class="btn-icon-sq play" onclick="executeScenario('gslb_rr')" title="Execute Scenario 1"><i class="bi bi-play-fill"></i></button>
-                    </div>
+                    <h3><i class="bi bi-caret-right-square headline-icon"></i>Run Scenario 1</h3>
                     <p>In this section we will demonstrate global site load balancing.</p>
                     <p>Please note: the Main site has two links, and the DR site has one link:</p>
                     <ul style="margin:8px 0 8px 20px;">
@@ -591,6 +588,7 @@
                         <li>Site B ISP link is represented by VIP <strong>10.100.7.103</strong></li>
                     </ul>
                     <p>The Execute action performs multiple attempts to app1.radware.lab. Each attempt triggers a DNS decision and then sends HTTP traffic to the selected destination so you can observe GSLB behavior over time.</p>
+                    <button class="btn btn-primary" onclick="executeScenario('gslb_rr')">Execute Scenario 1</button>
                 </div>
 
                 <!-- ═══════════════════════════════════════════════════════ -->
@@ -865,15 +863,19 @@
 
                 <!-- ═══ Alteon WebUI — GSLB DNS Rules View ═══ -->
                 <div class="panel" id="alteon-webui-gslb-panel">
-                    <div class="panel-header-row">
-                        <h3><i class="bi bi-display headline-icon"></i> How It Looks in Alteon WebUI</h3>
-                        <button class="btn-icon-sq alteon-a1" onclick="toggleAlteonWebUI('alteon1','gslb-dns-rules')" title="Alteon 1 WebUI"><i class="bi bi-display"></i></button>
-                        <button class="btn-icon-sq alteon-a2" onclick="toggleAlteonWebUI('alteon2','gslb-dns-rules')" title="Alteon 2 WebUI"><i class="bi bi-display"></i></button>
-                    </div>
+                    <h3><i class="bi bi-display headline-icon"></i> How It Looks in Alteon WebUI</h3>
                     <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
                         See the actual GSLB DNS Redirection Rules as configured in the Alteon administration interface.
                         Opens a side panel auto-navigated to <strong>Application Delivery &rarr; Global Traffic Redirection &rarr; DNS Redirection Rules &rarr; Rule 10</strong>.
                     </p>
+                    <div class="btn-row" style="align-items:center;">
+                        <button class="btn btn-primary" onclick="toggleAlteonWebUI('alteon1','gslb-dns-rules')">
+                            <i class="bi bi-display"></i> Show Alteon 1 WebUI
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleAlteonWebUI('alteon2','gslb-dns-rules')">
+                            <i class="bi bi-display"></i> Show Alteon 2 WebUI
+                        </button>
+                    </div>
                 </div>
             </section>
             <section id="scenario-2" class="content-section">
@@ -1033,15 +1035,19 @@
 
                 <!-- ═══ Alteon WebUI — HA Config View ═══ -->
                 <div class="panel" id="alteon-webui-panel">
-                    <div class="panel-header-row">
-                        <h3><i class="bi bi-display headline-icon"></i> How It Looks in Alteon WebUI</h3>
-                        <button class="btn-icon-sq alteon-a1" onclick="toggleAlteonWebUI('alteon1','ha')" title="Alteon 1 WebUI"><i class="bi bi-display"></i></button>
-                        <button class="btn-icon-sq alteon-a2" onclick="toggleAlteonWebUI('alteon2','ha')" title="Alteon 2 WebUI"><i class="bi bi-display"></i></button>
-                    </div>
+                    <h3><i class="bi bi-display headline-icon"></i> How It Looks in Alteon WebUI</h3>
                     <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
                         See the actual High Availability configuration as it appears in the Alteon administration interface.
                         Opens a side panel with the live Alteon WebUI, auto-navigated to <strong>Network &rarr; High Availability</strong>.
                     </p>
+                    <div class="btn-row" style="align-items:center;">
+                        <button class="btn btn-primary" onclick="toggleAlteonWebUI('alteon1','ha')">
+                            <i class="bi bi-display"></i> Show Alteon 1 WebUI
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleAlteonWebUI('alteon2','ha')">
+                            <i class="bi bi-display"></i> Show Alteon 2 WebUI
+                        </button>
+                    </div>
                 </div>
             </section>
             <section id="scenario-3" class="content-section">
@@ -1210,15 +1216,19 @@
 
                 <!-- ═══ Alteon WebUI — HTTP Redirect Config View ═══ -->
                 <div class="panel" id="alteon-webui-redirect-panel">
-                    <div class="panel-header-row">
-                        <h3><i class="bi bi-display headline-icon"></i> How It Looks in Alteon WebUI</h3>
-                        <button class="btn-icon-sq alteon-a1" onclick="toggleAlteonWebUI('alteon1','vs-scenario2-http')" title="Alteon 1 WebUI"><i class="bi bi-display"></i></button>
-                        <button class="btn-icon-sq alteon-a2" onclick="toggleAlteonWebUI('alteon2','vs-scenario2-http')" title="Alteon 2 WebUI"><i class="bi bi-display"></i></button>
-                    </div>
+                    <h3><i class="bi bi-display headline-icon"></i> How It Looks in Alteon WebUI</h3>
                     <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
                         See the HTTP-to-HTTPS redirect virtual service as configured in the Alteon administration interface.
                         Opens a side panel auto-navigated to <strong>Application Delivery &rarr; Virtual Services &rarr; Scenario2 &rarr; Application: HTTP</strong>.
                     </p>
+                    <div class="btn-row" style="align-items:center;">
+                        <button class="btn btn-primary" onclick="toggleAlteonWebUI('alteon1','vs-scenario2-http')">
+                            <i class="bi bi-display"></i> Show Alteon 1 WebUI
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleAlteonWebUI('alteon2','vs-scenario2-http')">
+                            <i class="bi bi-display"></i> Show Alteon 2 WebUI
+                        </button>
+                    </div>
                 </div>
             </section>
             <section id="scenario-offloading" class="content-section">
@@ -1394,15 +1404,19 @@
 
                 <!-- ═══ Alteon WebUI — Content Offloading Config View ═══ -->
                 <div class="panel" id="alteon-webui-offloading-panel">
-                    <div class="panel-header-row">
-                        <h3><i class="bi bi-display headline-icon"></i> How It Looks in Alteon WebUI</h3>
-                        <button class="btn-icon-sq alteon-a1" onclick="toggleAlteonWebUI('alteon1','vs-scenario2-https-contentmod')" title="Alteon 1 WebUI"><i class="bi bi-display"></i></button>
-                        <button class="btn-icon-sq alteon-a2" onclick="toggleAlteonWebUI('alteon2','vs-scenario2-https-contentmod')" title="Alteon 2 WebUI"><i class="bi bi-display"></i></button>
-                    </div>
+                    <h3><i class="bi bi-display headline-icon"></i> How It Looks in Alteon WebUI</h3>
                     <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
                         See the content-offloading virtual service as configured in the Alteon administration interface.
                         Opens a side panel auto-navigated to <strong>Application Delivery &rarr; Virtual Services &rarr; Scenario2 &rarr; Application: HTTPS &rarr; HTTP Content Modification</strong>.
                     </p>
+                    <div class="btn-row" style="align-items:center;">
+                        <button class="btn btn-primary" onclick="toggleAlteonWebUI('alteon1','vs-scenario2-https-contentmod')">
+                            <i class="bi bi-display"></i> Show Alteon 1 WebUI
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleAlteonWebUI('alteon2','vs-scenario2-https-contentmod')">
+                            <i class="bi bi-display"></i> Show Alteon 2 WebUI
+                        </button>
+                    </div>
                 </div>
 
 
@@ -1569,15 +1583,19 @@
 
                 <!-- ═══ Alteon WebUI — Content-Switching Config View ═══ -->
                 <div class="panel" id="alteon-webui-cs-panel">
-                    <div class="panel-header-row">
-                        <h3><i class="bi bi-display headline-icon"></i> How It Looks in Alteon WebUI</h3>
-                        <button class="btn-icon-sq alteon-a1" onclick="toggleAlteonWebUI('alteon1','vs-scenario3-cbr')" title="Alteon 1 WebUI"><i class="bi bi-display"></i></button>
-                        <button class="btn-icon-sq alteon-a2" onclick="toggleAlteonWebUI('alteon2','vs-scenario3-cbr')" title="Alteon 2 WebUI"><i class="bi bi-display"></i></button>
-                    </div>
+                    <h3><i class="bi bi-display headline-icon"></i> How It Looks in Alteon WebUI</h3>
                     <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
                         See the content-switching virtual service as configured in the Alteon administration interface.
                         Opens a side panel auto-navigated to <strong>Application Delivery &rarr; Virtual Services &rarr; Scenario3 &rarr; Content Based Rules</strong>.
                     </p>
+                    <div class="btn-row" style="align-items:center;">
+                        <button class="btn btn-primary" onclick="toggleAlteonWebUI('alteon1','vs-scenario3-cbr')">
+                            <i class="bi bi-display"></i> Show Alteon 1 WebUI
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleAlteonWebUI('alteon2','vs-scenario3-cbr')">
+                            <i class="bi bi-display"></i> Show Alteon 2 WebUI
+                        </button>
+                    </div>
                 </div>
             </section>
             <section id="scenario-http2-gateway" class="content-section">

@@ -936,62 +936,6 @@ h1 .headline-icon {
     margin-top: 12px;
 }
 
-/* Panel header with inline action buttons */
-.panel-header-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-}
-.panel-header-row h3 {
-    margin: 0;
-    flex: 0 1 auto;
-}
-.btn-icon-sq {
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    border: none;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 14px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-    flex-shrink: 0;
-}
-.btn-icon-sq.play {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(22,163,74,0.3);
-}
-.btn-icon-sq.play:hover {
-    background: linear-gradient(135deg, #16a34a, #15803d);
-    transform: scale(1.08);
-    box-shadow: 0 3px 12px rgba(22,163,74,0.4);
-}
-.btn-icon-sq.alteon-a1 {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(37,99,235,0.25);
-}
-.btn-icon-sq.alteon-a1:hover {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    transform: scale(1.08);
-    box-shadow: 0 3px 12px rgba(37,99,235,0.4);
-}
-.btn-icon-sq.alteon-a2 {
-    background: linear-gradient(135deg, #6b7280, #4b5563);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(75,85,99,0.25);
-}
-.btn-icon-sq.alteon-a2:hover {
-    background: linear-gradient(135deg, #4b5563, #374151);
-    transform: scale(1.08);
-    box-shadow: 0 3px 12px rgba(75,85,99,0.4);
-}
-
 .status-chip-row {
     display: flex;
     flex-wrap: wrap;
