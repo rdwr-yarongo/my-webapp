@@ -2376,3 +2376,49 @@ function pollHealth() {
 }
 pollHealth();
 setInterval(pollHealth, 30000);
+
+// ── Traffic Generator Monitor ─────────────────────────────────────────────────
+function pollTrafficGen() {
+    fetch('/api/traffic-generator/status')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var dot = document.getElementById('tg-dot');
+            var label = document.getElementById('tg-status-label');
+            var pidEl = document.getElementById('tg-pid');
+            var activeEl = document.getElementById('tg-active');
+            var twEl = document.getElementById('tg-timewait');
+            var tsEl = document.getElementById('tg-timestamp');
+
+            if (!data.reachable) {
+                if (dot) { dot.className = 'status-dot unreachable'; }
+                if (label) { label.textContent = 'Unreachable'; }
+                if (pidEl) pidEl.textContent = '\u2014';
+                if (activeEl) activeEl.textContent = '\u2014';
+                if (twEl) twEl.textContent = '\u2014';
+            } else if (data.running) {
+                if (dot) { dot.className = 'status-dot running'; }
+                if (label) { label.textContent = 'Running'; }
+                if (pidEl) pidEl.textContent = data.pid || '\u2014';
+                if (activeEl) activeEl.textContent = data.active_connections;
+                if (twEl) twEl.textContent = data.timewait_connections;
+            } else {
+                if (dot) { dot.className = 'status-dot stopped'; }
+                if (label) { label.textContent = 'Stopped'; }
+                if (pidEl) pidEl.textContent = '\u2014';
+                if (activeEl) activeEl.textContent = '0';
+                if (twEl) twEl.textContent = '0';
+            }
+            if (tsEl && data.timestamp) {
+                var d = new Date(data.timestamp);
+                tsEl.textContent = d.toLocaleTimeString();
+            }
+        })
+        .catch(function() {
+            var dot = document.getElementById('tg-dot');
+            var label = document.getElementById('tg-status-label');
+            if (dot) dot.className = 'status-dot unreachable';
+            if (label) label.textContent = 'Error';
+        });
+}
+pollTrafficGen();
+setInterval(pollTrafficGen, 10000);

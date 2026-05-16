@@ -107,6 +107,13 @@
                         <div class="nav-flat-desc">Configuration</div>
                     </div>
                 </a>
+                <a href="#" data-section="status" class="nav-flat-item">
+                    <div class="nav-flat-icon"><i class="bi bi-activity"></i></div>
+                    <div class="nav-flat-text">
+                        <div class="nav-flat-name">Status</div>
+                        <div class="nav-flat-desc">Traffic Monitor</div>
+                    </div>
+                </a>
                 <a href="#" data-section="about" class="nav-flat-item">
                     <div class="nav-flat-icon"><i class="bi bi-info-circle"></i></div>
                     <div class="nav-flat-text">
@@ -1816,6 +1823,62 @@
                         </div>
                     </div>
                     <div class="about-lab-version">Lab v8.0 &mdash; May 2026</div>
+                </div>
+            </section>
+
+            <!-- ══ Status — Traffic Generator Monitor ══ -->
+            <section id="status" class="content-section">
+                <h1><i class="bi bi-activity headline-icon"></i>Traffic Generator Status</h1>
+
+                <div class="panel">
+                    <h3><i class="bi bi-broadcast headline-icon"></i>SSL Traffic Generator</h3>
+                    <div class="status-card">
+                        <div class="status-card-header">
+                            <div class="status-indicator" id="tg-status-indicator">
+                                <span class="status-dot" id="tg-dot"></span>
+                                <span class="status-label" id="tg-status-label">Checking…</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="pollTrafficGen()" title="Refresh now">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="status-stats-grid">
+                            <div class="status-stat">
+                                <div class="status-stat-label">Process ID</div>
+                                <div class="status-stat-value" id="tg-pid">&mdash;</div>
+                            </div>
+                            <div class="status-stat">
+                                <div class="status-stat-label">Active Connections</div>
+                                <div class="status-stat-value status-stat-highlight" id="tg-active">0</div>
+                            </div>
+                            <div class="status-stat">
+                                <div class="status-stat-label">TIME_WAIT</div>
+                                <div class="status-stat-value" id="tg-timewait">0</div>
+                            </div>
+                            <div class="status-stat">
+                                <div class="status-stat-label">Target</div>
+                                <div class="status-stat-value" id="tg-target">10.100.2.2:444</div>
+                            </div>
+                            <div class="status-stat">
+                                <div class="status-stat-label">Host</div>
+                                <div class="status-stat-value" id="tg-host">10.100.0.30</div>
+                            </div>
+                            <div class="status-stat">
+                                <div class="status-stat-label">Last Updated</div>
+                                <div class="status-stat-value" id="tg-timestamp">&mdash;</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3><i class="bi bi-info-circle headline-icon"></i>About This Monitor</h3>
+                    <p style="font-size:13px;color:var(--text-muted);line-height:1.6;">
+                        The SSL traffic generator runs <code>bash /root/ssl_test.sh</code> on <strong>10.100.0.30</strong>.
+                        It continuously creates outbound TLS/HTTPS connections toward <strong>10.100.2.2:444</strong>,
+                        producing high-rate short-lived TCP/TLS sessions with frequent TIME_WAIT connections.
+                        This page monitors the process state and connection statistics in real time (polling every 10 seconds).
+                    </p>
                 </div>
             </section>
         </main>

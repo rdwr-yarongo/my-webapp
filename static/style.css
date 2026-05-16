@@ -1760,3 +1760,88 @@ h1 .headline-icon {
     color: var(--text-muted);
     text-transform: uppercase;
 }
+
+/* ── Status / Traffic Generator Monitor ── */
+.status-card {
+    margin-top: 12px;
+    padding: 18px 20px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.status-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.status-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #6b7280;
+    box-shadow: 0 0 0 3px rgba(107,114,128,0.2);
+    transition: background 0.3s, box-shadow 0.3s;
+}
+.status-dot.running {
+    background: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22,163,74,0.25), 0 0 8px rgba(22,163,74,0.4);
+    animation: statusPulse 2s ease-in-out infinite;
+}
+.status-dot.stopped {
+    background: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.25);
+}
+.status-dot.unreachable {
+    background: #d97706;
+    box-shadow: 0 0 0 3px rgba(217,119,6,0.25);
+}
+@keyframes statusPulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(22,163,74,0.25), 0 0 8px rgba(22,163,74,0.4); }
+    50% { box-shadow: 0 0 0 5px rgba(22,163,74,0.15), 0 0 14px rgba(22,163,74,0.3); }
+}
+.status-label {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+.status-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+.status-stat {
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    text-align: center;
+}
+.status-stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+.status-stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-color);
+    font-variant-numeric: tabular-nums;
+}
+.status-stat-highlight {
+    color: #3b82f6;
+}
+.btn-sm {
+    padding: 5px 12px;
+    font-size: 12px;
+}

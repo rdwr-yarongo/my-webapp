@@ -8,6 +8,7 @@ from urllib.parse import quote, urljoin
 import dns.resolver
 import requests
 import urllib3
+import paramiko
 from requests.auth import HTTPBasicAuth
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -970,6 +971,68 @@ def alteon_webui_proxy(device, subpath):
         status=resp.status_code,
         headers=headers,
     )
+
+
+# ── Traffic Generator Monitor ──────────────────────────────────────────────────
+TRAFFIC_GEN_HOST = '10.100.0.30'
+TRAFFIC_GEN_USER = 'root'
+TRAFFIC_GEN_PASS = 'radware'
+TRAFFIC_GEN_TARGET = '10.100.2.2:444'
+
+
+@app.route('/api/traffic-generator/status')
+def traffic_generator_status():
+    import datetime
+    result = {
+        'running': False,
+        'pid': None,
+        'active_connections': 0,
+        'timewait_connections': 0,
+        'target': TRAFFIC_GEN_TARGET,
+        'host': TRAFFIC_GEN_HOST,
+        'reachable': False,
+        'timestamp': datetime.datetime.utcnow().isoformat() + 'Z'
+    }
+    try:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(TRAFFIC_GEN_HOST, username=TRAFFIC_GEN_USER,
+                       password=TRAFFIC_GEN_PASS, timeout=5)
+        result['reachable'] = True
+
+        # Check process
+        _, stdout, _ = client.exec_command('pgrep -f "ssl_test.sh"')
+        pids = stdout.read().decode().strip().split('\n')
+        pids = [p for p in pids if p]
+        if pids:
+            result['running'] = True
+            result['pid'] = int(pids[0])
+
+        # Try PID file
+        if not result['pid']:
+            _, stdout, _ = client.exec_command('cat /var/run/ssltest.pid 2>/dev/null')
+            pid_val = stdout.read().decode().strip()
+            if pid_val.isdigit():
+                result['pid'] = int(pid_val)
+
+        # Count active connections
+        _, stdout, _ = client.exec_command(
+            'ss -tn state established dst 10.100.2.2:444 2>/dev/null | tail -n +2 | wc -l')
+        val = stdout.read().decode().strip()
+        if val.isdigit():
+            result['active_connections'] = int(val)
+
+        # Count TIME_WAIT connections
+        _, stdout, _ = client.exec_command(
+            'ss -tn state time-wait dst 10.100.2.2:444 2>/dev/null | tail -n +2 | wc -l')
+        val = stdout.read().decode().strip()
+        if val.isdigit():
+            result['timewait_connections'] = int(val)
+
+        client.close()
+    except Exception:
+        pass
+    return jsonify(result)
 
 
 if __name__ == '__main__':
