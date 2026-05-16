@@ -1241,21 +1241,6 @@
             <section id="scenario-offloading" class="content-section">
                 <h1><i class="bi bi-layers headline-icon"></i>Scenario 2 &#x2014; Content Offloading</h1>
 
-                <div class="panel">
-                    <h3><i class="bi bi-play-fill headline-icon"></i>Send Request via Alteon</h3>
-                    <div class="btn-row">
-                        <button class="btn btn-primary" id="off-load-btn" onclick="loadOffloadingDemo()">
-                            <i class="bi bi-play-fill"></i> Load Page via Alteon
-                        </button>
-                        <button class="btn btn-secondary" onclick="window.open('https://scenario2.radware.lab/index.php','_blank','noopener,noreferrer')">
-                            <i class="bi bi-box-arrow-up-right"></i> Open in New Tab
-                        </button>
-                        <button class="btn btn-danger" id="bypass-btn" onclick="loadBypassDemo()">
-                            <i class="bi bi-shield-x"></i> Bypass Alteon (Direct)
-                        </button>
-                    </div>
-                </div>
-
                 <!-- ══ Content Offloading Live Flow Diagram ══ -->
                 <div class="panel" id="off-flow-panel">
                     <button class="diagram-expand-btn" onclick="openDiagramLightbox('off-flow-svg','Live Content-Offloading Flow')" title="Expand"><i class="bi bi-arrows-fullscreen"></i></button>
@@ -1384,6 +1369,17 @@
                     <h3><i class="bi bi-info-circle headline-icon"></i>What is Content Offloading?</h3>
                     <p>Alteon can modify HTTP traffic in transit: <strong>removing sensitive headers from responses</strong>, <strong>stripping strings from the body</strong>, and <strong>injecting new content</strong> &#x2014; all without touching the backend server.</p>
                     <p>Click <strong>Load Page via Alteon</strong> to fetch <strong>https://scenario2.radware.lab/index.php</strong> through Alteon and view the page in the Execution Results pane.</p>
+                    <div class="btn-row" style="margin-top:12px;">
+                        <button class="btn btn-primary" id="off-load-btn" onclick="loadOffloadingDemo()">
+                            <i class="bi bi-play-fill"></i> Load Page via Alteon
+                        </button>
+                        <button class="btn btn-secondary" onclick="window.open('https://scenario2.radware.lab/index.php','_blank','noopener,noreferrer')">
+                            <i class="bi bi-box-arrow-up-right"></i> Open in New Tab
+                        </button>
+                        <button class="btn btn-danger" id="bypass-btn" onclick="loadBypassDemo()">
+                            <i class="bi bi-shield-x"></i> Bypass Alteon (Direct)
+                        </button>
+                    </div>
                 </div>
                 <div class="panel">
                     <h3><i class="bi bi-pencil-square headline-icon"></i>Custom Header Injection via Alteon API</h3>
