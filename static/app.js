@@ -69,7 +69,7 @@ function switchSection(section) {
     if (sidebar) sidebar.style.display = (section === 'home') ? 'none' : '';
     const resultsContent = document.getElementById('results-content');
     if (resultsContent && section === 'scenario-http2-gateway') {
-        resultsContent.innerHTML = '<p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Browser connects directly to <code>https://scenario4.radware.lab/index.php</code> over HTTP/2.</p><iframe src="https://scenario4.radware.lab/index.php" style="width:100%;height:820px;border:1px solid #555;border-radius:4px;background:#fff;" title="scenario4.radware.lab/index.php"></iframe>';
+        resultsContent.innerHTML = '<p>Click <strong>Send HTTPS Request</strong> to load the page via Alteon HTTP/2 gateway.</p>';
     } else if (resultsContent && section !== 'scenario-http2-gateway') {
         if (resultsContent.querySelector('iframe[src*="scenario4"]')) {
             resultsContent.innerHTML = '<p>No results yet. Execute a scenario to see results here.</p>';
