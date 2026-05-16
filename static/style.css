@@ -524,24 +524,51 @@ p + svg {
 
 /* Custom scrollbar styling */
 .content-section.active::-webkit-scrollbar {
-    width: 12px;
+    width: 10px;
+    transition: width 0.2s ease;
 }
 
 .content-section.active::-webkit-scrollbar-track {
-    background: #e5e7eb;
-    border-radius: 6px;
+    background: linear-gradient(to bottom, #e5e7eb, #d1d5db);
+    border-radius: 10px;
+    margin: 4px 0;
 }
 
 .content-section.active::-webkit-scrollbar-thumb {
-    background: #9ca3af;
-    border-radius: 6px;
+    background: linear-gradient(180deg, #3b82f6, #2563eb);
+    border-radius: 10px;
     border: 2px solid transparent;
     background-clip: content-box;
+    min-height: 40px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
 }
 
 .content-section.active::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
+    background: linear-gradient(180deg, #2563eb, #1d4ed8);
     background-clip: content-box;
+    border: 1px solid transparent;
+}
+
+.content-section.active::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(180deg, #1d4ed8, #1e40af);
+    background-clip: content-box;
+    border: 1px solid transparent;
+}
+
+/* Firefox scrollbar */
+.content-section.active {
+    scrollbar-width: auto;
+    scrollbar-color: #3b82f6 #e5e7eb;
+}
+
+/* Scrollbar pulse animation on first load */
+@keyframes scrollbarPulse {
+    0%   { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2); }
+    40%  { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 0 8px rgba(59,130,246,0.6); }
+    100% { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2); }
+}
+.content-section.active.scroll-pulse::-webkit-scrollbar-thumb {
+    animation: scrollbarPulse 1.5s ease-out 1;
 }
 
 .cards-grid {

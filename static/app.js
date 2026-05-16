@@ -59,6 +59,12 @@ function switchSection(section) {
     var sec = document.getElementById(section);
     if (sec) sec.scrollTop = 0;
     setTimeout(updateScrollHint, 100);
+    // One-time scrollbar pulse
+    if (sec && !sec.dataset.pulsed) {
+        sec.classList.add('scroll-pulse');
+        sec.dataset.pulsed = '1';
+        setTimeout(function() { sec.classList.remove('scroll-pulse'); }, 2000);
+    }
     const sidebar = document.getElementById('results-sidebar');
     if (sidebar) sidebar.style.display = (section === 'home') ? 'none' : '';
     const resultsContent = document.getElementById('results-content');
