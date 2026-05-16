@@ -975,7 +975,7 @@ def alteon_webui_proxy(device, subpath):
 
 # ── Traffic Generator Monitor ──────────────────────────────────────────────────
 TRAFFIC_GEN_HOST = '10.100.0.30'
-TRAFFIC_GEN_USER = 'root'
+TRAFFIC_GEN_USER = 'radware'
 TRAFFIC_GEN_PASS = 'radware'
 TRAFFIC_GEN_TARGET = '10.100.2.2:444'
 
