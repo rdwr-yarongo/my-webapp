@@ -910,7 +910,7 @@
                     <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
                         Animates in real-time as each HA attempt resolves — the active Alteon path lights up and the phase indicator updates automatically.
                     </p>
-                    <svg id="ha-topology-svg" viewBox="0 0 900 290" width="100%"
+                    <svg id="ha-topology-svg" viewBox="0 0 900 310" width="100%"
                          style="font-family:'Segoe UI',Tahoma,sans-serif;border-radius:10px;display:block;"
                          role="img" aria-label="Live HA topology diagram">
                         <defs>
@@ -929,7 +929,7 @@
                         </defs>
 
                         <!-- ── Background ── -->
-                        <rect x="0" y="0" width="900" height="290" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+                        <rect x="0" y="0" width="900" height="310" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
 
                         <!-- ── Legend row ── -->
                         <circle cx="20" cy="16" r="5" fill="#3b82f6"/>
@@ -946,85 +946,85 @@
                         <!-- ══ PATHS (drawn behind nodes) ══ -->
 
                         <!-- Controller → Alteon 1 -->
-                        <line id="ha-path-a1" x1="193" y1="100" x2="280" y2="70"
+                        <line id="ha-path-a1" x1="193" y1="115" x2="280" y2="85"
                               stroke="#cbd5e1" stroke-width="2" opacity="0.5"
                               marker-end="url(#ha-live-arr-idle)"/>
 
                         <!-- Controller → Alteon 2 -->
-                        <line id="ha-path-a2" x1="193" y1="160" x2="280" y2="200"
+                        <line id="ha-path-a2" x1="193" y1="175" x2="280" y2="215"
                               stroke="#cbd5e1" stroke-width="2" opacity="0.5"
                               marker-end="url(#ha-live-arr-idle)"/>
 
                         <!-- Alteon 1 → WebApp -->
-                        <line id="ha-path-srv1" x1="507" y1="70" x2="600" y2="120"
+                        <line id="ha-path-srv1" x1="507" y1="85" x2="600" y2="135"
                               stroke="#cbd5e1" stroke-width="2" opacity="0.5"
                               marker-end="url(#ha-live-arr-idle)"/>
 
                         <!-- Alteon 2 → WebApp -->
-                        <line id="ha-path-srv2" x1="507" y1="200" x2="600" y2="150"
+                        <line id="ha-path-srv2" x1="507" y1="215" x2="600" y2="165"
                               stroke="#cbd5e1" stroke-width="2" opacity="0.5"
                               marker-end="url(#ha-live-arr-idle)"/>
 
                         <!-- ══ LAB CONTROLLER node ══ -->
                         <g id="ha-node-client">
-                            <rect x="50" y="82" width="143" height="100" rx="8"
+                            <rect x="50" y="97" width="143" height="100" rx="8"
                                   fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
-                            <text x="121" y="100" text-anchor="middle"
+                            <text x="121" y="115" text-anchor="middle"
                                   fill="#1e293b" font-size="12" font-weight="700">Lab Controller</text>
-                            <image href="/static/desktop.svg" x="104" y="105" width="34" height="32"/>
-                            <text x="121" y="152" text-anchor="middle"
-                                  fill="#64748b" font-size="10">HTTP monitor</text>
+                            <image href="/static/desktop.svg" x="104" y="120" width="34" height="32"/>
                             <text x="121" y="167" text-anchor="middle"
+                                  fill="#64748b" font-size="10">HTTP monitor</text>
+                            <text x="121" y="182" text-anchor="middle"
                                   fill="#94a3b8" font-size="9">→ app2.radware.lab</text>
-                            <text id="ha-attempt-text" x="121" y="180" text-anchor="middle"
+                            <text id="ha-attempt-text" x="121" y="195" text-anchor="middle"
                                   fill="#94a3b8" font-size="10">—</text>
                         </g>
 
                         <!-- ══ ALTEON 1 — Master ══ -->
                         <g id="ha-node-a1" class="ha-alteon-node" opacity="0.45">
-                            <rect x="280" y="36" width="227" height="66" rx="8"
+                            <rect x="280" y="51" width="227" height="66" rx="8"
                                   fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
-                            <image href="/static/adc.svg" x="285" y="49" width="34" height="34"/>
-                            <text x="373" y="58" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="700">ALTEON 1 — MASTER</text>
-                            <text x="373" y="75" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">10.100.0.51</text>
-                            <text id="ha-a1-role" x="373" y="90" text-anchor="middle" fill="#64748b" font-size="9">Active · HA primary</text>
-                            <rect x="452" y="42" width="46" height="52" rx="6" fill="#3b82f6" opacity="0.9"/>
-                            <text id="ha-count-a1" x="475" y="64" text-anchor="middle"
+                            <image href="/static/adc.svg" x="285" y="64" width="34" height="34"/>
+                            <text x="373" y="73" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="700">ALTEON 1 — MASTER</text>
+                            <text x="373" y="90" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">10.100.0.51</text>
+                            <text id="ha-a1-role" x="373" y="105" text-anchor="middle" fill="#64748b" font-size="9">Active · HA primary</text>
+                            <rect x="452" y="57" width="46" height="52" rx="6" fill="#3b82f6" opacity="0.9"/>
+                            <text id="ha-count-a1" x="475" y="79" text-anchor="middle"
                                   fill="#fff" font-size="15" font-weight="700">0×</text>
-                            <text id="ha-pct-a1" x="475" y="81" text-anchor="middle"
+                            <text id="ha-pct-a1" x="475" y="96" text-anchor="middle"
                                   fill="#dbeafe" font-size="10">—</text>
                         </g>
 
                         <!-- ══ ALTEON 2 — Backup ══ -->
                         <g id="ha-node-a2" class="ha-alteon-node" opacity="0.45">
-                            <rect x="280" y="168" width="227" height="66" rx="8"
+                            <rect x="280" y="183" width="227" height="66" rx="8"
                                   fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
-                            <image href="/static/adc.svg" x="285" y="181" width="34" height="34"/>
-                            <text x="373" y="190" text-anchor="middle" fill="#b45309" font-size="10" font-weight="700">ALTEON 2 — BACKUP</text>
-                            <text x="373" y="207" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">10.100.0.52</text>
-                            <text id="ha-a2-role" x="373" y="222" text-anchor="middle" fill="#64748b" font-size="9">Standby · HA secondary</text>
-                            <rect x="452" y="174" width="46" height="52" rx="6" fill="#f59e0b" opacity="0.9"/>
-                            <text id="ha-count-a2" x="475" y="196" text-anchor="middle"
+                            <image href="/static/adc.svg" x="285" y="196" width="34" height="34"/>
+                            <text x="373" y="205" text-anchor="middle" fill="#b45309" font-size="10" font-weight="700">ALTEON 2 — BACKUP</text>
+                            <text x="373" y="222" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">10.100.0.52</text>
+                            <text id="ha-a2-role" x="373" y="237" text-anchor="middle" fill="#64748b" font-size="9">Standby · HA secondary</text>
+                            <rect x="452" y="189" width="46" height="52" rx="6" fill="#f59e0b" opacity="0.9"/>
+                            <text id="ha-count-a2" x="475" y="211" text-anchor="middle"
                                   fill="#fff" font-size="15" font-weight="700">0×</text>
-                            <text id="ha-pct-a2" x="475" y="213" text-anchor="middle"
+                            <text id="ha-pct-a2" x="475" y="228" text-anchor="middle"
                                   fill="#fef3c7" font-size="10">—</text>
                         </g>
 
                         <!-- ══ WEBAPP SERVERS ══ -->
                         <g id="ha-node-srv">
-                            <rect x="600" y="82" width="240" height="120" rx="8"
+                            <rect x="600" y="97" width="240" height="120" rx="8"
                                   fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
-                            <text x="720" y="105" text-anchor="middle" fill="#047857" font-size="10" font-weight="700">WEBAPP SERVERS</text>
-                            <image href="/static/server.svg" x="703" y="110" width="34" height="34"/>
-                            <text x="720" y="158" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">app2.radware.lab</text>
-                            <text x="720" y="173" text-anchor="middle" fill="#64748b" font-size="9">10.100.0.10–15 (Site A)</text>
-                            <text id="ha-srv-status" x="720" y="188" text-anchor="middle" fill="#94a3b8" font-size="10">—</text>
+                            <text x="720" y="120" text-anchor="middle" fill="#047857" font-size="10" font-weight="700">WEBAPP SERVERS</text>
+                            <image href="/static/server.svg" x="703" y="125" width="34" height="34"/>
+                            <text x="720" y="173" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">app2.radware.lab</text>
+                            <text x="720" y="188" text-anchor="middle" fill="#64748b" font-size="9">10.100.0.10–15 (Site A)</text>
+                            <text id="ha-srv-status" x="720" y="203" text-anchor="middle" fill="#94a3b8" font-size="10">—</text>
                         </g>
 
                         <!-- ══ HA SYNC indicator (between Alteons) ══ -->
-                        <line x1="393" y1="102" x2="393" y2="168"
+                        <line x1="393" y1="117" x2="393" y2="183"
                               stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="4 3"/>
-                        <text x="407" y="140" fill="#cbd5e1" font-size="9" font-weight="600">HA</text>
+                        <text x="407" y="155" fill="#cbd5e1" font-size="9" font-weight="600">HA</text>
                     </svg>
 
                     <!-- Status + history strip -->
