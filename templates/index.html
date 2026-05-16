@@ -1241,6 +1241,21 @@
             <section id="scenario-offloading" class="content-section">
                 <h1><i class="bi bi-layers headline-icon"></i>Scenario 2 &#x2014; Content Offloading</h1>
 
+                <div class="panel">
+                    <h3><i class="bi bi-play-fill headline-icon"></i>Send Request via Alteon</h3>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" id="off-load-btn" onclick="loadOffloadingDemo()">
+                            <i class="bi bi-play-fill"></i> Load Page via Alteon
+                        </button>
+                        <button class="btn btn-secondary" onclick="window.open('https://scenario2.radware.lab/index.php','_blank','noopener,noreferrer')">
+                            <i class="bi bi-box-arrow-up-right"></i> Open in New Tab
+                        </button>
+                        <button class="btn btn-danger" id="bypass-btn" onclick="loadBypassDemo()">
+                            <i class="bi bi-shield-x"></i> Bypass Alteon (Direct)
+                        </button>
+                    </div>
+                </div>
+
                 <!-- ══ Content Offloading Live Flow Diagram ══ -->
                 <div class="panel" id="off-flow-panel">
                     <button class="diagram-expand-btn" onclick="openDiagramLightbox('off-flow-svg','Live Content-Offloading Flow')" title="Expand"><i class="bi bi-arrows-fullscreen"></i></button>
@@ -1369,23 +1384,6 @@
                     <h3><i class="bi bi-info-circle headline-icon"></i>What is Content Offloading?</h3>
                     <p>Alteon can modify HTTP traffic in transit: <strong>removing sensitive headers from responses</strong>, <strong>stripping strings from the body</strong>, and <strong>injecting new content</strong> &#x2014; all without touching the backend server.</p>
                     <p>Click <strong>Load Page via Alteon</strong> to fetch <strong>https://scenario2.radware.lab/index.php</strong> through Alteon and view the page in the Execution Results pane.</p>
-                    <div class="btn-row">
-                        <button class="btn btn-primary" id="off-load-btn" onclick="loadOffloadingDemo()">
-                            <i class="bi bi-play-fill"></i> Load Page via Alteon
-                        </button>
-                        <button class="btn btn-secondary" onclick="window.open('https://scenario2.radware.lab/index.php','_blank','noopener,noreferrer')">
-                            <i class="bi bi-box-arrow-up-right"></i> Open in New Tab
-                        </button>
-                    </div>
-                </div>
-                <div class="panel">
-                    <h3><i class="bi bi-slash-circle headline-icon"></i>Bypass Alteon &#x2014; Direct Server Access</h3>
-                    <p>Fetch <strong>https://site-a-servers.radware.lab/index.php</strong> <em>directly</em> from the backend server, bypassing Alteon entirely. Compare the raw server response to the Alteon-processed version above to see what content modifications Alteon applied.</p>
-                    <div class="btn-row">
-                        <button class="btn btn-danger" id="bypass-btn" onclick="loadBypassDemo()">
-                            <i class="bi bi-shield-x"></i> Bypass Alteon (Direct)
-                        </button>
-                    </div>
                 </div>
                 <div class="panel">
                     <h3><i class="bi bi-pencil-square headline-icon"></i>Custom Header Injection via Alteon API</h3>
@@ -1432,8 +1430,15 @@
                 <h1><i class="bi bi-signpost-split headline-icon"></i>Scenario 3 &#x2014; Content-Switching</h1>
 
                 <div class="panel">
-                    <h3><i class="bi bi-play-circle headline-icon"></i>Send Request via Alteon</h3>
-                    <p style="font-size:13px;font-weight:600;margin:0 0 6px;color:var(--text-color);">HTTP</p>
+                    <h3><i class="bi bi-info-circle headline-icon"></i>What is Content-Switching?</h3>
+                    <p>Alteon inspects each incoming request and routes it to a <strong>different backend server group</strong> based on the HTTP <strong>Host header</strong>. This allows a single VIP (<code>10.100.4.56</code>) to serve multiple environments simultaneously:</p>
+                    <ul>
+                        <li><strong>scenario3-dev.radware.lab</strong> &rarr; Development backend</li>
+                        <li><strong>scenario3-stg.radware.lab</strong> &rarr; Staging backend</li>
+                        <li><strong>scenario3.radware.lab</strong> &rarr; Production backend</li>
+                    </ul>
+                    <p>Click any button below to send a real request through the Alteon VIP with the corresponding Host header and view the page served by that environment in the Execution Results pane.</p>
+                    <p style="font-size:13px;font-weight:600;margin:12px 0 6px;color:var(--text-color);">HTTP</p>
                     <div class="btn-row" style="margin-bottom:16px;">
                         <button class="btn btn-primary" id="cs-dev-btn" onclick="loadContentSwitch('Scenario3-dev.radware.lab','cs-dev-btn','http')">
                             <i class="bi bi-code-slash"></i> DEV &mdash; scenario3-dev.radware.lab
@@ -1457,17 +1462,6 @@
                             <i class="bi bi-shield-lock"></i> PROD &mdash; scenario3.radware.lab
                         </button>
                     </div>
-                </div>
-
-                <div class="panel">
-                    <h3><i class="bi bi-info-circle headline-icon"></i>What is Content-Switching?</h3>
-                    <p>Alteon inspects each incoming request and routes it to a <strong>different backend server group</strong> based on the HTTP <strong>Host header</strong>. This allows a single VIP (<code>10.100.4.56</code>) to serve multiple environments simultaneously:</p>
-                    <ul>
-                        <li><strong>scenario3-dev.radware.lab</strong> &rarr; Development backend</li>
-                        <li><strong>scenario3-stg.radware.lab</strong> &rarr; Staging backend</li>
-                        <li><strong>scenario3.radware.lab</strong> &rarr; Production backend</li>
-                    </ul>
-                    <p>Click any button below to send a real request through the Alteon VIP with the corresponding Host header and view the page served by that environment in the Execution Results pane.</p>
                 </div>
 
                 <!-- ══ Content-Switching Live Flow Diagram ══ -->
