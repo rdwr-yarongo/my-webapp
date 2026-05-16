@@ -1430,6 +1430,35 @@
             </section>
             <section id="scenario-content-switching" class="content-section">
                 <h1><i class="bi bi-signpost-split headline-icon"></i>Scenario 3 &#x2014; Content-Switching</h1>
+
+                <div class="panel">
+                    <h3><i class="bi bi-play-circle headline-icon"></i>Send Request via Alteon</h3>
+                    <p style="font-size:13px;font-weight:600;margin:0 0 6px;color:var(--text-color);">HTTP</p>
+                    <div class="btn-row" style="margin-bottom:16px;">
+                        <button class="btn btn-primary" id="cs-dev-btn" onclick="loadContentSwitch('Scenario3-dev.radware.lab','cs-dev-btn','http')">
+                            <i class="bi bi-code-slash"></i> DEV &mdash; scenario3-dev.radware.lab
+                        </button>
+                        <button class="btn btn-secondary" id="cs-stg-btn" onclick="loadContentSwitch('Scenario3-stg.radware.lab','cs-stg-btn','http')">
+                            <i class="bi bi-layers"></i> STG &mdash; scenario3-stg.radware.lab
+                        </button>
+                        <button class="btn btn-warning" id="cs-prod-btn" onclick="loadContentSwitch('Scenario3.radware.lab','cs-prod-btn','http')">
+                            <i class="bi bi-globe2"></i> PROD &mdash; scenario3.radware.lab
+                        </button>
+                    </div>
+                    <p style="font-size:13px;font-weight:600;margin:0 0 6px;color:var(--text-color);">HTTPS</p>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" id="cs-dev-https-btn" onclick="loadContentSwitch('Scenario3-dev.radware.lab','cs-dev-https-btn','https')">
+                            <i class="bi bi-shield-lock"></i> DEV &mdash; scenario3-dev.radware.lab
+                        </button>
+                        <button class="btn btn-secondary" id="cs-stg-https-btn" onclick="loadContentSwitch('Scenario3-stg.radware.lab','cs-stg-https-btn','https')">
+                            <i class="bi bi-shield-lock"></i> STG &mdash; scenario3-stg.radware.lab
+                        </button>
+                        <button class="btn btn-warning" id="cs-prod-https-btn" onclick="loadContentSwitch('Scenario3.radware.lab','cs-prod-https-btn','https')">
+                            <i class="bi bi-shield-lock"></i> PROD &mdash; scenario3.radware.lab
+                        </button>
+                    </div>
+                </div>
+
                 <div class="panel">
                     <h3><i class="bi bi-info-circle headline-icon"></i>What is Content-Switching?</h3>
                     <p>Alteon inspects each incoming request and routes it to a <strong>different backend server group</strong> based on the HTTP <strong>Host header</strong>. This allows a single VIP (<code>10.100.4.56</code>) to serve multiple environments simultaneously:</p>
@@ -1557,34 +1586,6 @@
                             Click a button below to animate the content-switching flow.
                         </span>
                         <div id="cs-history-strip" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;"></div>
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <h3><i class="bi bi-play-circle headline-icon"></i>Send Request via Alteon</h3>
-                    <p style="font-size:13px;font-weight:600;margin:0 0 6px;color:var(--text-color);">HTTP</p>
-                    <div class="btn-row" style="margin-bottom:16px;">
-                        <button class="btn btn-primary" id="cs-dev-btn" onclick="loadContentSwitch('Scenario3-dev.radware.lab','cs-dev-btn','http')">
-                            <i class="bi bi-code-slash"></i> DEV &mdash; scenario3-dev.radware.lab
-                        </button>
-                        <button class="btn btn-secondary" id="cs-stg-btn" onclick="loadContentSwitch('Scenario3-stg.radware.lab','cs-stg-btn','http')">
-                            <i class="bi bi-layers"></i> STG &mdash; scenario3-stg.radware.lab
-                        </button>
-                        <button class="btn btn-warning" id="cs-prod-btn" onclick="loadContentSwitch('Scenario3.radware.lab','cs-prod-btn','http')">
-                            <i class="bi bi-globe2"></i> PROD &mdash; scenario3.radware.lab
-                        </button>
-                    </div>
-                    <p style="font-size:13px;font-weight:600;margin:0 0 6px;color:var(--text-color);">HTTPS</p>
-                    <div class="btn-row">
-                        <button class="btn btn-primary" id="cs-dev-https-btn" onclick="loadContentSwitch('Scenario3-dev.radware.lab','cs-dev-https-btn','https')">
-                            <i class="bi bi-shield-lock"></i> DEV &mdash; scenario3-dev.radware.lab
-                        </button>
-                        <button class="btn btn-secondary" id="cs-stg-https-btn" onclick="loadContentSwitch('Scenario3-stg.radware.lab','cs-stg-https-btn','https')">
-                            <i class="bi bi-shield-lock"></i> STG &mdash; scenario3-stg.radware.lab
-                        </button>
-                        <button class="btn btn-warning" id="cs-prod-https-btn" onclick="loadContentSwitch('Scenario3.radware.lab','cs-prod-https-btn','https')">
-                            <i class="bi bi-shield-lock"></i> PROD &mdash; scenario3.radware.lab
-                        </button>
                     </div>
                 </div>
 
