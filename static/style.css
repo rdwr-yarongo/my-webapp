@@ -1696,6 +1696,7 @@ h1 .headline-icon {
     min-width: 540px;
     display: flex;
     flex-direction: column;
+    height: calc(100vh - 44px) !important; /* leave room for health bar */
 }
 .terminal-drawer-header {
     background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%) !important;
