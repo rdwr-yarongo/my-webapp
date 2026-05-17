@@ -1053,7 +1053,7 @@ _terminal_sessions = {}
 @socketio.on('terminal_connect')
 def handle_terminal_connect(data):
     host = data.get('host', '')
-    initial_cmd = data.get('initialCmd', '')
+    initial_cmd = data.get('initialCmd', [])
 
     if host not in TERMINAL_HOSTS:
         emit('terminal_output', '\r\n\x1b[31mError: Host not allowed.\x1b[0m\r\n')
@@ -1102,12 +1102,14 @@ def handle_terminal_connect(data):
     reader = threading.Thread(target=read_output, daemon=True)
     reader.start()
 
-    # Answer the login confirmation prompt, then send the initial command
+    # Answer the login confirmation prompt, then send initial commands
     time.sleep(1.5)
     channel.send('y\n')
     if initial_cmd:
-        time.sleep(1.5)
-        channel.send(initial_cmd + '\n')
+        cmds = initial_cmd if isinstance(initial_cmd, list) else [initial_cmd]
+        for cmd in cmds:
+            time.sleep(1.5)
+            channel.send(cmd + '\n')
 
 
 @socketio.on('terminal_input')

@@ -2271,7 +2271,7 @@ function openTerminal(host, initialCmd) {
 
     _termSocket.on('connect', function() {
         _xterm.writeln('\x1b[36mConnecting to ' + host + '...\x1b[0m');
-        _termSocket.emit('terminal_connect', { host: host, initialCmd: initialCmd || '' });
+        _termSocket.emit('terminal_connect', { host: host, initialCmd: initialCmd || [] });
     });
 
     _termSocket.on('terminal_output', function(data) {
