@@ -1937,35 +1937,5 @@
         <div class="diagram-lightbox-body" id="diagram-lightbox-body"></div>
     </div>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
-    <script>
-    // Animated favicon — matches the sidebar spin3d effect
-    (function() {
-        var canvas = document.createElement('canvas');
-        canvas.width = 32; canvas.height = 32;
-        var ctx = canvas.getContext('2d');
-        var img = new Image();
-        img.src = "{{ url_for('static', filename='favicon-32x32.png') }}";
-        var link = document.querySelector("link[rel='icon'][sizes='32x32']") ||
-                   document.querySelector("link[rel='icon']");
-        var CYCLE = 15000, SPIN = 0.07;
-        function draw(t) {
-            var p = (t % CYCLE) / CYCLE;
-            var scaleX = 1;
-            if (p < SPIN) {
-                var angle = (p / SPIN) * Math.PI * 2;
-                scaleX = Math.cos(angle);
-            }
-            ctx.clearRect(0, 0, 32, 32);
-            ctx.save();
-            ctx.translate(16, 0);
-            ctx.scale(Math.abs(scaleX) < 0.05 ? 0.05 : scaleX, 1);
-            ctx.drawImage(img, -16, 0, 32, 32);
-            ctx.restore();
-            link.href = canvas.toDataURL('image/png');
-            requestAnimationFrame(draw);
-        }
-        img.onload = function() { requestAnimationFrame(draw); };
-    })();
-    </script>
 </body>
 </html>
