@@ -538,21 +538,23 @@ p + svg {
     color: #1e293b;
 }
 .results-mini-stop {
-    width: 36px;
-    height: 36px;
+    width: auto;
+    height: auto;
     border: none;
-    background: #fee2e2;
-    color: #dc2626;
-    font-size: 16px;
+    background: #e02424;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 6px;
     display: none;
     align-items: center;
     justify-content: center;
+    padding: 6px 14px;
     transition: all 0.15s;
 }
 .results-mini-stop:hover {
-    background: #dc2626;
+    background: #b91c1c;
     color: #fff;
 }
 .results-mini-stop.visible {
