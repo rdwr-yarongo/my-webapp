@@ -1063,22 +1063,81 @@ function resetHttpFlow() {
 }
 // ─────────────────────────────────────────────────────────
 
+// ─── GSLB Summary Table ─────────────────────────────────
+var _gslbResults = [];
+var _gslbSelectedIdx = -1;
+
+function renderGslbSummaryShell() {
+    var rc = document.getElementById('results-content');
+    rc.innerHTML = '<div class="panel">' +
+        '<h3>Round Robin Global Load Balancing — Live</h3>' +
+        '<p><strong>Target:</strong> app1.radware.lab &nbsp;|&nbsp; <strong>DNS:</strong> 10.100.1.30</p>' +
+        '<span id="gslb-live-indicator" style="display:inline-block;padding:2px 8px;background:#28a745;color:#fff;border-radius:4px;font-size:12px;font-weight:600;">&#9679; LIVE</span>' +
+        '<span class="gslb-attempt-counter" id="gslb-attempt-counter"></span>' +
+        '</div>' +
+        '<table class="gslb-summary-table"><thead><tr>' +
+        '<th>#</th><th>Status</th><th>Resolved IP</th><th>WAN Link</th><th>Server</th><th>Time</th>' +
+        '</tr></thead><tbody id="gslb-summary-body"></tbody></table>' +
+        '<div id="gslb-detail-view"></div>';
+}
+
+function addGslbSummaryRow(result) {
+    var idx = _gslbResults.length;
+    _gslbResults.push(result);
+    var tbody = document.getElementById('gslb-summary-body');
+    if (!tbody) return;
+    var isError = !!(result.dns_error || result.http_error);
+    var tr = document.createElement('tr');
+    tr.dataset.idx = idx;
+    tr.onclick = function() { selectGslbRow(parseInt(this.dataset.idx)); };
+    var statusDot = '<span class="status-dot ' + (isError ? 'fail' : 'ok') + '"></span>';
+    var ip = escapeHtml(result.target_ip || result.dns_error || 'n/a');
+    var wanlink = result.wanlink ? '<span class="wanlink-badge">' + escapeHtml(result.wanlink) + '</span>' : '—';
+    var server = (result.served_by || result.server_name) ? '<span class="server-badge">' + escapeHtml(result.served_by || result.server_name) + '</span>' : '—';
+    var time = formatTimestamp(result.timestamp);
+    tr.innerHTML = '<td><strong>' + result.attempt + '</strong></td>' +
+        '<td>' + statusDot + '</td>' +
+        '<td>' + ip + '</td>' +
+        '<td>' + wanlink + '</td>' +
+        '<td>' + server + '</td>' +
+        '<td style="font-size:11px;color:#94a3b8;">' + time + '</td>';
+    tbody.appendChild(tr);
+    // Update counter
+    var counter = document.getElementById('gslb-attempt-counter');
+    if (counter) counter.textContent = 'Attempt ' + _gslbResults.length + ' / 10';
+    // Auto-select this latest row
+    selectGslbRow(idx);
+}
+
+function selectGslbRow(idx) {
+    if (idx < 0 || idx >= _gslbResults.length) return;
+    _gslbSelectedIdx = idx;
+    // Highlight row
+    var tbody = document.getElementById('gslb-summary-body');
+    if (tbody) {
+        var rows = tbody.querySelectorAll('tr');
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].classList.toggle('selected', parseInt(rows[i].dataset.idx) === idx);
+        }
+    }
+    // Render detail
+    var detail = document.getElementById('gslb-detail-view');
+    if (!detail) return;
+    detail.innerHTML = '';
+    var panel = buildTrafficPanel(_gslbResults[idx], { titlePrefix: 'Attempt' });
+    detail.appendChild(panel);
+}
+
 function startGslbStream() {
     stopHaStream();
     stopGslbStream();
     clearMiniSidebar();
+    _gslbResults = [];
+    _gslbSelectedIdx = -1;
     initGslbDiagram();
     initGslbDnsFlow();
     initHttpFlow();
-    const resultsContent = document.getElementById('results-content');
-    resultsContent.innerHTML = `
-        <div class="panel">
-            <h3>Round Robin Global Load Balancing — Live</h3>
-            <p><strong>Target:</strong> app1.radware.lab &nbsp;|&nbsp; <strong>DNS:</strong> 10.100.1.30</p>
-            <span id="gslb-live-indicator" style="display:inline-block;padding:2px 8px;background:#28a745;color:#fff;border-radius:4px;font-size:12px;font-weight:600;">&#9679; LIVE</span>
-        </div>
-        <div id="gslb-attempts"></div>
-    `;
+    renderGslbSummaryShell();
 
     ensureResultsActionButton('gslb-stop-btn', 'Stop', stopGslbStream);
     showMiniStopButton();
@@ -1094,12 +1153,11 @@ function startGslbStream() {
                 indicator.textContent = '\u25CF COMPLETED';
                 indicator.id = '';
             }
+            var counter = document.getElementById('gslb-attempt-counter');
+            if (counter) counter.textContent = 'Completed — ' + _gslbResults.length + ' attempts';
             return;
         }
-        const attemptsDiv = document.getElementById('gslb-attempts');
-        if (!attemptsDiv) return;
-        const panel = buildTrafficPanel(result, { titlePrefix: 'Attempt' });
-        attemptsDiv.insertBefore(panel, attemptsDiv.firstChild);
+        addGslbSummaryRow(result);
         updateMiniSidebar(result.attempt, result.dns_error || result.http_error ? 'error' : 'success', result.wanlink || '', result.served_by || '');
         updateGslbDiagram(result);
         updateGslbDnsFlow(result);

@@ -946,6 +946,82 @@ svg {
     margin-bottom: var(--spacing-4);
 }
 
+/* ── GSLB Summary Table ── */
+.gslb-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+.gslb-summary-table thead th {
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    border-bottom: 2px solid #e2e8f0;
+    white-space: nowrap;
+}
+.gslb-summary-table tbody tr {
+    cursor: pointer;
+    transition: background 0.1s;
+    border-bottom: 1px solid #f1f5f9;
+}
+.gslb-summary-table tbody tr:hover {
+    background: #f1f5f9;
+}
+.gslb-summary-table tbody tr.selected {
+    background: #eff6ff;
+    border-left: 3px solid #3b82f6;
+}
+.gslb-summary-table tbody td {
+    padding: 7px 10px;
+    vertical-align: middle;
+}
+.gslb-summary-table .status-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+.gslb-summary-table .status-dot.ok     { background: #22c55e; }
+.gslb-summary-table .status-dot.fail   { background: #ef4444; }
+.gslb-summary-table .wanlink-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #fef3c7;
+    color: #92400e;
+    white-space: nowrap;
+}
+.gslb-summary-table .server-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #d1fae5;
+    color: #065f46;
+    white-space: nowrap;
+}
+#gslb-detail-view {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 12px;
+    margin-top: 4px;
+}
+.gslb-attempt-counter {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    float: right;
+    margin-top: 2px;
+}
+
 .form-group {
     margin-bottom: var(--spacing-16);
 }
