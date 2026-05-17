@@ -1102,6 +1102,9 @@ def handle_terminal_connect(data):
     reader = threading.Thread(target=read_output, daemon=True)
     reader.start()
 
+    # Answer the login confirmation prompt, then send the initial command
+    time.sleep(1.5)
+    channel.send('y\n')
     if initial_cmd:
         time.sleep(1.5)
         channel.send(initial_cmd + '\n')
