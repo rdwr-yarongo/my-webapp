@@ -278,18 +278,19 @@ function toggleResultsSidebar() {
 }
 
 /* Update the mini sidebar strip with latest attempt results */
-function updateMiniSidebar(attemptNum, status) {
+function updateMiniSidebar(attemptNum, status, wanlink, servedBy) {
     var container = document.getElementById('results-mini-items');
     if (!container) return;
     var dotClass = 'mini-dot';
     if (status === 'success') dotClass += ' success';
     else if (status === 'error') dotClass += ' error';
-    // prepend newest at top
+    var badges = '';
+    if (wanlink) badges += '<span class="mini-badge wanlink">' + wanlink + '</span>';
+    if (servedBy) badges += '<span class="mini-badge served">' + servedBy + '</span>';
     var item = document.createElement('div');
     item.className = 'results-mini-attempt';
-    item.innerHTML = '<span class="' + dotClass + '"></span><span class="mini-num">#' + attemptNum + '</span>';
+    item.innerHTML = '<span class="' + dotClass + '"></span><span class="mini-num">#' + attemptNum + '</span>' + badges;
     container.insertBefore(item, container.firstChild);
-    // keep max 20 items
     while (container.children.length > 20) container.removeChild(container.lastChild);
 }
 
@@ -1072,7 +1073,7 @@ function startGslbStream() {
         if (!attemptsDiv) return;
         const panel = buildTrafficPanel(result, { titlePrefix: 'Attempt' });
         attemptsDiv.insertBefore(panel, attemptsDiv.firstChild);
-        updateMiniSidebar(result.attempt, result.dns_error || result.http_error ? 'error' : 'success');
+        updateMiniSidebar(result.attempt, result.dns_error || result.http_error ? 'error' : 'success', result.wanlink || '', result.served_by || '');
         updateGslbDiagram(result);
         updateGslbDnsFlow(result);
         updateHttpFlow(result);
@@ -1699,7 +1700,7 @@ function startHaScenario() {
             if (!attemptsDiv) return;
             const panel = buildTrafficPanel(result, { titlePrefix: 'HA Attempt' });
             attemptsDiv.insertBefore(panel, attemptsDiv.firstChild);
-            updateMiniSidebar(result.attempt, result.dns_error || result.http_error ? 'error' : 'success');
+            updateMiniSidebar(result.attempt, result.dns_error || result.http_error ? 'error' : 'success', result.wanlink || '', result.served_by || '');
         };
 
         haEventSource.onerror = function() {
