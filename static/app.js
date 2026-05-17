@@ -1086,6 +1086,16 @@ function startGslbStream() {
 
     gslbEventSource.onmessage = function(event) {
         const result = JSON.parse(event.data);
+        if (result.done) {
+            stopGslbStream();
+            const indicator = document.getElementById('gslb-live-indicator');
+            if (indicator) {
+                indicator.style.background = '#6c757d';
+                indicator.textContent = '\u25CF COMPLETED';
+                indicator.id = '';
+            }
+            return;
+        }
         const attemptsDiv = document.getElementById('gslb-attempts');
         if (!attemptsDiv) return;
         const panel = buildTrafficPanel(result, { titlePrefix: 'Attempt' });

@@ -503,12 +503,14 @@ def offloading_bypass():
 
 @app.route('/api/scenario/gslb_rr/stream')
 def gslb_rr_stream():
+    max_attempts = request.args.get('max', 5, type=int)
     def generate():
         attempt = 0
-        while True:
+        while attempt < max_attempts:
             attempt += 1
             yield f"data: {json.dumps(fetch_target_attempt(attempt, GSLB_TARGET_HOST))}\n\n"
             time.sleep(3)
+        yield f"data: {json.dumps({'done': True, 'total': attempt})}\n\n"
 
     return Response(
         stream_with_context(generate()),
