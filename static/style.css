@@ -537,6 +537,27 @@ p + svg {
     background: #e2e8f0;
     color: #1e293b;
 }
+.results-mini-stop {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+.results-mini-stop:hover {
+    background: #dc2626;
+    color: #fff;
+}
+.results-mini-stop.visible {
+    display: flex;
+}
 .results-mini-label {
     writing-mode: vertical-lr;
     text-orientation: mixed;
@@ -581,16 +602,16 @@ p + svg {
 /* Collapse toggle — centered edge handle */
 .results-collapse-btn {
     position: absolute;
-    left: -16px;
+    left: -28px;
     top: 50%;
     transform: translateY(-50%);
-    width: 16px;
+    width: 28px;
     height: 56px;
     border: 1px solid #d1d5db;
     border-right: none;
     background: #f1f5f9;
     color: #64748b;
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
     border-radius: 8px 0 0 8px;
     display: flex;
@@ -603,11 +624,11 @@ p + svg {
 .results-collapse-btn:hover {
     background: #e2e8f0;
     color: #1e293b;
-    width: 20px;
-    left: -20px;
+    width: 32px;
+    left: -32px;
 }
 .results-sidebar.compact .results-collapse-btn {
-    left: -16px;
+    left: -28px;
 }
 
 /* Mini attempt badge row */

@@ -263,6 +263,20 @@ function removeResultsActionButton(buttonId) {
     }
 }
 
+/* ── Mini sidebar stop button helpers ── */
+function showMiniStopButton() {
+    var btn = document.getElementById('results-mini-stop-btn');
+    if (btn) btn.classList.add('visible');
+}
+function hideMiniStopButton() {
+    var btn = document.getElementById('results-mini-stop-btn');
+    if (btn) btn.classList.remove('visible');
+}
+function stopCurrentScenario() {
+    if (gslbEventSource) stopGslbStream();
+    if (haEventSource) stopHaStream();
+}
+
 /* ── Results Sidebar: toggle expanded ↔ compact ── */
 function toggleResultsSidebar() {
     var sidebar = document.getElementById('results-sidebar');
@@ -341,6 +355,7 @@ function stopGslbStream() {
         gslbEventSource = null;
     }
     removeResultsActionButton('gslb-stop-btn');
+    hideMiniStopButton();
     resetGslbDiagram();
     resetGslbDnsFlow();
     resetHttpFlow();
@@ -358,6 +373,7 @@ function stopHaStream() {
         haEventSource = null;
     }
     removeResultsActionButton('ha-stop-btn');
+    hideMiniStopButton();
     resetHaDiagram();
 }
 
@@ -1065,6 +1081,7 @@ function startGslbStream() {
     `;
 
     ensureResultsActionButton('gslb-stop-btn', 'Stop', stopGslbStream);
+    showMiniStopButton();
     gslbEventSource = new EventSource('/api/scenario/gslb_rr/stream');
 
     gslbEventSource.onmessage = function(event) {
@@ -1690,6 +1707,7 @@ function startHaScenario() {
 
         renderHaShell();
         ensureResultsActionButton('ha-stop-btn', 'Stop', stopHaStream);
+        showMiniStopButton();
         initHaDiagram();
         haEventSource = new EventSource('/api/scenario/ha_failover/stream');
 
