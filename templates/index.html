@@ -1901,9 +1901,15 @@
         <aside id="results-sidebar" class="results-sidebar" style="display:none">
             <div class="results-sidebar-header">
                 <h2><i class="bi bi-bar-chart-line"></i> Execution Results</h2>
+                <button class="results-collapse-btn" onclick="toggleResultsSidebar()" title="Collapse panel"><i class="bi bi-chevron-right"></i></button>
             </div>
             <div id="results-content" class="results-content">
                 <p>No results yet. Execute a scenario to see results here.</p>
+            </div>
+            <div class="results-mini-content" id="results-mini-content">
+                <button class="results-mini-toggle" onclick="toggleResultsSidebar()" title="Expand results"><i class="bi bi-chevron-left"></i></button>
+                <span class="results-mini-label">Results</span>
+                <div id="results-mini-items"></div>
             </div>
         </aside>
     </div>

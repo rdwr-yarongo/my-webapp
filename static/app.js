@@ -66,7 +66,19 @@ function switchSection(section) {
         setTimeout(function() { sec.classList.remove('scroll-pulse'); }, 2000);
     }
     const sidebar = document.getElementById('results-sidebar');
-    if (sidebar) sidebar.style.display = (section === 'home') ? 'none' : '';
+    if (sidebar) {
+        if (section === 'home') {
+            sidebar.style.display = 'none';
+        } else {
+            sidebar.style.display = '';
+            if (!sidebar.dataset.userState) sidebar.dataset.userState = 'compact';
+            if (sidebar.dataset.userState === 'compact') {
+                sidebar.classList.add('compact');
+            } else {
+                sidebar.classList.remove('compact');
+            }
+        }
+    }
     const resultsContent = document.getElementById('results-content');
     if (resultsContent && section === 'scenario-http2-gateway') {
         resultsContent.innerHTML = '<p>Click <strong>Send HTTPS Request</strong> to load the page via Alteon HTTP/2 gateway.</p>';
@@ -249,6 +261,41 @@ function removeResultsActionButton(buttonId) {
     if (button) {
         button.remove();
     }
+}
+
+/* ── Results Sidebar: toggle expanded ↔ compact ── */
+function toggleResultsSidebar() {
+    var sidebar = document.getElementById('results-sidebar');
+    if (!sidebar) return;
+    var isCompact = sidebar.classList.contains('compact');
+    if (isCompact) {
+        sidebar.classList.remove('compact');
+        sidebar.dataset.userState = 'expanded';
+    } else {
+        sidebar.classList.add('compact');
+        sidebar.dataset.userState = 'compact';
+    }
+}
+
+/* Update the mini sidebar strip with latest attempt results */
+function updateMiniSidebar(attemptNum, status) {
+    var container = document.getElementById('results-mini-items');
+    if (!container) return;
+    var dotClass = 'mini-dot';
+    if (status === 'success') dotClass += ' success';
+    else if (status === 'error') dotClass += ' error';
+    // prepend newest at top
+    var item = document.createElement('div');
+    item.className = 'results-mini-attempt';
+    item.innerHTML = '<span class="' + dotClass + '"></span><span class="mini-num">#' + attemptNum + '</span>';
+    container.insertBefore(item, container.firstChild);
+    // keep max 20 items
+    while (container.children.length > 20) container.removeChild(container.lastChild);
+}
+
+function clearMiniSidebar() {
+    var container = document.getElementById('results-mini-items');
+    if (container) container.innerHTML = '';
 }
 
 // DNS Lookup
@@ -1002,6 +1049,7 @@ function resetHttpFlow() {
 function startGslbStream() {
     stopHaStream();
     stopGslbStream();
+    clearMiniSidebar();
     initGslbDiagram();
     initGslbDnsFlow();
     initHttpFlow();
@@ -1024,6 +1072,7 @@ function startGslbStream() {
         if (!attemptsDiv) return;
         const panel = buildTrafficPanel(result, { titlePrefix: 'Attempt' });
         attemptsDiv.insertBefore(panel, attemptsDiv.firstChild);
+        updateMiniSidebar(result.attempt, result.dns_error || result.http_error ? 'error' : 'success');
         updateGslbDiagram(result);
         updateGslbDnsFlow(result);
         updateHttpFlow(result);
@@ -1627,6 +1676,7 @@ function hideAlteonWebUI() {
 function startHaScenario() {
     stopGslbStream();
     stopHaStream();
+    clearMiniSidebar();
 
     fetch('/api/scenario/ha_failover/start', {
         method: 'POST'
@@ -1649,6 +1699,7 @@ function startHaScenario() {
             if (!attemptsDiv) return;
             const panel = buildTrafficPanel(result, { titlePrefix: 'HA Attempt' });
             attemptsDiv.insertBefore(panel, attemptsDiv.firstChild);
+            updateMiniSidebar(result.attempt, result.dns_error || result.http_error ? 'error' : 'success');
         };
 
         haEventSource.onerror = function() {
