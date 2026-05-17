@@ -503,7 +503,7 @@ def offloading_bypass():
 
 @app.route('/api/scenario/gslb_rr/stream')
 def gslb_rr_stream():
-    max_attempts = request.args.get('max', 5, type=int)
+    max_attempts = request.args.get('max', 10, type=int)
     def generate():
         attempt = 0
         while attempt < max_attempts:
