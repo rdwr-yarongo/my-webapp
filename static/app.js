@@ -1287,6 +1287,8 @@ function renderRedirectTrace(data) {
         return;
     }
 
+    window._lastTcpdumpData = data;
+
     const httpExchange = (data.http_exchange_lines || []).map(line => escapeHtml(line)).join('\n');
     const packetTrace = (data.packet_trace_lines || []).map(line => escapeHtml(line)).join('\n');
 
@@ -1308,7 +1310,38 @@ function renderRedirectTrace(data) {
                 <pre class="trace-block">${packetTrace || escapeHtml(data.packet_capture_error || 'No packet trace captured.')}</pre>
             </div>
         </div>
+        <button class="btn btn-info" onclick="downloadTcpdump()" style="margin-top:10px;"><i class="bi bi-download"></i> Download TCPDump</button>
     `;
+}
+
+function downloadTcpdump() {
+    var data = window._lastTcpdumpData;
+    if (!data) return;
+    var lines = [];
+    lines.push('=== TCPDump Capture Report ===');
+    lines.push('Date: ' + new Date().toLocaleString());
+    lines.push('Target: ' + (data.target_host || ''));
+    lines.push('Resolved IP: ' + (data.target_ip || ''));
+    lines.push('Source URL: ' + (data.source_url || ''));
+    lines.push('Redirect Status: ' + (data.redirect_status_code || ''));
+    lines.push('Location: ' + (data.redirect_location || ''));
+    lines.push('Destination URL: ' + (data.destination_url || ''));
+    lines.push('Final Status: ' + (data.final_status_code || ''));
+    lines.push('');
+    lines.push('=== HTTP Exchange ===');
+    (data.http_exchange_lines || []).forEach(function(l) { lines.push(l); });
+    lines.push('');
+    lines.push('=== Packet Trace ===');
+    (data.packet_trace_lines || []).forEach(function(l) { lines.push(l); });
+    var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'tcpdump_' + new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19) + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 /* ═══════════════════════════════════════════════════════════
