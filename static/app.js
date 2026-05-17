@@ -2176,6 +2176,395 @@ function updateH2Flow(data) {
     if (vipEl) { vipEl.setAttribute('opacity','1'); vipEl.style.filter = 'drop-shadow(0 0 8px #3b82f6)'; }
     var beEl = document.getElementById('h2-node-backend');
     if (beEl) { beEl.setAttribute('opacity','1'); beEl.style.filter = 'drop-shadow(0 0 8px #f59e0b)'; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   Annotation / Drawing Overlay
+   ═══════════════════════════════════════════════════════ */
+(function() {
+    var canvas = document.getElementById('annotation-canvas');
+    var ctx = canvas.getContext('2d');
+    var toolbar = document.getElementById('annotation-toolbar');
+    var fab = document.getElementById('annotation-fab');
+    var thicknessInput = document.getElementById('ann-thickness');
+    var thicknessPreview = document.getElementById('ann-thickness-preview');
+    var undoBtn = document.getElementById('ann-undo');
+    var redoBtn = document.getElementById('ann-redo');
+    var clearBtn = document.getElementById('ann-clear');
+    var closeBtn = document.getElementById('ann-close');
+
+    var state = {
+        active: false,
+        tool: 'pen',
+        color: '#e02424',
+        thickness: 3,
+        strokes: [],
+        redoStack: [],
+        currentStroke: null,
+        drawing: false
+    };
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        redrawAll();
+    }
+
+    function toggleAnnotation() {
+        state.active = !state.active;
+        canvas.classList.toggle('active', state.active);
+        toolbar.classList.toggle('active', state.active);
+        fab.classList.toggle('active', state.active);
+        updateCursorClass();
+        if (state.active) {
+            resizeCanvas();
+            fab.innerHTML = '<i class="bi bi-x-lg"></i>';
+        } else {
+            fab.innerHTML = '<i class="bi bi-pencil-fill"></i>';
+        }
+    }
+
+    function updateCursorClass() {
+        canvas.classList.remove('eraser-cursor', 'text-cursor');
+        if (state.active) {
+            if (state.tool === 'eraser') canvas.classList.add('eraser-cursor');
+            else if (state.tool === 'text') canvas.classList.add('text-cursor');
+        }
+    }
+
+    function updateThicknessPreview() {
+        var sz = Math.max(4, state.thickness * 2);
+        thicknessPreview.style.width = sz + 'px';
+        thicknessPreview.style.height = sz + 'px';
+        thicknessPreview.style.background = state.color;
+    }
+
+    function updateUndoRedoState() {
+        undoBtn.disabled = state.strokes.length === 0;
+        redoBtn.disabled = state.redoStack.length === 0;
+    }
+
+    // ── Drawing engine ──
+    function drawStroke(s) {
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = s.color;
+        ctx.lineWidth = s.thickness;
+
+        if (s.tool === 'highlighter') {
+            ctx.globalAlpha = 0.3;
+            ctx.lineWidth = s.thickness * 5;
+        }
+
+        if (s.tool === 'pen' || s.tool === 'highlighter') {
+            if (s.points.length < 2) { ctx.restore(); return; }
+            ctx.beginPath();
+            ctx.moveTo(s.points[0].x, s.points[0].y);
+            for (var i = 1; i < s.points.length; i++) {
+                ctx.lineTo(s.points[i].x, s.points[i].y);
+            }
+            ctx.stroke();
+        } else if (s.tool === 'line') {
+            ctx.beginPath();
+            ctx.moveTo(s.x1, s.y1);
+            ctx.lineTo(s.x2, s.y2);
+            ctx.stroke();
+        } else if (s.tool === 'arrow') {
+            ctx.beginPath();
+            ctx.moveTo(s.x1, s.y1);
+            ctx.lineTo(s.x2, s.y2);
+            ctx.stroke();
+            // Arrowhead
+            var angle = Math.atan2(s.y2 - s.y1, s.x2 - s.x1);
+            var headLen = Math.max(12, s.thickness * 4);
+            ctx.beginPath();
+            ctx.moveTo(s.x2, s.y2);
+            ctx.lineTo(s.x2 - headLen * Math.cos(angle - Math.PI / 6), s.y2 - headLen * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(s.x2, s.y2);
+            ctx.lineTo(s.x2 - headLen * Math.cos(angle + Math.PI / 6), s.y2 - headLen * Math.sin(angle + Math.PI / 6));
+            ctx.stroke();
+        } else if (s.tool === 'rect') {
+            ctx.strokeRect(s.x, s.y, s.w, s.h);
+        } else if (s.tool === 'circle') {
+            ctx.beginPath();
+            var rx = Math.abs(s.w) / 2, ry = Math.abs(s.h) / 2;
+            var cx = s.x + s.w / 2, cy = s.y + s.h / 2;
+            ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+            ctx.stroke();
+        } else if (s.tool === 'text') {
+            ctx.fillStyle = s.color;
+            ctx.font = 'bold ' + Math.max(16, s.thickness * 5) + 'px "Segoe UI", sans-serif';
+            ctx.fillText(s.text, s.x, s.y);
+        }
+        ctx.restore();
+    }
+
+    function redrawAll() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (var i = 0; i < state.strokes.length; i++) {
+            drawStroke(state.strokes[i]);
+        }
+    }
+
+    function getPos(e) {
+        if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+    }
+
+    function onPointerDown(e) {
+        if (!state.active) return;
+        e.preventDefault();
+        state.drawing = true;
+        var pos = getPos(e);
+
+        if (state.tool === 'text') {
+            var text = prompt('Enter text:');
+            if (text) {
+                state.strokes.push({ tool: 'text', color: state.color, thickness: state.thickness, x: pos.x, y: pos.y, text: text });
+                state.redoStack = [];
+                updateUndoRedoState();
+                redrawAll();
+            }
+            state.drawing = false;
+            return;
+        }
+
+        if (state.tool === 'eraser') {
+            doErase(pos);
+            return;
+        }
+
+        if (state.tool === 'pen' || state.tool === 'highlighter') {
+            state.currentStroke = { tool: state.tool, color: state.color, thickness: state.thickness, points: [pos] };
+        } else {
+            state.currentStroke = { tool: state.tool, color: state.color, thickness: state.thickness, x1: pos.x, y1: pos.y, x2: pos.x, y2: pos.y, x: pos.x, y: pos.y, w: 0, h: 0 };
+        }
+    }
+
+    function onPointerMove(e) {
+        if (!state.active || !state.drawing) return;
+        e.preventDefault();
+        var pos = getPos(e);
+
+        if (state.tool === 'eraser') {
+            doErase(pos);
+            return;
+        }
+
+        if (!state.currentStroke) return;
+
+        if (state.tool === 'pen' || state.tool === 'highlighter') {
+            state.currentStroke.points.push(pos);
+        } else {
+            state.currentStroke.x2 = pos.x;
+            state.currentStroke.y2 = pos.y;
+            state.currentStroke.x = Math.min(state.currentStroke.x1, pos.x);
+            state.currentStroke.y = Math.min(state.currentStroke.y1, pos.y);
+            state.currentStroke.w = Math.abs(pos.x - state.currentStroke.x1);
+            state.currentStroke.h = Math.abs(pos.y - state.currentStroke.y1);
+        }
+
+        // Rubber-band preview
+        redrawAll();
+        drawStroke(state.currentStroke);
+    }
+
+    function onPointerUp(e) {
+        if (!state.active || !state.drawing) return;
+        state.drawing = false;
+        if (state.tool === 'eraser') return;
+        if (!state.currentStroke) return;
+
+        // Only add if the stroke has substance
+        var valid = false;
+        if (state.tool === 'pen' || state.tool === 'highlighter') {
+            valid = state.currentStroke.points.length >= 2;
+        } else {
+            valid = state.currentStroke.w > 2 || state.currentStroke.h > 2 ||
+                    Math.abs(state.currentStroke.x2 - state.currentStroke.x1) > 2 ||
+                    Math.abs(state.currentStroke.y2 - state.currentStroke.y1) > 2;
+        }
+
+        if (valid) {
+            state.strokes.push(state.currentStroke);
+            state.redoStack = [];
+            updateUndoRedoState();
+        }
+        state.currentStroke = null;
+        redrawAll();
+    }
+
+    function doErase(pos) {
+        var eraseRadius = Math.max(12, state.thickness * 3);
+        var changed = false;
+        for (var i = state.strokes.length - 1; i >= 0; i--) {
+            if (hitTest(state.strokes[i], pos, eraseRadius)) {
+                state.strokes.splice(i, 1);
+                changed = true;
+                break; // erase one at a time for precision
+            }
+        }
+        if (changed) {
+            state.redoStack = [];
+            updateUndoRedoState();
+            redrawAll();
+        }
+    }
+
+    function hitTest(s, pos, radius) {
+        if (s.tool === 'pen' || s.tool === 'highlighter') {
+            for (var i = 0; i < s.points.length; i++) {
+                if (dist(s.points[i], pos) < radius) return true;
+            }
+        } else if (s.tool === 'line' || s.tool === 'arrow') {
+            return distToSegment(pos, { x: s.x1, y: s.y1 }, { x: s.x2, y: s.y2 }) < radius;
+        } else if (s.tool === 'rect') {
+            // Check if near any edge
+            var edges = [
+                [{ x: s.x, y: s.y }, { x: s.x + s.w, y: s.y }],
+                [{ x: s.x + s.w, y: s.y }, { x: s.x + s.w, y: s.y + s.h }],
+                [{ x: s.x + s.w, y: s.y + s.h }, { x: s.x, y: s.y + s.h }],
+                [{ x: s.x, y: s.y + s.h }, { x: s.x, y: s.y }]
+            ];
+            for (var i = 0; i < edges.length; i++) {
+                if (distToSegment(pos, edges[i][0], edges[i][1]) < radius) return true;
+            }
+        } else if (s.tool === 'circle') {
+            var cx = s.x + s.w / 2, cy = s.y + s.h / 2;
+            var d = dist(pos, { x: cx, y: cy });
+            var rx = Math.abs(s.w) / 2, ry = Math.abs(s.h) / 2;
+            var avgR = (rx + ry) / 2;
+            if (Math.abs(d - avgR) < radius) return true;
+        } else if (s.tool === 'text') {
+            var textW = ctx.measureText(s.text).width || 100;
+            var fontSize = Math.max(16, s.thickness * 5);
+            if (pos.x >= s.x && pos.x <= s.x + textW && pos.y >= s.y - fontSize && pos.y <= s.y) return true;
+        }
+        return false;
+    }
+
+    function dist(a, b) { return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)); }
+
+    function distToSegment(p, v, w) {
+        var l2 = (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
+        if (l2 === 0) return dist(p, v);
+        var t = Math.max(0, Math.min(1, ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2));
+        return dist(p, { x: v.x + t * (w.x - v.x), y: v.y + t * (w.y - v.y) });
+    }
+
+    // ── Undo / Redo ──
+    function undo() {
+        if (state.strokes.length === 0) return;
+        state.redoStack.push(state.strokes.pop());
+        updateUndoRedoState();
+        redrawAll();
+    }
+    function redo() {
+        if (state.redoStack.length === 0) return;
+        state.strokes.push(state.redoStack.pop());
+        updateUndoRedoState();
+        redrawAll();
+    }
+
+    // ── Event bindings ──
+    fab.addEventListener('click', toggleAnnotation);
+    closeBtn.addEventListener('click', function() { if (state.active) toggleAnnotation(); });
+    undoBtn.addEventListener('click', undo);
+    redoBtn.addEventListener('click', redo);
+    clearBtn.addEventListener('click', function() {
+        if (state.strokes.length === 0) return;
+        state.strokes = [];
+        state.redoStack = [];
+        updateUndoRedoState();
+        redrawAll();
+    });
+
+    // Tool selection
+    toolbar.querySelectorAll('.ann-tool-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            toolbar.querySelectorAll('.ann-tool-btn').forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            state.tool = btn.getAttribute('data-tool');
+            updateCursorClass();
+        });
+    });
+
+    // Color selection
+    toolbar.querySelectorAll('.ann-color-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            toolbar.querySelectorAll('.ann-color-btn').forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            state.color = btn.getAttribute('data-color');
+            updateThicknessPreview();
+        });
+    });
+
+    // Thickness
+    thicknessInput.addEventListener('input', function() {
+        state.thickness = parseInt(this.value, 10);
+        updateThicknessPreview();
+    });
+
+    // Canvas events
+    canvas.addEventListener('mousedown', onPointerDown);
+    canvas.addEventListener('mousemove', onPointerMove);
+    canvas.addEventListener('mouseup', onPointerUp);
+    canvas.addEventListener('mouseleave', onPointerUp);
+    canvas.addEventListener('touchstart', onPointerDown, { passive: false });
+    canvas.addEventListener('touchmove', onPointerMove, { passive: false });
+    canvas.addEventListener('touchend', onPointerUp);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+D — toggle annotation mode
+        if (e.ctrlKey && e.key === 'd') {
+            e.preventDefault();
+            toggleAnnotation();
+            return;
+        }
+        if (!state.active) return;
+        // Escape — exit annotation mode
+        if (e.key === 'Escape') {
+            toggleAnnotation();
+            return;
+        }
+        // Ctrl+Z — undo
+        if (e.ctrlKey && e.key === 'z') {
+            e.preventDefault();
+            undo();
+            return;
+        }
+        // Ctrl+Y — redo
+        if (e.ctrlKey && e.key === 'y') {
+            e.preventDefault();
+            redo();
+            return;
+        }
+        // Tool shortcuts (single letter, no modifiers)
+        if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+            var toolMap = { p: 'pen', h: 'highlighter', l: 'line', a: 'arrow', r: 'rect', c: 'circle', t: 'text', e: 'eraser' };
+            var t = toolMap[e.key.toLowerCase()];
+            if (t) {
+                toolbar.querySelectorAll('.ann-tool-btn').forEach(function(b) { b.classList.remove('active'); });
+                var target = toolbar.querySelector('[data-tool="' + t + '"]');
+                if (target) target.classList.add('active');
+                state.tool = t;
+                updateCursorClass();
+            }
+        }
+    });
+
+    window.addEventListener('resize', function() {
+        if (state.active) resizeCanvas();
+    });
+
+    // Init
+    updateThicknessPreview();
+    updateUndoRedoState();
+})();
 
     // Host label
     var hl = document.getElementById('h2-host-label'); if (hl) { hl.textContent = 'Host: ' + host; hl.setAttribute('fill','#16a34a'); }
