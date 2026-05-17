@@ -1293,6 +1293,7 @@ function renderRedirectTrace(data) {
     const packetTrace = (data.packet_trace_lines || []).map(line => escapeHtml(line)).join('\n');
 
     proof.innerHTML = `
+        <button class="btn btn-info" onclick="downloadTcpdump()" style="margin-bottom:10px;"><i class="bi bi-download"></i> Download TCPDump</button>
         <div class="redirect-proof-grid">
             <div class="status-chip">Source: ${escapeHtml(data.source_url)}</div>
             <div class="status-chip warning">Redirect: ${escapeHtml(data.redirect_status_code)}</div>
@@ -1310,7 +1311,6 @@ function renderRedirectTrace(data) {
                 <pre class="trace-block">${packetTrace || escapeHtml(data.packet_capture_error || 'No packet trace captured.')}</pre>
             </div>
         </div>
-        <button class="btn btn-info" onclick="downloadTcpdump()" style="margin-top:10px;"><i class="bi bi-download"></i> Download TCPDump</button>
     `;
 }
 
