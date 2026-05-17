@@ -1709,7 +1709,7 @@ h1 .headline-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), box-shadow 0.18s ease, background 0.3s ease;
 }
 .annotation-fab:hover {
     transform: scale(1.1);
@@ -1718,6 +1718,7 @@ h1 .headline-icon {
 .annotation-fab.active {
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
     box-shadow: 0 4px 16px rgba(220,38,38,0.35);
+    transform: rotate(90deg);
 }
 
 /* Canvas */
@@ -1726,10 +1727,13 @@ h1 .headline-icon {
     inset: 0;
     z-index: 985;
     pointer-events: none;
-    display: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 .annotation-canvas.active {
-    display: block;
+    opacity: 1;
+    visibility: visible;
     pointer-events: auto;
     cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z' fill='%23e02424'/%3E%3C/svg%3E") 0 24, auto;
 }
@@ -1739,9 +1743,9 @@ h1 .headline-icon {
     position: fixed;
     bottom: 64px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateY(20px);
     z-index: 990;
-    display: none;
+    display: flex;
     align-items: center;
     gap: 6px;
     padding: 8px 14px;
@@ -1751,9 +1755,16 @@ h1 .headline-icon {
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1px 3px rgba(0,0,0,0.08);
     border: 1px solid rgba(0,0,0,0.08);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.4,0,0.2,1), visibility 0.3s ease;
 }
 .annotation-toolbar.active {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
 }
 .annotation-toolbar-group {
     display: flex;
@@ -1873,7 +1884,9 @@ h1 .headline-icon {
 
 /* Hide FAB when toolbar is active */
 .annotation-toolbar.active ~ .annotation-fab {
-    display: none;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.5) rotate(90deg);
 }
 }
 .about-feature-text span {
