@@ -1694,7 +1694,7 @@ h1 .headline-icon {
 /* Floating Action Button */
 .annotation-fab {
     position: fixed;
-    bottom: 28px;
+    bottom: 68px;
     right: 28px;
     z-index: 995;
     width: 52px;
@@ -1737,7 +1737,7 @@ h1 .headline-icon {
 /* Toolbar */
 .annotation-toolbar {
     position: fixed;
-    bottom: 24px;
+    bottom: 64px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 990;
