@@ -1688,6 +1688,71 @@ h1 .headline-icon {
 }
 
 /* ═══════════════════════════════════════════
+   SSH Terminal Drawer
+   ═══════════════════════════════════════════ */
+
+.terminal-drawer {
+    width: 52% !important;
+    min-width: 540px;
+    display: flex;
+    flex-direction: column;
+}
+.terminal-drawer-header {
+    background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%) !important;
+    border-bottom: 1px solid #334155;
+}
+.terminal-drawer-header .drawer-title i {
+    color: #22d3ee;
+}
+.terminal-drawer-header .drawer-device-badge {
+    background: rgba(34,211,238,0.15);
+    color: #22d3ee;
+    border-color: rgba(34,211,238,0.3);
+}
+.terminal-drawer-close {
+    color: #94a3b8 !important;
+}
+.terminal-drawer-close:hover {
+    color: #f87171 !important;
+    background: rgba(248,113,113,0.1) !important;
+}
+#terminal-container {
+    flex: 1;
+    background: #0f172a;
+    padding: 4px;
+    overflow: hidden;
+}
+#terminal-container .xterm {
+    height: 100%;
+}
+.terminal-backdrop {
+    z-index: 898;
+}
+.terminal-drawer {
+    z-index: 908;
+}
+
+/* Terminal button outline style */
+.btn-outline {
+    background: transparent;
+    color: var(--primary-color);
+    border: 1.5px solid var(--primary-color);
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.18s ease;
+}
+.btn-outline:hover {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+/* ═══════════════════════════════════════════
    Annotation / Drawing Overlay
    ═══════════════════════════════════════════ */
 

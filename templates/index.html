@@ -16,6 +16,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css">
 </head>
 <body>
     <div class="app-shell">
@@ -606,6 +607,7 @@
                     </ul>
                     <p>The Execute action performs multiple attempts to app1.radware.lab. Each attempt triggers a DNS decision and then sends HTTP traffic to the selected destination so you can observe GSLB behavior over time.</p>
                     <button class="btn btn-primary" onclick="executeScenario('gslb_rr')">Execute Scenario 1</button>
+                    <button class="btn btn-outline" onclick="openTerminal('10.100.0.51', 'apropos gslb')" style="margin-left:8px;"><i class="bi bi-terminal"></i> SSH Terminal</button>
                 </div>
 
                 <!-- ═══════════════════════════════════════════════════════ -->
@@ -1975,6 +1977,25 @@
     </div>
     <button id="annotation-fab" class="annotation-fab" title="Draw / Annotate (Ctrl+D)"><i class="bi bi-pencil-fill"></i></button>
 
+    <!-- ═══ SSH Terminal Drawer ═══ -->
+    <div id="terminal-drawer-backdrop" class="drawer-backdrop terminal-backdrop"></div>
+    <aside id="terminal-drawer" class="drawer terminal-drawer">
+        <div class="drawer-header terminal-drawer-header">
+            <div class="drawer-title">
+                <i class="bi bi-terminal-fill"></i>
+                <span>SSH Terminal</span>
+                <span class="drawer-device-badge" id="terminal-host-badge"></span>
+            </div>
+            <div class="drawer-actions">
+                <button class="drawer-btn terminal-drawer-close" onclick="closeTerminal()" title="Close"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div id="terminal-container"></div>
+    </aside>
+
+    <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4/dist/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

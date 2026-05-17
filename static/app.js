@@ -2219,6 +2219,116 @@ function updateH2Flow(data) {
 }
 
 /* ═══════════════════════════════════════════════════════
+   SSH Terminal Drawer (xterm.js + Socket.IO + Paramiko)
+   ═══════════════════════════════════════════════════════ */
+var _termSocket = null;
+var _xterm = null;
+var _fitAddon = null;
+
+function openTerminal(host, initialCmd) {
+    var drawer = document.getElementById('terminal-drawer');
+    var backdrop = document.getElementById('terminal-drawer-backdrop');
+    var container = document.getElementById('terminal-container');
+    var badge = document.getElementById('terminal-host-badge');
+
+    if (badge) badge.textContent = host;
+
+    // Clean previous session
+    if (_xterm) { try { _xterm.dispose(); } catch(e){} _xterm = null; }
+    if (_termSocket) { try { _termSocket.disconnect(); } catch(e){} _termSocket = null; }
+    container.innerHTML = '';
+
+    // Open drawer
+    backdrop.classList.add('active');
+    drawer.classList.add('open');
+
+    // Init xterm
+    _xterm = new Terminal({
+        cursorBlink: true,
+        fontSize: 14,
+        fontFamily: "'JetBrains Mono', 'Cascadia Code', 'Fira Code', Menlo, monospace",
+        theme: {
+            background: '#0f172a',
+            foreground: '#e2e8f0',
+            cursor: '#22d3ee',
+            selectionBackground: 'rgba(34,211,238,0.25)'
+        },
+        scrollback: 5000,
+        allowProposedApi: true
+    });
+    _fitAddon = new FitAddon.FitAddon();
+    _xterm.loadAddon(_fitAddon);
+    _xterm.open(container);
+
+    // Small delay to let DOM settle before fitting
+    setTimeout(function() {
+        _fitAddon.fit();
+    }, 100);
+
+    // Socket.IO connection
+    var proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    _termSocket = io.connect(location.origin, { transports: ['websocket'] });
+
+    _termSocket.on('connect', function() {
+        _xterm.writeln('\x1b[36mConnecting to ' + host + '...\x1b[0m');
+        _termSocket.emit('terminal_connect', { host: host, initialCmd: initialCmd || '' });
+    });
+
+    _termSocket.on('terminal_output', function(data) {
+        _xterm.write(data);
+    });
+
+    _termSocket.on('connect_error', function(err) {
+        _xterm.writeln('\x1b[31mWebSocket connection error: ' + err.message + '\x1b[0m');
+    });
+
+    // Send keystrokes
+    _xterm.onData(function(data) {
+        if (_termSocket && _termSocket.connected) {
+            _termSocket.emit('terminal_input', data);
+        }
+    });
+
+    // Handle resize
+    _xterm.onResize(function(size) {
+        if (_termSocket && _termSocket.connected) {
+            _termSocket.emit('terminal_resize', { cols: size.cols, rows: size.rows });
+        }
+    });
+
+    // Refit on window resize
+    window._termResizeHandler = function() {
+        if (_fitAddon && drawer.classList.contains('open')) {
+            _fitAddon.fit();
+        }
+    };
+    window.addEventListener('resize', window._termResizeHandler);
+
+    // Backdrop click closes
+    backdrop.onclick = function() { closeTerminal(); };
+}
+
+function closeTerminal() {
+    var drawer = document.getElementById('terminal-drawer');
+    var backdrop = document.getElementById('terminal-drawer-backdrop');
+
+    drawer.classList.remove('open');
+    backdrop.classList.remove('active');
+
+    if (window._termResizeHandler) {
+        window.removeEventListener('resize', window._termResizeHandler);
+    }
+
+    setTimeout(function() {
+        if (_termSocket) { try { _termSocket.disconnect(); } catch(e){} _termSocket = null; }
+        if (_xterm) { try { _xterm.dispose(); } catch(e){} _xterm = null; }
+        var container = document.getElementById('terminal-container');
+        if (container) container.innerHTML = '';
+    }, 350);
+}
+
+
+/* ═══════════════════════════════════════════════════════
    Annotation / Drawing Overlay
    ═══════════════════════════════════════════════════════ */
 (function() {

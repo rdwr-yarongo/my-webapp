@@ -1,8 +1,10 @@
 from flask import Flask, render_template, request, jsonify, Response, stream_with_context
+from flask_socketio import SocketIO, emit
 import json
 import re
 import subprocess
 import time
+import threading
 from urllib.parse import quote, urljoin
 
 import dns.resolver
@@ -14,6 +16,7 @@ from requests.auth import HTTPBasicAuth
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 app = Flask(__name__)
+socketio = SocketIO(app, async_mode='threading', cors_allowed_origins='*')
 
 GSLB_TARGET_HOST = 'app1.radware.lab'
 HA_TARGET_HOST = 'app2.radware.lab'
@@ -1035,6 +1038,112 @@ def traffic_generator_status():
     return jsonify(result)
 
 
+# ═══════════════════════════════════════════════════════════════
+#  Interactive SSH Terminal (WebSocket via Flask-SocketIO)
+# ═══════════════════════════════════════════════════════════════
+
+TERMINAL_HOSTS = {
+    '10.100.0.51': {'user': 'radware', 'passwords': ['Radware1!', 'radware']},
+    '10.100.0.52': {'user': 'radware', 'passwords': ['Radware1!', 'radware']},
+}
+
+_terminal_sessions = {}
+
+
+@socketio.on('terminal_connect')
+def handle_terminal_connect(data):
+    host = data.get('host', '')
+    initial_cmd = data.get('initialCmd', '')
+
+    if host not in TERMINAL_HOSTS:
+        emit('terminal_output', '\r\n\x1b[31mError: Host not allowed.\x1b[0m\r\n')
+        return
+
+    creds = TERMINAL_HOSTS[host]
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    connected = False
+    for pw in creds['passwords']:
+        try:
+            ssh.connect(host, username=creds['user'], password=pw, timeout=8,
+                        look_for_keys=False, allow_agent=False)
+            connected = True
+            break
+        except paramiko.AuthenticationException:
+            continue
+        except Exception as exc:
+            emit('terminal_output',
+                 f'\r\n\x1b[31mConnection error: {exc}\x1b[0m\r\n')
+            return
+
+    if not connected:
+        emit('terminal_output',
+             '\r\n\x1b[31mAuthentication failed for all credentials.\x1b[0m\r\n')
+        return
+
+    channel = ssh.invoke_shell(term='xterm-256color', width=120, height=40)
+    channel.settimeout(0.1)
+
+    sid = request.sid
+    _terminal_sessions[sid] = {'ssh': ssh, 'channel': channel, 'active': True}
+
+    def read_output():
+        while _terminal_sessions.get(sid, {}).get('active'):
+            try:
+                data = channel.recv(4096)
+                if not data:
+                    break
+                socketio.emit('terminal_output', data.decode('utf-8', errors='replace'), to=sid)
+            except Exception:
+                time.sleep(0.05)
+        socketio.emit('terminal_output', '\r\n\x1b[33m[Session closed]\x1b[0m\r\n', to=sid)
+
+    reader = threading.Thread(target=read_output, daemon=True)
+    reader.start()
+
+    if initial_cmd:
+        time.sleep(1.5)
+        channel.send(initial_cmd + '\n')
+
+
+@socketio.on('terminal_input')
+def handle_terminal_input(data):
+    session = _terminal_sessions.get(request.sid)
+    if session and session['active']:
+        try:
+            session['channel'].send(data)
+        except Exception:
+            pass
+
+
+@socketio.on('terminal_resize')
+def handle_terminal_resize(data):
+    session = _terminal_sessions.get(request.sid)
+    if session and session['active']:
+        try:
+            cols = int(data.get('cols', 120))
+            rows = int(data.get('rows', 40))
+            session['channel'].resize_pty(width=cols, height=rows)
+        except Exception:
+            pass
+
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    session = _terminal_sessions.pop(request.sid, None)
+    if session:
+        session['active'] = False
+        try:
+            session['channel'].close()
+        except Exception:
+            pass
+        try:
+            session['ssh'].close()
+        except Exception:
+            pass
+
+
 if __name__ == '__main__':
     import ssl as _ssl_mod
     import threading as _threading
@@ -1047,8 +1156,10 @@ if __name__ == '__main__':
     )
 
     def _run_http():
-        app.run(host='0.0.0.0', port=5000, use_reloader=False, debug=False)
+        socketio.run(app, host='0.0.0.0', port=5000, use_reloader=False,
+                     debug=False, allow_unsafe_werkzeug=True)
 
     _http_thread = _threading.Thread(target=_run_http, daemon=True)
     _http_thread.start()
-    app.run(host='0.0.0.0', port=443, ssl_context=_ssl_ctx, use_reloader=False, debug=False)
+    socketio.run(app, host='0.0.0.0', port=443, ssl_context=_ssl_ctx,
+                 use_reloader=False, debug=False, allow_unsafe_werkzeug=True)
