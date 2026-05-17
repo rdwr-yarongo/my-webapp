@@ -1692,7 +1692,7 @@ h1 .headline-icon {
    ═══════════════════════════════════════════ */
 
 .terminal-drawer {
-    width: 52% !important;
+    width: 80% !important;
     min-width: 540px;
     display: flex;
     flex-direction: column;
