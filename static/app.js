@@ -2176,6 +2176,46 @@ function updateH2Flow(data) {
     if (vipEl) { vipEl.setAttribute('opacity','1'); vipEl.style.filter = 'drop-shadow(0 0 8px #3b82f6)'; }
     var beEl = document.getElementById('h2-node-backend');
     if (beEl) { beEl.setAttribute('opacity','1'); beEl.style.filter = 'drop-shadow(0 0 8px #f59e0b)'; }
+
+    // Host label
+    var hl = document.getElementById('h2-host-label'); if (hl) { hl.textContent = 'Host: ' + host; hl.setAttribute('fill','#16a34a'); }
+    var cl = document.getElementById('h2-client-label'); if (cl) cl.textContent = 'https://' + host;
+
+    // VIP status
+    var vs = document.getElementById('h2-vip-status');
+    if (vs) vs.textContent = clientProto + ' \u2192 HTTP/1.1 translated';
+
+    // Protocol badges
+    var pc = document.getElementById('h2-proto-client'); if (pc) pc.textContent = clientProto;
+
+    // Counter
+    var rc = document.getElementById('h2-req-count'); if (rc) rc.textContent = _h2ReqCount;
+
+    // HTTP badge
+    var badge = document.getElementById('h2-http-badge');
+    var badgeBg = document.getElementById('h2-http-badge-bg');
+    if (badge) { badge.textContent = sc + (sc === 200 ? ' OK' : ''); badge.setAttribute('fill', sc === 200 ? '#10b981' : '#ef4444'); }
+    if (badgeBg) { badgeBg.setAttribute('fill', sc === 200 ? '#ecfdf5' : '#fef2f2'); badgeBg.setAttribute('opacity','1'); }
+
+    // Phase pill
+    var phase = document.getElementById('h2-phase-text');
+    if (phase) phase.textContent = '#' + _h2ReqCount + ' HTTPS \u2192 ' + host + ' \u2014 ' + clientProto + ' \u2192 HTTP/1.1 \u2014 ' + sc;
+    var phaseBg = document.getElementById('h2-phase-bg'); if (phaseBg) phaseBg.setAttribute('fill','#dcfce7');
+
+    // Status text
+    var st = document.getElementById('h2-status-text');
+    if (st) { st.textContent = '#' + _h2ReqCount + ' https://' + host + ' \u2014 ' + clientProto + ' gateway \u2192 HTTP/1.1 backend \u2014 ' + sc; st.style.color = '#16a34a'; }
+
+    // History dot
+    var strip = document.getElementById('h2-history-strip');
+    if (strip) {
+        var dot = document.createElement('span');
+        dot.className = 'gslb-history-dot';
+        dot.style.background = sc === 200 ? '#16a34a' : '#ef4444';
+        dot.title = '#' + _h2ReqCount + ': ' + clientProto + ' \u2192 HTTP/1.1 \u2014 ' + sc;
+        strip.appendChild(dot);
+        while (strip.children.length > 20) strip.removeChild(strip.firstChild);
+    }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -2565,47 +2605,6 @@ function updateH2Flow(data) {
     updateThicknessPreview();
     updateUndoRedoState();
 })();
-
-    // Host label
-    var hl = document.getElementById('h2-host-label'); if (hl) { hl.textContent = 'Host: ' + host; hl.setAttribute('fill','#16a34a'); }
-    var cl = document.getElementById('h2-client-label'); if (cl) cl.textContent = 'https://' + host;
-
-    // VIP status
-    var vs = document.getElementById('h2-vip-status');
-    if (vs) vs.textContent = clientProto + ' \u2192 HTTP/1.1 translated';
-
-    // Protocol badges
-    var pc = document.getElementById('h2-proto-client'); if (pc) pc.textContent = clientProto;
-
-    // Counter
-    var rc = document.getElementById('h2-req-count'); if (rc) rc.textContent = _h2ReqCount;
-
-    // HTTP badge
-    var badge = document.getElementById('h2-http-badge');
-    var badgeBg = document.getElementById('h2-http-badge-bg');
-    if (badge) { badge.textContent = sc + (sc === 200 ? ' OK' : ''); badge.setAttribute('fill', sc === 200 ? '#10b981' : '#ef4444'); }
-    if (badgeBg) { badgeBg.setAttribute('fill', sc === 200 ? '#ecfdf5' : '#fef2f2'); badgeBg.setAttribute('opacity','1'); }
-
-    // Phase pill
-    var phase = document.getElementById('h2-phase-text');
-    if (phase) phase.textContent = '#' + _h2ReqCount + ' HTTPS \u2192 ' + host + ' \u2014 ' + clientProto + ' \u2192 HTTP/1.1 \u2014 ' + sc;
-    var phaseBg = document.getElementById('h2-phase-bg'); if (phaseBg) phaseBg.setAttribute('fill','#dcfce7');
-
-    // Status text
-    var st = document.getElementById('h2-status-text');
-    if (st) { st.textContent = '#' + _h2ReqCount + ' https://' + host + ' — ' + clientProto + ' gateway \u2192 HTTP/1.1 backend \u2014 ' + sc; st.style.color = '#16a34a'; }
-
-    // History dot
-    var strip = document.getElementById('h2-history-strip');
-    if (strip) {
-        var dot = document.createElement('span');
-        dot.className = 'gslb-history-dot';
-        dot.style.background = sc === 200 ? '#16a34a' : '#ef4444';
-        dot.title = '#' + _h2ReqCount + ': ' + clientProto + ' \u2192 HTTP/1.1 \u2014 ' + sc;
-        strip.appendChild(dot);
-        while (strip.children.length > 20) strip.removeChild(strip.firstChild);
-    }
-}
 
 function loadHttp2Gateway() {
     var resultsContent = document.getElementById('results-content');
