@@ -2267,8 +2267,18 @@ function updateH2Flow(data) {
     function updateCursorClass() {
         canvas.classList.remove('eraser-cursor', 'text-cursor');
         if (state.active) {
-            if (state.tool === 'eraser') canvas.classList.add('eraser-cursor');
-            else if (state.tool === 'text') canvas.classList.add('text-cursor');
+            if (state.tool === 'eraser') {
+                canvas.classList.add('eraser-cursor');
+                canvas.style.cursor = '';
+            } else if (state.tool === 'text') {
+                canvas.classList.add('text-cursor');
+                canvas.style.cursor = '';
+            } else {
+                var c = encodeURIComponent(state.color);
+                canvas.style.cursor = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\'%3E%3Cpath d=\'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z\' fill=\'' + c + '\'/%3E%3C/svg%3E") 0 24, auto';
+            }
+        } else {
+            canvas.style.cursor = '';
         }
     }
 
@@ -2539,6 +2549,7 @@ function updateH2Flow(data) {
             btn.classList.add('active');
             state.color = btn.getAttribute('data-color');
             updateThicknessPreview();
+            updateCursorClass();
         });
     });
 
