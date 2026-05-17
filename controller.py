@@ -1103,12 +1103,12 @@ def handle_terminal_connect(data):
     reader.start()
 
     # Answer the login confirmation prompt, then send initial commands
-    time.sleep(1.5)
+    time.sleep(2)
     channel.send('y\n')
     if initial_cmd:
         cmds = initial_cmd if isinstance(initial_cmd, list) else [initial_cmd]
         for cmd in cmds:
-            time.sleep(1.5)
+            time.sleep(2)
             channel.send(cmd + '\n')
 
 
