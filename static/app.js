@@ -2699,13 +2699,14 @@ function openCyberController() {
                 }
                 if (userInput && passInput && !userInput.value) {
                     clearInterval(loginPoller);
-                    var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-                    nativeInputValueSetter.call(userInput, 'radware');
-                    nativeInputValueSetter.call(passInput, 'radware');
-                    userInput.dispatchEvent(new Event('input', {bubbles: true}));
-                    passInput.dispatchEvent(new Event('input', {bubbles: true}));
-                    userInput.dispatchEvent(new Event('change', {bubbles: true}));
-                    passInput.dispatchEvent(new Event('change', {bubbles: true}));
+                    var iframeWin = iframe.contentWindow;
+                    var nativeSet = Object.getOwnPropertyDescriptor(iframeWin.HTMLInputElement.prototype, 'value').set;
+                    nativeSet.call(userInput, 'radware');
+                    userInput.dispatchEvent(new iframeWin.Event('input', {bubbles: true}));
+                    userInput.dispatchEvent(new iframeWin.Event('change', {bubbles: true}));
+                    nativeSet.call(passInput, 'radware');
+                    passInput.dispatchEvent(new iframeWin.Event('input', {bubbles: true}));
+                    passInput.dispatchEvent(new iframeWin.Event('change', {bubbles: true}));
                     setTimeout(function() {
                         var btn = doc.querySelector('button');
                         if (btn) btn.click();

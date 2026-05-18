@@ -1180,36 +1180,100 @@ def handle_disconnect():
 
 # ═══ Cyber Controller Proxy ═══
 _CYBER_BASE = 'https://cybercontroller.radware.lab'
-_CYBER_AUTH = HTTPBasicAuth('radware', 'radware')
 
-@app.route('/cyber-proxy/')
-@app.route('/cyber-proxy/<path:path>')
-def cyber_proxy(path=''):
+@app.route('/cyber-proxy/', defaults={'path': ''}, methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
+@app.route('/cyber-proxy/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
+def cyber_proxy(path):
     url = f'{_CYBER_BASE}/{path}'
     qs = request.query_string.decode()
     if qs:
         url += '?' + qs
     try:
-        resp = requests.get(url, auth=_CYBER_AUTH, verify=False, timeout=15,
-                            headers={'Accept': request.headers.get('Accept', '*/*')})
+        # Forward headers (excluding host)
+        fwd_headers = {k: v for k, v in request.headers if k.lower() not in ('host', 'cookie')}
+        fwd_headers['Host'] = 'cybercontroller.radware.lab'
+        # Forward cookies
+        cookies = {k: v for k, v in request.cookies.items() if k != 'session'}
+        resp = requests.request(
+            method=request.method,
+            url=url,
+            headers=fwd_headers,
+            data=request.get_data(),
+            cookies=cookies,
+            verify=False,
+            timeout=30,
+            allow_redirects=False
+        )
         excluded_headers = {'content-encoding', 'transfer-encoding', 'connection',
                             'content-length', 'x-frame-options', 'content-security-policy'}
         headers = [(k, v) for k, v in resp.headers.items() if k.lower() not in excluded_headers]
+        # Rewrite Location header for redirects
+        for i, (k, v) in enumerate(headers):
+            if k.lower() == 'location' and 'cybercontroller.radware.lab' in v:
+                headers[i] = (k, v.replace('https://cybercontroller.radware.lab', '/cyber-proxy').replace('http://cybercontroller.radware.lab', '/cyber-proxy'))
+            elif k.lower() == 'location' and v.startswith('/'):
+                headers[i] = (k, '/cyber-proxy' + v)
+        # Rewrite Set-Cookie paths
+        new_headers = []
+        for k, v in headers:
+            if k.lower() == 'set-cookie':
+                v = v.replace('path=/', 'path=/cyber-proxy/').replace('Path=/', 'Path=/cyber-proxy/')
+                v = v.replace('; secure', '').replace('; Secure', '')
+            new_headers.append((k, v))
+        headers = new_headers
         content_type = resp.headers.get('Content-Type', '')
         body = resp.content
         if 'text/html' in content_type:
             body = body.replace(b'https://cybercontroller.radware.lab', b'/cyber-proxy')
             body = body.replace(b'http://cybercontroller.radware.lab', b'/cyber-proxy')
-            # Rewrite absolute paths in src/href to go through proxy
             body = re.sub(rb'(src|href)\s*=\s*"/', rb'\1="/cyber-proxy/', body)
             body = re.sub(rb"(src|href)\s*=\s*'/", rb"\1='/cyber-proxy/", body)
+            # Inject XHR/fetch/DOM interceptor to rewrite absolute paths
+            intercept_script = b'''<script>
+(function(){
+  var P = '/cyber-proxy';
+  function rw(u){ return (typeof u==='string' && u.startsWith('/') && !u.startsWith(P)) ? P+u : u; }
+  // XHR
+  var _open = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function(m, u) {
+    arguments[1] = rw(u);
+    return _open.apply(this, arguments);
+  };
+  // Fetch
+  var _fetch = window.fetch;
+  window.fetch = function(input, init) {
+    if (typeof input === 'string') input = rw(input);
+    return _fetch.call(this, input, init);
+  };
+  // Dynamic script/img/link src/href
+  function patchProp(proto, prop) {
+    var d = Object.getOwnPropertyDescriptor(proto, prop);
+    if (d && d.set) {
+      Object.defineProperty(proto, prop, {
+        set: function(v){ d.set.call(this, rw(v)); },
+        get: d.get, configurable: true
+      });
+    }
+  }
+  patchProp(HTMLScriptElement.prototype, 'src');
+  patchProp(HTMLImageElement.prototype, 'src');
+  patchProp(HTMLLinkElement.prototype, 'href');
+  // setAttribute override
+  var _setAttr = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function(name, value) {
+    if ((name === 'src' || name === 'href') && typeof value === 'string') value = rw(value);
+    return _setAttr.call(this, name, value);
+  };
+})();
+</script>'''
+            body = body.replace(b'<head>', b'<head>' + intercept_script, 1)
         elif 'text/css' in content_type:
-            # Rewrite url() references in CSS (preserve quotes)
             body = re.sub(rb"url\(\s*(['\"]?)/", rb"url(\1/cyber-proxy/", body)
         elif 'javascript' in content_type:
-            # Rewrite fetch/XHR paths in JS
             body = body.replace(b'"/api/', b'"/cyber-proxy/api/')
             body = body.replace(b"'/api/", b"'/cyber-proxy/api/")
+            body = body.replace(b'"/visr-', b'"/cyber-proxy/visr-')
+            body = body.replace(b"'/visr-", b"'/cyber-proxy/visr-")
         return Response(body, status=resp.status_code, headers=headers, content_type=content_type)
     except Exception as e:
         return Response(f'Proxy error: {e}', status=502)
