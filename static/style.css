@@ -658,6 +658,25 @@ p + svg {
     color: #065f46;
     border: 1px solid #6ee7b7;
 }
+.mini-badge.redirect-src {
+    background: #dbeafe;
+    color: #1e40af;
+}
+.mini-badge.redirect-code {
+    background: #fef3c7;
+    color: #92400e;
+}
+.mini-badge.redirect-dst {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+.mini-arrow {
+    font-size: 10px;
+    color: #94a3b8;
+    flex-shrink: 0;
+    line-height: 1;
+}
 
 .results-sidebar-header {
     display: flex;

@@ -313,6 +313,32 @@ function clearMiniSidebar() {
     if (container) container.innerHTML = '';
 }
 
+/* Update mini sidebar with HTTP redirect result */
+function updateRedirectMini(data) {
+    var container = document.getElementById('results-mini-items');
+    if (!container) return;
+    var ok = data && data.success;
+    var dotClass = 'mini-dot ' + (ok ? 'success' : 'error');
+    var item = document.createElement('div');
+    item.className = 'results-mini-attempt redirect-mini';
+    if (ok) {
+        var srcHost = (data.source_url || '').replace(/^https?:\/\//, '').replace(/\/.*/, '');
+        item.innerHTML =
+            '<span class="' + dotClass + '"></span>' +
+            '<span class="mini-badge redirect-src">' + escapeHtml(srcHost) + '</span>' +
+            '<span class="mini-arrow">→</span>' +
+            '<span class="mini-badge redirect-code">' + escapeHtml(String(data.redirect_status_code || '')) + '</span>' +
+            '<span class="mini-arrow">→</span>' +
+            '<span class="mini-badge redirect-dst">HTTPS</span>';
+    } else {
+        item.innerHTML =
+            '<span class="' + dotClass + '"></span>' +
+            '<span class="mini-badge redirect-src">Redirect</span>' +
+            '<span style="font-size:10px;color:#ef4444;">failed</span>';
+    }
+    container.insertBefore(item, container.firstChild);
+}
+
 // DNS Lookup
 function performDnsLookup() {
     const domain = document.getElementById('dns-domain').value;
@@ -1288,6 +1314,8 @@ function renderRedirectTrace(data) {
     }
 
     window._lastTcpdumpData = data;
+    clearMiniSidebar();
+    updateRedirectMini(data);
 
     const httpExchange = (data.http_exchange_lines || []).map(line => escapeHtml(line)).join('\n');
     const packetTrace = (data.packet_trace_lines || []).map(line => escapeHtml(line)).join('\n');
@@ -1589,6 +1617,8 @@ function launchEmbeddedRedirectDemo() {
         .then(response => response.json())
         .then(data => {
             renderRedirectProof(data);
+            clearMiniSidebar();
+            updateRedirectMini(data);
             if (!data.success) {
                 animateRedirStep('error', data);
                 throw new Error(data.error || 'Unable to validate redirect flow');
