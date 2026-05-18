@@ -388,6 +388,38 @@ function updateOffloadingMini(data) {
     while (container.children.length > 20) container.removeChild(container.lastChild);
 }
 
+/* Update mini sidebar with content-switching result */
+var CS_MINI_COLORS = { dev: '#7c3aed', stg: '#b45309', prod: '#16a34a' };
+function updateContentSwitchMini(data) {
+    var container = document.getElementById('results-mini-items');
+    if (!container) return;
+    var ok = data && data.success;
+    var dotClass = 'mini-dot ' + (ok ? 'success' : 'error');
+    var env = (data && data.env) || '?';
+    var color = CS_MINI_COLORS[env] || '#6b7280';
+    var badgeStyle = 'background:' + color + ';color:#fff;';
+    var item = document.createElement('div');
+    item.className = 'results-mini-attempt redirect-mini';
+    if (ok) {
+        var scheme = (data.scheme || 'http').toUpperCase();
+        var ip = data.target_ip || '';
+        var html = '<span class="' + dotClass + '"></span>' +
+            '<span class="mini-badge" style="' + badgeStyle + '">' + escapeHtml(env.toUpperCase()) + '</span>' +
+            '<span class="mini-arrow">\u2192</span>' +
+            '<span class="mini-badge redirect-code">' + escapeHtml(scheme) + '</span>' +
+            '<span class="mini-arrow">\u2192</span>' +
+            '<span class="mini-badge served">' + escapeHtml(ip) + '</span>';
+        item.innerHTML = html;
+    } else {
+        item.innerHTML =
+            '<span class="' + dotClass + '"></span>' +
+            '<span class="mini-badge" style="' + badgeStyle + '">' + escapeHtml(env.toUpperCase()) + '</span>' +
+            '<span style="font-size:10px;color:#ef4444;margin-left:4px;">failed</span>';
+    }
+    container.insertBefore(item, container.firstChild);
+    while (container.children.length > 20) container.removeChild(container.lastChild);
+}
+
 // DNS Lookup
 function performDnsLookup() {
     const domain = document.getElementById('dns-domain').value;
@@ -2354,6 +2386,7 @@ function loadContentSwitch(host, btnId, scheme) {
     const btn = document.getElementById(btnId);
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading…'; }
     resultsContent.innerHTML = '<p>Loading…</p>';
+    showResultsSidebar();
 
     fetch('/api/scenario/content_switch', {
         method: 'POST',
@@ -2365,9 +2398,11 @@ function loadContentSwitch(host, btnId, scheme) {
         if (btn) { btn.disabled = false; btn.innerHTML = CS_BTN_LABELS[host] || host; }
         if (!data.success) {
             resultsContent.innerHTML = `<p class="error">Error: ${escapeHtml(data.error)}</p>`;
+            updateContentSwitchMini({ success: false, env: '?' });
             return;
         }
         updateCsFlow(data);
+        updateContentSwitchMini(data);
         const envKey = (data.env || 'prod');
         const color = CS_ENV_COLORS[envKey] || '#1a56db';
         const badge = `<span style="display:inline-block;padding:2px 10px;border-radius:12px;background:${color};color:#fff;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">${envKey.toUpperCase()}</span>`;
@@ -2381,6 +2416,7 @@ function loadContentSwitch(host, btnId, scheme) {
     .catch(err => {
         if (btn) { btn.disabled = false; btn.innerHTML = CS_BTN_LABELS[host] || host; }
         resultsContent.innerHTML = `<p class="error">Request failed: ${escapeHtml(err.message)}</p>`;
+        updateContentSwitchMini({ success: false, env: '?' });
     });
 }
 
