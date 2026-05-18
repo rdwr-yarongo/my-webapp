@@ -420,6 +420,38 @@ function updateContentSwitchMini(data) {
     while (container.children.length > 20) container.removeChild(container.lastChild);
 }
 
+/* Update mini sidebar with HTTP/2 gateway result */
+function updateH2Mini(data) {
+    var container = document.getElementById('results-mini-items');
+    if (!container) return;
+    var ok = data && data.success;
+    var dotClass = 'mini-dot ' + (ok ? 'success' : 'error');
+    var item = document.createElement('div');
+    item.className = 'results-mini-attempt redirect-mini';
+    if (ok) {
+        var proto = data.protocol_version || '?';
+        var isH2 = proto.indexOf('2') !== -1;
+        var protoStyle = isH2
+            ? 'background:#dcfce7;color:#166534;'
+            : 'background:#fef3c7;color:#92400e;';
+        var sc = String(data.status_code || '');
+        var ip = data.target_ip || '';
+        item.innerHTML = '<span class="' + dotClass + '"></span>' +
+            '<span class="mini-badge" style="' + protoStyle + '">' + escapeHtml(proto) + '</span>' +
+            '<span class="mini-arrow">\u2192</span>' +
+            '<span class="mini-badge redirect-code">' + escapeHtml(sc) + '</span>' +
+            '<span class="mini-arrow">\u2192</span>' +
+            '<span class="mini-badge served">' + escapeHtml(ip) + '</span>';
+    } else {
+        item.innerHTML =
+            '<span class="' + dotClass + '"></span>' +
+            '<span class="mini-badge" style="background:#fee2e2;color:#b91c1c;">H2</span>' +
+            '<span style="font-size:10px;color:#ef4444;margin-left:4px;">failed</span>';
+    }
+    container.insertBefore(item, container.firstChild);
+    while (container.children.length > 20) container.removeChild(container.lastChild);
+}
+
 // DNS Lookup
 function performDnsLookup() {
     const domain = document.getElementById('dns-domain').value;
@@ -3027,6 +3059,7 @@ function loadHttp2Gateway() {
     var btn = document.getElementById('h2-send-btn');
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading\u2026'; }
     resultsContent.innerHTML = '<p>Loading\u2026</p>';
+    showResultsSidebar();
 
     fetch('/api/scenario/http2_gateway')
     .then(function(r) { return r.json(); })
@@ -3034,9 +3067,11 @@ function loadHttp2Gateway() {
         if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-lightning-charge"></i> Send HTTPS Request \u2192 scenario4.radware.lab'; }
         if (!data.success) {
             resultsContent.innerHTML = '<p class="error">Error: ' + escapeHtml(data.error) + '</p>';
+            updateH2Mini({ success: false });
             return;
         }
         updateH2Flow(data);
+        updateH2Mini(data);
         var proto = data.protocol_version || 'HTTP/1.1';
         var label = document.createElement('p');
         label.style.cssText = 'margin:0 0 6px 0;font-size:13px;';
@@ -3048,6 +3083,7 @@ function loadHttp2Gateway() {
     .catch(function(err) {
         if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-lightning-charge"></i> Send HTTPS Request \u2192 scenario4.radware.lab'; }
         resultsContent.innerHTML = '<p class="error">Request failed: ' + escapeHtml(err.message) + '</p>';
+        updateH2Mini({ success: false });
     });
 }
 
