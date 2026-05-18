@@ -453,12 +453,24 @@ def offloading_data():
                     name, value = name.strip(), value.strip()
                     if name and name.lower() not in skip:
                         headers_list.append({'name': name, 'value': value})
+        served_by = ''
+        xff = ''
+        for h in headers_list:
+            hn = h['name'].lower()
+            if hn == 'server' and not served_by:
+                served_by = h['value']
+            elif hn == 'x-served-by':
+                served_by = h['value']
+            elif hn == 'x-forwarded-for':
+                xff = h['value']
         return jsonify({
             'success': True,
             'target_host': REDIRECT_TARGET_HOST,
             'status_code': status_code,
             'body_html': body_html,
-            'response_headers': headers_list
+            'response_headers': headers_list,
+            'served_by': served_by,
+            'xff': xff
         })
     except Exception as exc:
         return jsonify({'success': False, 'error': str(exc)}), 502
@@ -472,6 +484,7 @@ def offloading_bypass():
         result = subprocess.run(
             [
                 'curl', '-sk', '-L',
+                '-D', '/dev/stderr',
                 '-o', '/dev/stdout',
                 '-w', '\n__CURL_META__%{http_code}',
                 '-H', f'Host: {BYPASS_TARGET_HOST}',
@@ -492,11 +505,25 @@ def offloading_bypass():
         body_html = rewrite_relative_resource_urls(
             body_part, target_ip, BYPASS_TARGET_HOST, scheme='https'
         )
+        served_by = ''
+        raw_headers = result.stderr
+        blocks = raw_headers.split('HTTP/')
+        if len(blocks) > 1:
+            last_block = blocks[-1]
+            for line in last_block.splitlines()[1:]:
+                if ':' in line:
+                    name, _, value = line.partition(':')
+                    name, value = name.strip(), value.strip()
+                    if name.lower() == 'server' and not served_by:
+                        served_by = value
+                    elif name.lower() == 'x-served-by':
+                        served_by = value
         return jsonify({
             'success': True,
             'target_host': BYPASS_TARGET_HOST,
             'status_code': status_code,
-            'body_html': body_html
+            'body_html': body_html,
+            'served_by': served_by
         })
     except Exception as exc:
         return jsonify({'success': False, 'error': str(exc)}), 502

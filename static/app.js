@@ -277,6 +277,17 @@ function stopCurrentScenario() {
     if (haEventSource) stopHaStream();
 }
 
+/* ── Results Sidebar: ensure visible in compact mode ── */
+function showResultsSidebar() {
+    var sidebar = document.getElementById('results-sidebar');
+    if (!sidebar) return;
+    sidebar.style.display = 'flex';
+    if (!sidebar.dataset.userState || sidebar.dataset.userState === 'compact') {
+        sidebar.classList.add('compact');
+        sidebar.dataset.userState = 'compact';
+    }
+}
+
 /* ── Results Sidebar: toggle expanded ↔ compact ── */
 function toggleResultsSidebar() {
     var sidebar = document.getElementById('results-sidebar');
@@ -338,6 +349,43 @@ function updateRedirectMini(data) {
             '<span style="font-size:10px;color:#ef4444;">failed</span>';
     }
     container.insertBefore(item, container.firstChild);
+}
+
+/* Update mini sidebar with offloading result (Alteon or Bypass) */
+function updateOffloadingMini(data) {
+    var container = document.getElementById('results-mini-items');
+    if (!container) return;
+    var ok = data && data.success;
+    var isAlteon = data && data.mode === 'alteon';
+    var dotClass = 'mini-dot ' + (ok ? 'success' : 'error');
+    var modeLabel = isAlteon ? 'Alteon' : 'Direct';
+    var modeStyle = isAlteon
+        ? 'background:#dbeafe;color:#1d4ed8;'
+        : 'background:#fee2e2;color:#b91c1c;';
+    var item = document.createElement('div');
+    item.className = 'results-mini-attempt redirect-mini';
+    if (ok) {
+        var servedBy = (data.served_by || '').replace(/^Apache\//, 'Apache ');
+        var xff = data.xff || '';
+        var html = '<span class="' + dotClass + '"></span>' +
+            '<span class="mini-badge" style="' + modeStyle + '">' + escapeHtml(modeLabel) + '</span>';
+        if (servedBy) {
+            html += '<span class="mini-arrow">\u2192</span>' +
+                '<span class="mini-badge served">' + escapeHtml(servedBy) + '</span>';
+        }
+        if (xff) {
+            html += '<span class="mini-arrow">\u2192</span>' +
+                '<span class="mini-badge wanlink">XFF:' + escapeHtml(xff) + '</span>';
+        }
+        item.innerHTML = html;
+    } else {
+        item.innerHTML =
+            '<span class="' + dotClass + '"></span>' +
+            '<span class="mini-badge" style="' + modeStyle + '">' + escapeHtml(modeLabel) + '</span>' +
+            '<span style="font-size:10px;color:#ef4444;margin-left:4px;">failed</span>';
+    }
+    container.insertBefore(item, container.firstChild);
+    while (container.children.length > 20) container.removeChild(container.lastChild);
 }
 
 // DNS Lookup
@@ -2060,6 +2108,7 @@ function loadOffloadingDemo() {
     const resultsContent = document.getElementById('results-content');
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading…'; }
     if (resultsContent) resultsContent.innerHTML = '<p>Loading page from <strong>https://scenario2.radware.lab/index.php</strong> via Alteon…</p>';
+    showResultsSidebar();
 
     fetch('/api/scenario/offloading/data')
         .then(r => r.json())
@@ -2067,10 +2116,12 @@ function loadOffloadingDemo() {
             if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Reload'; }
             if (!data.success) {
                 if (resultsContent) resultsContent.innerHTML = `<p class="error">Error: ${escapeHtml(data.error)}</p>`;
+                updateOffloadingMini({ success: false, mode: 'alteon' });
                 return;
             }
             if (!resultsContent) return;
             updateOffFlow({ mode: 'alteon', status_code: data.status_code, target_host: data.target_host || 'scenario2.radware.lab' });
+            updateOffloadingMini({ success: true, mode: 'alteon', served_by: data.served_by || '', xff: data.xff || '' });
             const iframe = document.createElement('iframe');
             iframe.sandbox = 'allow-same-origin allow-scripts';
             iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
@@ -2081,6 +2132,7 @@ function loadOffloadingDemo() {
         .catch(err => {
             if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-play-fill"></i> Load Page via Alteon'; }
             if (resultsContent) resultsContent.innerHTML = `<p class="error">Request failed: ${escapeHtml(err.message)}</p>`;
+            updateOffloadingMini({ success: false, mode: 'alteon' });
         });
 }
 
@@ -2092,6 +2144,7 @@ function loadBypassDemo() {
     const resultsContent = document.getElementById('results-content');
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading…'; }
     if (resultsContent) resultsContent.innerHTML = '<p>Loading page directly from <strong>https://site-a-servers.radware.lab/index.php</strong> (bypassing Alteon)…</p>';
+    showResultsSidebar();
 
     fetch('/api/scenario/offloading/bypass')
         .then(r => r.json())
@@ -2099,10 +2152,12 @@ function loadBypassDemo() {
             if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Reload Bypass'; }
             if (!data.success) {
                 if (resultsContent) resultsContent.innerHTML = `<p class="error">Error: ${escapeHtml(data.error)}</p>`;
+                updateOffloadingMini({ success: false, mode: 'bypass' });
                 return;
             }
             if (!resultsContent) return;
             updateOffFlow({ mode: 'bypass', status_code: data.status_code, target_host: data.target_host || 'site-a-servers.radware.lab' });
+            updateOffloadingMini({ success: true, mode: 'bypass', served_by: data.served_by || '' });
             const iframe = document.createElement('iframe');
             iframe.sandbox = 'allow-same-origin allow-scripts';
             iframe.style.cssText = 'width:100%;height:820px;border:1px solid #555;border-radius:4px;margin-top:8px;background:#fff;';
@@ -2113,6 +2168,7 @@ function loadBypassDemo() {
         .catch(err => {
             if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-shield-x"></i> Bypass Alteon (Direct)'; }
             if (resultsContent) resultsContent.innerHTML = `<p class="error">Request failed: ${escapeHtml(err.message)}</p>`;
+            updateOffloadingMini({ success: false, mode: 'bypass' });
         });
 }
 
