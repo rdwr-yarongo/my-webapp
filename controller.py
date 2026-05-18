@@ -1178,6 +1178,43 @@ def handle_disconnect():
             pass
 
 
+# ═══ Cyber Controller Proxy ═══
+_CYBER_BASE = 'https://cybercontroller.radware.lab'
+_CYBER_AUTH = HTTPBasicAuth('radware', 'radware')
+
+@app.route('/cyber-proxy/')
+@app.route('/cyber-proxy/<path:path>')
+def cyber_proxy(path=''):
+    url = f'{_CYBER_BASE}/{path}'
+    qs = request.query_string.decode()
+    if qs:
+        url += '?' + qs
+    try:
+        resp = requests.get(url, auth=_CYBER_AUTH, verify=False, timeout=15,
+                            headers={'Accept': request.headers.get('Accept', '*/*')})
+        excluded_headers = {'content-encoding', 'transfer-encoding', 'connection',
+                            'content-length', 'x-frame-options', 'content-security-policy'}
+        headers = [(k, v) for k, v in resp.headers.items() if k.lower() not in excluded_headers]
+        content_type = resp.headers.get('Content-Type', '')
+        body = resp.content
+        if 'text/html' in content_type:
+            body = body.replace(b'https://cybercontroller.radware.lab', b'/cyber-proxy')
+            body = body.replace(b'http://cybercontroller.radware.lab', b'/cyber-proxy')
+            # Rewrite absolute paths in src/href to go through proxy
+            body = re.sub(rb'(src|href)\s*=\s*"/', rb'\1="/cyber-proxy/', body)
+            body = re.sub(rb"(src|href)\s*=\s*'/", rb"\1='/cyber-proxy/", body)
+        elif 'text/css' in content_type:
+            # Rewrite url() references in CSS (preserve quotes)
+            body = re.sub(rb"url\(\s*(['\"]?)/", rb"url(\1/cyber-proxy/", body)
+        elif 'javascript' in content_type:
+            # Rewrite fetch/XHR paths in JS
+            body = body.replace(b'"/api/', b'"/cyber-proxy/api/')
+            body = body.replace(b"'/api/", b"'/cyber-proxy/api/")
+        return Response(body, status=resp.status_code, headers=headers, content_type=content_type)
+    except Exception as e:
+        return Response(f'Proxy error: {e}', status=502)
+
+
 if __name__ == '__main__':
     import ssl as _ssl_mod
     import threading as _threading

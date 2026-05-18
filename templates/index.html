@@ -114,6 +114,13 @@
                     </div>
                 </div>
                 <div class="nav-section-label" style="margin-top:18px;">SYSTEM</div>
+                <a href="#" class="nav-flat-item" title="Cyber Controller" onclick="openCyberController(); return false;">
+                    <div class="nav-flat-icon"><i class="bi bi-shield-shaded"></i></div>
+                    <div class="nav-flat-text">
+                        <div class="nav-flat-name">Cyber Controller</div>
+                        <div class="nav-flat-desc">Traffic Visualization</div>
+                    </div>
+                </a>
                 <a href="#" data-section="status" class="nav-flat-item" title="Status">
                     <div class="nav-flat-icon"><i class="bi bi-activity"></i></div>
                     <div class="nav-flat-text">
@@ -1964,6 +1971,22 @@
         <button class="ann-action-btn ann-close-btn" id="ann-close" title="Exit (Esc)"><i class="bi bi-x-lg"></i></button>
     </div>
     <button id="annotation-fab" class="annotation-fab" title="Draw / Annotate (Ctrl+D)"><i class="bi bi-pencil-fill"></i></button>
+
+    <!-- ═══ Cyber Controller Drawer ═══ -->
+    <div id="cyber-drawer-backdrop" class="drawer-backdrop" onclick="closeCyberController()"></div>
+    <aside id="cyber-drawer" class="drawer cyber-drawer">
+        <div class="drawer-header cyber-drawer-header">
+            <div class="drawer-title">
+                <i class="bi bi-shield-shaded"></i>
+                <span>Cyber Controller</span>
+                <span class="drawer-device-badge">cybercontroller.radware.lab</span>
+            </div>
+            <div class="drawer-actions">
+                <button class="drawer-btn" onclick="closeCyberController()" title="Close"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <iframe id="cyber-iframe" class="cyber-iframe"></iframe>
+    </aside>
 
     <!-- ═══ SSH Terminal Drawer ═══ -->
     <div id="terminal-drawer-backdrop" class="drawer-backdrop terminal-backdrop"></div>

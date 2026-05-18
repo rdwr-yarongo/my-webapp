@@ -2672,6 +2672,63 @@ function closeTerminal() {
     }, 350);
 }
 
+/* ═══ Cyber Controller Drawer ═══ */
+function openCyberController() {
+    var drawer = document.getElementById('cyber-drawer');
+    var backdrop = document.getElementById('cyber-drawer-backdrop');
+    var iframe = document.getElementById('cyber-iframe');
+
+    backdrop.classList.add('open');
+    drawer.classList.add('open');
+
+    if (!iframe.src || iframe.src === 'about:blank' || iframe.src === '') {
+        iframe.src = '/cyber-proxy/?_t=' + Date.now();
+        /* Poll for login form and auto-fill */
+        var attempts = 0;
+        var loginPoller = setInterval(function() {
+            attempts++;
+            if (attempts > 30) { clearInterval(loginPoller); return; }
+            try {
+                var doc = iframe.contentDocument || iframe.contentWindow.document;
+                if (!doc) return;
+                var inputs = doc.querySelectorAll('input');
+                var userInput = null, passInput = null;
+                for (var i = 0; i < inputs.length; i++) {
+                    if (inputs[i].type === 'password') passInput = inputs[i];
+                    else if (inputs[i].type === 'text' || inputs[i].type === 'email') userInput = inputs[i];
+                }
+                if (userInput && passInput && !userInput.value) {
+                    clearInterval(loginPoller);
+                    var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+                    nativeInputValueSetter.call(userInput, 'radware');
+                    nativeInputValueSetter.call(passInput, 'radware');
+                    userInput.dispatchEvent(new Event('input', {bubbles: true}));
+                    passInput.dispatchEvent(new Event('input', {bubbles: true}));
+                    userInput.dispatchEvent(new Event('change', {bubbles: true}));
+                    passInput.dispatchEvent(new Event('change', {bubbles: true}));
+                    setTimeout(function() {
+                        var btn = doc.querySelector('button');
+                        if (btn) btn.click();
+                    }, 500);
+                }
+            } catch(e) { clearInterval(loginPoller); }
+        }, 500);
+    }
+}
+
+function closeCyberController() {
+    var drawer = document.getElementById('cyber-drawer');
+    var backdrop = document.getElementById('cyber-drawer-backdrop');
+    var iframe = document.getElementById('cyber-iframe');
+
+    drawer.classList.remove('open');
+    backdrop.classList.remove('open');
+
+    setTimeout(function() {
+        iframe.src = '';
+    }, 350);
+}
+
 
 /* ═══════════════════════════════════════════════════════
    Annotation / Drawing Overlay

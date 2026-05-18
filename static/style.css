@@ -2216,6 +2216,37 @@ h1 .headline-icon {
     z-index: 1210;
 }
 
+/* ═══ Cyber Controller Drawer ═══ */
+.cyber-drawer {
+    width: 90% !important;
+    min-width: 800px;
+    height: 100vh !important;
+}
+.cyber-drawer-header {
+    background: linear-gradient(90deg, #1e293b 0%, #334155 100%) !important;
+    border-bottom: 1px solid #475569;
+}
+.cyber-drawer-header .drawer-title i {
+    color: #a78bfa;
+}
+.cyber-drawer-header .drawer-device-badge {
+    background: rgba(167,139,250,0.15);
+    color: #a78bfa;
+    border-color: rgba(167,139,250,0.3);
+}
+.cyber-iframe {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: #0f172a;
+}
+#cyber-drawer-backdrop {
+    z-index: 1200;
+}
+#cyber-drawer {
+    z-index: 1210;
+}
+
 /* Terminal button outline style */
 .btn-outline {
     background: transparent;
