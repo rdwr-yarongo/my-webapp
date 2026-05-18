@@ -658,9 +658,15 @@ p + svg {
     color: #065f46;
     border: 1px solid #6ee7b7;
 }
+.redirect-mini {
+    flex-wrap: wrap;
+}
 .mini-badge.redirect-src {
     background: #dbeafe;
     color: #1e40af;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .mini-badge.redirect-code {
     background: #fef3c7;

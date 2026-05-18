@@ -323,9 +323,10 @@ function updateRedirectMini(data) {
     item.className = 'results-mini-attempt redirect-mini';
     if (ok) {
         var srcHost = (data.source_url || '').replace(/^https?:\/\//, '').replace(/\/.*/, '');
+        var shortHost = srcHost.replace(/\.radware\.lab$/, '');
         item.innerHTML =
             '<span class="' + dotClass + '"></span>' +
-            '<span class="mini-badge redirect-src">' + escapeHtml(srcHost) + '</span>' +
+            '<span class="mini-badge redirect-src">' + escapeHtml(shortHost) + '</span>' +
             '<span class="mini-arrow">→</span>' +
             '<span class="mini-badge redirect-code">' + escapeHtml(String(data.redirect_status_code || '')) + '</span>' +
             '<span class="mini-arrow">→</span>' +
