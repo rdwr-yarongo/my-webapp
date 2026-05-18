@@ -622,7 +622,7 @@ def http_redirect_page():
 def ha_failover_stream():
     def generate():
         attempt = 0
-        while True:
+        while attempt < 10:
             attempt += 1
             result = fetch_target_attempt(attempt, HA_TARGET_HOST)
             result['scenario'] = 'ha_failover'
