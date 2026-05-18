@@ -163,7 +163,7 @@ p + svg {
 /* Collapsed: center items and reduce padding */
 .sidebar .sidebar-brand {
     justify-content: center;
-    padding: 14px 8px;
+    padding: 10px 8px;
     transition: padding 0.25s ease;
 }
 .sidebar:hover .sidebar-brand,
@@ -174,7 +174,7 @@ p + svg {
 .sidebar .nav-flat-item,
 .sidebar .nav-group-flat-header {
     justify-content: center;
-    padding: 12px 0;
+    padding: 8px 0;
     transition: padding 0.2s ease, justify-content 0s;
 }
 .sidebar:hover .nav-flat-item,
@@ -186,9 +186,9 @@ p + svg {
 }
 /* Collapsed: larger icons for better proportion */
 .sidebar .nav-flat-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 17px;
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
     transition: width 0.2s ease, height 0.2s ease, font-size 0.2s ease;
 }
 .sidebar:hover .nav-flat-icon,
@@ -200,8 +200,8 @@ p + svg {
 
 /* Collapsed: brand icon smaller */
 .sidebar .sidebar-brand-icon {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     transition: width 0.25s ease, height 0.25s ease;
 }
 .sidebar:hover .sidebar-brand-icon,
