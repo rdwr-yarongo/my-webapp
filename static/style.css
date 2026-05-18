@@ -2210,10 +2210,10 @@ h1 .headline-icon {
     height: 100%;
 }
 .terminal-backdrop {
-    z-index: 898;
+    z-index: 1200;
 }
 .terminal-drawer {
-    z-index: 908;
+    z-index: 1210;
 }
 
 /* Terminal button outline style */
