@@ -179,12 +179,14 @@ p + svg {
 .sidebar .sidebar-brand {
     justify-content: center;
     padding: 10px 8px;
-    transition: padding 0.25s ease;
+    gap: 0;
+    transition: padding 0.25s ease, gap 0.2s ease;
 }
 .sidebar:hover .sidebar-brand,
 .sidebar.pinned .sidebar-brand {
     justify-content: flex-start;
     padding: 18px 16px 16px;
+    gap: 10px;
 }
 .sidebar .nav-flat-item,
 .sidebar .nav-group-flat-header {
