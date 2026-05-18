@@ -92,7 +92,7 @@ p + svg {
 }
 
 .sidebar {
-    width: 220px;
+    width: 68px;
     background: linear-gradient(180deg, #e8eaed 0%, #d4d7dc 50%, #c8ccd2 100%);
     padding: 0;
     border-right: 1px solid #a8adb5;
@@ -100,6 +100,132 @@ p + svg {
     display: flex;
     flex-direction: column;
     box-shadow: inset -1px 0 0 rgba(255,255,255,0.6);
+    transition: width 0.25s ease;
+    overflow: hidden;
+    position: relative;
+    z-index: 100;
+}
+.sidebar:hover,
+.sidebar.pinned {
+    width: 240px;
+}
+
+/* Collapsed state: hide text, show only icons */
+.sidebar .sidebar-brand-text,
+.sidebar .nav-flat-text,
+.sidebar .nav-section-label,
+.sidebar .nav-group-flat-arrow {
+    opacity: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+}
+.sidebar:hover .sidebar-brand-text,
+.sidebar:hover .nav-flat-text,
+.sidebar:hover .nav-section-label,
+.sidebar:hover .nav-group-flat-arrow,
+.sidebar.pinned .sidebar-brand-text,
+.sidebar.pinned .nav-flat-text,
+.sidebar.pinned .nav-section-label,
+.sidebar.pinned .nav-group-flat-arrow {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Collapsed: hide sub-items and pointer hint */
+.sidebar .nav-group-flat-sub {
+    max-height: 0 !important;
+    opacity: 0 !important;
+}
+.sidebar:hover .nav-group-flat.open > .nav-group-flat-sub,
+.sidebar:hover .nav-group-flat:hover > .nav-group-flat-sub,
+.sidebar.pinned .nav-group-flat.open > .nav-group-flat-sub,
+.sidebar.pinned .nav-group-flat:hover > .nav-group-flat-sub {
+    max-height: 200px !important;
+    opacity: 1 !important;
+}
+.sidebar .nav-pointer-hint {
+    display: none;
+}
+
+/* Collapsed: center items and reduce padding */
+.sidebar .sidebar-brand {
+    justify-content: center;
+    padding: 14px 8px;
+    transition: padding 0.25s ease;
+}
+.sidebar:hover .sidebar-brand,
+.sidebar.pinned .sidebar-brand {
+    justify-content: flex-start;
+    padding: 18px 16px 16px;
+}
+.sidebar .nav-flat-item,
+.sidebar .nav-group-flat-header {
+    justify-content: center;
+    padding: 10px 0;
+    transition: padding 0.2s ease, justify-content 0s;
+}
+.sidebar:hover .nav-flat-item,
+.sidebar:hover .nav-group-flat-header,
+.sidebar.pinned .nav-flat-item,
+.sidebar.pinned .nav-group-flat-header {
+    justify-content: flex-start;
+    padding: 8px 10px;
+}
+
+/* Collapsed: brand icon smaller */
+.sidebar .sidebar-brand-icon {
+    width: 40px;
+    height: 40px;
+    transition: width 0.25s ease, height 0.25s ease;
+}
+.sidebar:hover .sidebar-brand-icon,
+.sidebar.pinned .sidebar-brand-icon {
+    width: 52px;
+    height: 52px;
+}
+
+/* Collapsed: hide footer text */
+.sidebar .sidebar-nav > div[style*="margin-top:auto"] {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.sidebar:hover .sidebar-nav > div[style*="margin-top:auto"],
+.sidebar.pinned .sidebar-nav > div[style*="margin-top:auto"] {
+    opacity: 1;
+}
+
+/* Pin toggle button */
+.sidebar-pin-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s, background 0.15s;
+    z-index: 10;
+}
+.sidebar:hover .sidebar-pin-btn,
+.sidebar.pinned .sidebar-pin-btn {
+    opacity: 1;
+}
+.sidebar-pin-btn:hover {
+    background: rgba(0,0,0,0.08);
+    color: #2563eb;
+}
+.sidebar.pinned .sidebar-pin-btn {
+    color: #2563eb;
 }
 
 /* HA attempt collapsible details */

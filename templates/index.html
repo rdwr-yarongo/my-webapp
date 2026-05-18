@@ -21,6 +21,9 @@
 <body>
     <div class="app-shell">
         <aside class="sidebar">
+            <button class="sidebar-pin-btn" id="sidebar-pin-btn" onclick="toggleSidebarPin()" title="Pin sidebar open">
+                <i class="bi bi-pin-angle"></i>
+            </button>
             <div class="sidebar-brand" id="sidebar-home-btn" title="Go to Home">
                 <div class="sidebar-brand-icon">
                     <img src="{{ url_for('static', filename='adc.svg') }}" style="width:42px;height:42px;object-fit:contain;" alt="Alteon ADC">
@@ -32,7 +35,7 @@
             </div>
             <nav class="sidebar-nav">
                 <div class="nav-section-label">NAVIGATION</div>
-                <a href="#" data-section="home" class="nav-flat-item">
+                <a href="#" data-section="home" class="nav-flat-item" title="Dashboard">
                     <div class="nav-flat-icon"><i class="bi bi-grid-1x2-fill"></i></div>
                     <div class="nav-flat-text">
                         <div class="nav-flat-name">Dashboard</div>
@@ -45,7 +48,7 @@
                     <i class="bi bi-cursor-fill"></i>
                 </div>
                 <div class="nav-group-flat" id="ng-s1">
-                    <div class="nav-group-flat-header" onclick="toggleFlatGroup('ng-s1')">
+                    <div class="nav-group-flat-header" onclick="toggleFlatGroup('ng-s1')" title="Scenario 1: GSLB & HA">
                         <div class="nav-flat-icon"><i class="bi bi-diagram-3"></i></div>
                         <div class="nav-flat-text">
                             <div class="nav-flat-name">Scenario 1</div>
@@ -63,7 +66,7 @@
                     </div>
                 </div>
                 <div class="nav-group-flat" id="ng-s2">
-                    <div class="nav-group-flat-header" onclick="toggleFlatGroup('ng-s2')">
+                    <div class="nav-group-flat-header" onclick="toggleFlatGroup('ng-s2')" title="Scenario 2: Redirect & Offloading">
                         <div class="nav-flat-icon"><i class="bi bi-arrow-repeat"></i></div>
                         <div class="nav-flat-text">
                             <div class="nav-flat-name">Scenario 2</div>
@@ -81,7 +84,7 @@
                     </div>
                 </div>
                 <div class="nav-group-flat" id="ng-s3">
-                    <div class="nav-group-flat-header" onclick="toggleFlatGroup('ng-s3')">
+                    <div class="nav-group-flat-header" onclick="toggleFlatGroup('ng-s3')" title="Scenario 3: Content-Switching">
                         <div class="nav-flat-icon"><i class="bi bi-signpost-split"></i></div>
                         <div class="nav-flat-text">
                             <div class="nav-flat-name">Scenario 3</div>
@@ -96,7 +99,7 @@
                     </div>
                 </div>
                 <div class="nav-group-flat" id="ng-s4">
-                    <div class="nav-group-flat-header" onclick="toggleFlatGroup('ng-s4')">
+                    <div class="nav-group-flat-header" onclick="toggleFlatGroup('ng-s4')" title="Scenario 4: HTTP/2 Gateway">
                         <div class="nav-flat-icon"><i class="bi bi-lightning-charge"></i></div>
                         <div class="nav-flat-text">
                             <div class="nav-flat-name">Scenario 4</div>
@@ -111,14 +114,14 @@
                     </div>
                 </div>
                 <div class="nav-section-label" style="margin-top:18px;">SYSTEM</div>
-                <a href="#" data-section="status" class="nav-flat-item">
+                <a href="#" data-section="status" class="nav-flat-item" title="Status">
                     <div class="nav-flat-icon"><i class="bi bi-activity"></i></div>
                     <div class="nav-flat-text">
                         <div class="nav-flat-name">Status</div>
                         <div class="nav-flat-desc">Traffic Monitor</div>
                     </div>
                 </a>
-                <a href="#" data-section="about" class="nav-flat-item">
+                <a href="#" data-section="about" class="nav-flat-item" title="About">
                     <div class="nav-flat-icon"><i class="bi bi-info-circle"></i></div>
                     <div class="nav-flat-text">
                         <div class="nav-flat-name">About</div>

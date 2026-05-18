@@ -42,6 +42,25 @@ function toggleFlatGroup(id) {
     if (g) g.classList.toggle('open');
 }
 
+/* Sidebar pin/unpin toggle */
+function toggleSidebarPin() {
+    var sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+    sidebar.classList.toggle('pinned');
+    var pinned = sidebar.classList.contains('pinned');
+    var btn = document.getElementById('sidebar-pin-btn');
+    if (btn) btn.title = pinned ? 'Unpin sidebar' : 'Pin sidebar open';
+    try { localStorage.setItem('sidebar-pinned', pinned ? '1' : '0'); } catch(e) {}
+}
+(function() {
+    try {
+        if (localStorage.getItem('sidebar-pinned') === '1') {
+            var sb = document.querySelector('.sidebar');
+            if (sb) sb.classList.add('pinned');
+        }
+    } catch(e) {}
+})();
+
 // Tab switching
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', function() {
