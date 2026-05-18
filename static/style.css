@@ -113,7 +113,6 @@ p + svg {
 /* Collapsed state: hide text, show only icons */
 .sidebar .sidebar-brand-text,
 .sidebar .nav-flat-text,
-.sidebar .nav-section-label,
 .sidebar .nav-group-flat-arrow {
     opacity: 0;
     white-space: nowrap;
@@ -121,16 +120,28 @@ p + svg {
     transition: opacity 0.15s ease;
     pointer-events: none;
 }
+.sidebar .nav-section-label {
+    opacity: 0;
+    height: 0;
+    padding: 0 8px;
+    margin: 0;
+    overflow: hidden;
+    transition: opacity 0.15s ease, height 0.2s ease, padding 0.2s ease;
+}
 .sidebar:hover .sidebar-brand-text,
 .sidebar:hover .nav-flat-text,
-.sidebar:hover .nav-section-label,
 .sidebar:hover .nav-group-flat-arrow,
 .sidebar.pinned .sidebar-brand-text,
 .sidebar.pinned .nav-flat-text,
-.sidebar.pinned .nav-section-label,
 .sidebar.pinned .nav-group-flat-arrow {
     opacity: 1;
     pointer-events: auto;
+}
+.sidebar:hover .nav-section-label,
+.sidebar.pinned .nav-section-label {
+    opacity: 1;
+    height: auto;
+    padding: 4px 8px 6px;
 }
 
 /* Collapsed: hide sub-items and pointer hint */
@@ -163,7 +174,7 @@ p + svg {
 .sidebar .nav-flat-item,
 .sidebar .nav-group-flat-header {
     justify-content: center;
-    padding: 10px 0;
+    padding: 12px 0;
     transition: padding 0.2s ease, justify-content 0s;
 }
 .sidebar:hover .nav-flat-item,
@@ -172,6 +183,19 @@ p + svg {
 .sidebar.pinned .nav-group-flat-header {
     justify-content: flex-start;
     padding: 8px 10px;
+}
+/* Collapsed: larger icons for better proportion */
+.sidebar .nav-flat-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 17px;
+    transition: width 0.2s ease, height 0.2s ease, font-size 0.2s ease;
+}
+.sidebar:hover .nav-flat-icon,
+.sidebar.pinned .nav-flat-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
 }
 
 /* Collapsed: brand icon smaller */
