@@ -175,6 +175,7 @@ p + svg {
 .sidebar .nav-group-flat-header {
     justify-content: center;
     padding: 8px 0;
+    min-width: 68px;
     transition: padding 0.2s ease, justify-content 0s;
 }
 .sidebar:hover .nav-flat-item,
@@ -336,6 +337,14 @@ p + svg {
     display: flex;
     flex-direction: column;
     position: relative;
+    transition: padding 0.25s ease;
+}
+.sidebar .sidebar-nav {
+    padding: 8px 0;
+}
+.sidebar:hover .sidebar-nav,
+.sidebar.pinned .sidebar-nav {
+    padding: 12px 10px;
 }
 
 /* Animated pointer hint for scenarios nav */
